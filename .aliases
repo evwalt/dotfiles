@@ -58,6 +58,8 @@ alias ys="yadm status"
 alias yc="yadm commit"
 alias ycm="yadm commit -m"
 alias yp="yadm push"
+alias yavs="yadm add ./Library/Application\ Support/Code/User/settings.json"
+alias yavk="yadm add ./Library/Application\ Support/Code/User/keyboard.json"
 
 ## npm
 alias ngo="npm -g outdated"
