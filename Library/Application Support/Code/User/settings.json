@@ -189,12 +189,13 @@
             "commands": ["editor.action.revealDefinition"]
         },
         {
-            "before": ["<leader>", "f", "f"],
-            "commands": ["workbench.view.search"]
-        },
-        {
             "before": ["g", "c"],
             "commands": ["editor.action.commentLine"]
+        },
+        { "before": ["g", "p"], "commands": ["markdown.showPreview"] },
+        {
+            "before": ["<leader>", "f", "f"],
+            "commands": ["workbench.view.search"]
         },
         {
             "before": ["<", "<"],
