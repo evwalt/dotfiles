@@ -87,6 +87,7 @@
     //   Hint - Report Spelling Issues as Hints, will not show up in Problems
     "cSpell.diagnosticLevel": "Information",
 
+    "editor.accessibilitySupport": "off",
     "editor.autoClosingBrackets": "never",
     "editor.autoClosingQuotes": "never",
     "editor.cursorSurroundingLines": 0,
