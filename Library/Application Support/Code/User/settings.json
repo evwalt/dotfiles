@@ -1,5 +1,11 @@
 {
     "workbench.editor.showTabs": "multiple",
+    "accessibility.signals.lineHasError": {
+        "sound": "off"
+    },
+    "accessibility.signals.lineHasWarning": {
+        "sound": "off"
+    },
     "colorize.include": ["**/*.ts", "**/*.tsx"],
     "colorize.languages": [
         "javascript",
@@ -83,6 +89,8 @@
 
     "editor.autoClosingBrackets": "never",
     "editor.autoClosingQuotes": "never",
+    "editor.cursorSurroundingLines": 0,
+    "editor.cursorSurroundingLinesStyle": "all",
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.find.autoFindInSelection": "always",
     "editor.fontSize": 14.5,
@@ -93,6 +101,8 @@
         "vscodevim.vim": 1
     },
     "git.openRepositoryInParentFolders": "always",
+    "prettier.tabWidth": 4,
+    "redhat.telemetry.enabled": false,
     "vim.leader": " ",
     "vim.normalModeKeyBindingsNonRecursive": [
         {
@@ -361,18 +371,10 @@
     ],
     "vim.smartRelativeLine": true,
     "vim.useSystemClipboard": true,
-    "redhat.telemetry.enabled": false,
-    "prettier.tabWidth": 4,
+    "workbench.activityBar.location": "hidden",
     "workbench.colorTheme": "Tokyo Night",
     "workbench.startupEditor": "none",
-    "workbench.activityBar.location": "hidden",
     "[markdown]": {
         "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
-    },
-    "accessibility.signals.lineHasError": {
-        "sound": "off"
-    },
-    "accessibility.signals.lineHasWarning": {
-        "sound": "off"
     }
 }
