@@ -1,0 +1,378 @@
+{
+    "workbench.editor.showTabs": "multiple",
+    "colorize.include": ["**/*.ts", "**/*.tsx"],
+    "colorize.languages": [
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact"
+    ],
+    //-------- Code Spell Checker Configuration --------
+    // The Language locale to use when spell checking. "en", "en-US" and "en-GB" are currently supported by default.
+    "cSpell.language": "en",
+
+    // Controls the maximum number of spelling errors per document.
+    "cSpell.maxNumberOfProblems": 100,
+
+    // Controls the number of suggestions shown.
+    "cSpell.numSuggestions": 8,
+
+    // The minimum length of a word before checking it against a dictionary.
+    "cSpell.minWordLength": 4,
+
+    // Specify file types to spell check.
+    "cSpell.enabledLanguageIds": [
+        "csharp",
+        "go",
+        "javascript",
+        "javascriptreact",
+        "json",
+        "markdown",
+        "php",
+        "plaintext",
+        "typescript",
+        "typescriptreact",
+        "yml",
+        "sql"
+    ],
+
+    // Enable / Disable the spell checker.
+    "cSpell.enabled": true,
+
+    // Display the spell checker status on the status bar.
+    "cSpell.showStatus": true,
+
+    // Words to add to dictionary for a workspace.
+    "cSpell.words": [],
+
+    // Enable / Disable compound words like 'errormessage'
+    "cSpell.allowCompoundWords": false,
+
+    // Words to be ignored and not suggested.
+    "cSpell.ignoreWords": ["behaviour"],
+
+    // User words to add to dictionary.  Should only be in the user settings.
+    "cSpell.userWords": [],
+
+    // Specify paths/files to ignore.
+    "cSpell.ignorePaths": [
+        "node_modules", // this will ignore anything the node_modules directory
+        "**/node_modules", // the same for this one
+        "**/node_modules/**", // the same for this one
+        "node_modules/**", // Doesn't currently work due to how the current working directory is determined.
+        "vscode-extension", //
+        ".git", // Ignore the .git directory
+        "*.dll", // Ignore all .dll files.
+        "**/*.dll" // Ignore all .dll files
+    ],
+
+    // flagWords - list of words to be always considered incorrect
+    // This is useful for offensive words and common spelling errors.
+    // For example "hte" should be "the"`
+    "cSpell.flagWords": ["hte"],
+
+    // Set the delay before spell checking the document. Default is 50.
+    "cSpell.spellCheckDelayMs": 50,
+
+    // Set Diagnostic Reporting Level
+    //   Error - Report Spelling Issues as Errors
+    //   Warning - Report Spelling Issues as Warnings
+    //   Information - Report Spelling Issues as Information (default)
+    //   Hint - Report Spelling Issues as Hints, will not show up in Problems
+    "cSpell.diagnosticLevel": "Information",
+
+    "editor.autoClosingBrackets": "never",
+    "editor.autoClosingQuotes": "never",
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.find.autoFindInSelection": "always",
+    "editor.fontSize": 14.5,
+    "editor.lineHeight": 1,
+    "editor.minimap.enabled": false,
+    // Improve performance:
+    "extensions.experimental.affinity": {
+        "vscodevim.vim": 1
+    },
+    "git.openRepositoryInParentFolders": "always",
+    "vim.leader": " ",
+    "vim.normalModeKeyBindingsNonRecursive": [
+        {
+            "before": ["<leader>", "<space>"],
+            "commands": ["workbench.action.quickOpen"]
+        },
+        // Leader | Right Hand | Bottom Row
+        { "before": ["<leader>", "w"], "commands": [":w"] },
+        {
+            "before": ["<leader>", "v"],
+            "commands": ["editor.action.formatDocument"]
+        },
+        {
+            "before": ["<leader>", "m"],
+            "commands": ["editor.action.formatDocument", ":w"]
+        },
+        {
+            "before": ["<leader>", "z"],
+            "commands": ["editor.action.toggleWordWrap"]
+        },
+        // Leader | Right Hand | Home Row
+        {
+            "before": ["<leader>", "h"],
+            "commands": ["vscode-harpoon.gotoEditor1"]
+        },
+        {
+            "before": ["<leader>", "t"],
+            "commands": ["vscode-harpoon.gotoEditor2"]
+        },
+        {
+            "before": ["<leader>", "n"],
+            "commands": ["vscode-harpoon.gotoEditor3"]
+        },
+        {
+            "before": ["<leader>", "s"],
+            "commands": ["vscode-harpoon.gotoEditor4"]
+        },
+        {
+            "before": ["<leader>", "g"],
+            "commands": ["vscode-harpoon.gotoEditor5"]
+        },
+        {
+            "before": ["<leader>", "c"],
+            "commands": ["vscode-harpoon.gotoEditor6"]
+        },
+        {
+            "before": ["<leader>", "r"],
+            "commands": ["vscode-harpoon.gotoEditor7"]
+        },
+        {
+            "before": ["<leader>", "l"],
+            "commands": ["vscode-harpoon.gotoEditor8"]
+        },
+        {
+            "before": ["<leader>", "f"],
+            "commands": ["vscode-harpoon.gotoEditor9"]
+        },
+        // The following command is defined in `keybindings.json` due to VSCode limitations. { "before": ["ctrl+s"], "commands": ["vscode-harpoon.gotoEditor4"] },
+        // Leader | Left Hand | Bottom Row
+        { "before": ["<leader>", "q"], "commands": [":q"] },
+        // Leader | Left Hand | Home Row
+        // {
+        //     "before": ["<leader>", "e"],
+        //     "commands": ["workbench.view.explorer"]
+        // },
+        {
+            "before": ["<leader>", "e"],
+            "commands": ["vsnetrw.open"],
+            "when": "editorLangId != vsnetrw"
+        },
+        {
+            "before": ["<leader>", "o"],
+            "commands": ["vscode-harpoon.editorQuickPick"]
+        },
+        {
+            "before": ["g", "h"],
+            "commands": ["editor.action.showDefinitionPreviewHover"]
+        },
+        {
+            "before": ["g", "d"],
+            "commands": ["editor.action.revealDefinition"]
+        },
+        {
+            "before": ["<leader>", "f", "f"],
+            "commands": ["workbench.view.search"]
+        },
+        {
+            "before": ["g", "c"],
+            "commands": ["editor.action.commentLine"]
+        },
+        {
+            "before": ["<", "<"],
+            "commands": ["workbench.action.moveEditorLeftInGroup"]
+        },
+        {
+            "before": [">", ">"],
+            "commands": ["workbench.action.moveEditorRightInGroup"]
+        },
+        {
+            "before": ["shift+J"],
+            "commands": ["workbench.action.previousEditorInGroup"]
+        },
+        {
+            "before": ["shift+K"],
+            "commands": ["workbench.action.nextEditorInGroup"]
+        },
+        {
+            "before": ["<leader>", "a"],
+            "commands": ["vscode-harpoon.addEditor"]
+        },
+        // Leader | Left Hand | Top Row
+        {
+            "before": ["<leader>", "p"],
+            "commands": ["workbench.action.showCommands"]
+        },
+        {
+            "before": ["<leader>", "g", "i"],
+            "commands": ["workbench.action.splitEditor"]
+        },
+        {
+            "before": ["<leader>", "g", "u"],
+            "commands": ["workbench.action.focusPreviousGroup"]
+        },
+        {
+            "before": ["<leader>", "g", "e"],
+            "commands": ["workbench.action.focusNextGroup"]
+        },
+        { "before": ["<C-e>"], "commands": ["vscode-harpoon.editEditors"] },
+        {
+            "before": ["<C-o>"],
+            "commands": ["vscode-harpoon.editorQuickPick"]
+        }
+    ],
+    // Copy and paste all settings from "vim.normalModeKeyBindingsNonRecursive" 😭.
+    "vim.visualModeKeyBindingsNonRecursive": [
+        {
+            "before": ["<leader>", "<space>"],
+            "commands": ["workbench.action.quickOpen"]
+        },
+        // Leader | Right Hand | Bottom Row
+        { "before": ["<leader>", "w"], "commands": [":w"] },
+        {
+            "before": ["<leader>", "v"],
+            "commands": ["editor.action.formatDocument"]
+        },
+        {
+            "before": ["<leader>", "m"],
+            "commands": ["editor.action.formatDocument", ":w"]
+        },
+        {
+            "before": ["<leader>", "z"],
+            "commands": ["editor.action.toggleWordWrap"]
+        },
+        // Leader | Right Hand | Home Row
+        {
+            "before": ["<leader>", "h"],
+            "commands": ["vscode-harpoon.gotoEditor1"]
+        },
+        {
+            "before": ["<leader>", "t"],
+            "commands": ["vscode-harpoon.gotoEditor2"]
+        },
+        {
+            "before": ["<leader>", "n"],
+            "commands": ["vscode-harpoon.gotoEditor3"]
+        },
+        {
+            "before": ["<leader>", "s"],
+            "commands": ["vscode-harpoon.gotoEditor4"]
+        },
+        {
+            "before": ["<leader>", "g"],
+            "commands": ["vscode-harpoon.gotoEditor5"]
+        },
+        {
+            "before": ["<leader>", "c"],
+            "commands": ["vscode-harpoon.gotoEditor6"]
+        },
+        {
+            "before": ["<leader>", "r"],
+            "commands": ["vscode-harpoon.gotoEditor7"]
+        },
+        {
+            "before": ["<leader>", "l"],
+            "commands": ["vscode-harpoon.gotoEditor8"]
+        },
+        {
+            "before": ["<leader>", "f"],
+            "commands": ["vscode-harpoon.gotoEditor9"]
+        },
+        // The following command is defined in `keybindings.json` due to VSCode limitations. { "before": ["ctrl+s"], "commands": ["vscode-harpoon.gotoEditor4"] },
+        // Leader | Left Hand | Bottom Row
+        { "before": ["<leader>", "q"], "commands": [":q"] },
+        // Leader | Left Hand | Home Row
+        // {
+        //     "before": ["<leader>", "e"],
+        //     "commands": ["workbench.view.explorer"]
+        // },
+        {
+            "before": ["<leader>", "e"],
+            "commands": ["vsnetrw.open"],
+            "when": "editorLangId != vsnetrw"
+        },
+        {
+            "before": ["<leader>", "o"],
+            "commands": ["vscode-harpoon.editorQuickPick"]
+        },
+        {
+            "before": ["g", "h"],
+            "commands": ["editor.action.showDefinitionPreviewHover"]
+        },
+        {
+            "before": ["g", "d"],
+            "commands": ["editor.action.revealDefinition"]
+        },
+        {
+            "before": ["<leader>", "f", "f"],
+            "commands": ["workbench.view.search"]
+        },
+        {
+            "before": ["g", "c"],
+            "commands": ["editor.action.commentLine"]
+        },
+        {
+            "before": ["<", "<"],
+            "commands": ["workbench.action.moveEditorLeftInGroup"]
+        },
+        {
+            "before": [">", ">"],
+            "commands": ["workbench.action.moveEditorRightInGroup"]
+        },
+        {
+            "before": ["shift+J"],
+            "commands": ["workbench.action.previousEditorInGroup"]
+        },
+        {
+            "before": ["shift+K"],
+            "commands": ["workbench.action.nextEditorInGroup"]
+        },
+        {
+            "before": ["<leader>", "a"],
+            "commands": ["vscode-harpoon.addEditor"]
+        },
+        // Leader | Left Hand | Top Row
+        {
+            "before": ["<leader>", "p"],
+            "commands": ["workbench.action.showCommands"]
+        },
+        {
+            "before": ["<leader>", "g", "i"],
+            "commands": ["workbench.action.splitEditor"]
+        },
+        {
+            "before": ["<leader>", "g", "u"],
+            "commands": ["workbench.action.focusPreviousGroup"]
+        },
+        {
+            "before": ["<leader>", "g", "e"],
+            "commands": ["workbench.action.focusNextGroup"]
+        },
+        { "before": ["<C-e>"], "commands": ["vscode-harpoon.editEditors"] },
+        {
+            "before": ["<C-o>"],
+            "commands": ["vscode-harpoon.editorQuickPick"]
+        }
+    ],
+    "vim.smartRelativeLine": true,
+    "vim.useSystemClipboard": true,
+    "redhat.telemetry.enabled": false,
+    "prettier.tabWidth": 4,
+    "workbench.colorTheme": "Tokyo Night",
+    "workbench.startupEditor": "none",
+    "workbench.activityBar.location": "hidden",
+    "[markdown]": {
+        "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
+    },
+    "accessibility.signals.lineHasError": {
+        "sound": "off"
+    },
+    "accessibility.signals.lineHasWarning": {
+        "sound": "off"
+    }
+}
