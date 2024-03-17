@@ -54,6 +54,7 @@ alias glo="git log --oneline"
 
 ## yadm
 alias u="yadm "
+alias ua="yadm add"
 alias us="yadm status"
 alias uc="yadm commit"
 alias ucm="yadm commit -m"
