@@ -13,10 +13,6 @@
         "typescript",
         "typescriptreact"
     ],
-    //-------- Code Spell Checker Configuration --------
-    // The Language locale to use when spell checking. "en", "en-US" and "en-GB" are currently supported by default.
-    "cSpell.language": "en",
-
     // Controls the maximum number of spelling errors per document.
     "cSpell.maxNumberOfProblems": 100,
 
@@ -26,30 +22,11 @@
     // The minimum length of a word before checking it against a dictionary.
     "cSpell.minWordLength": 4,
 
-    // Specify file types to spell check.
-    "cSpell.enabledLanguageIds": [
-        "csharp",
-        "go",
-        "javascript",
-        "javascriptreact",
-        "json",
-        "markdown",
-        "php",
-        "plaintext",
-        "typescript",
-        "typescriptreact",
-        "yml",
-        "sql"
-    ],
-
     // Enable / Disable the spell checker.
     "cSpell.enabled": true,
 
     // Display the spell checker status on the status bar.
     "cSpell.showStatus": true,
-
-    // Words to add to dictionary for a workspace.
-    "cSpell.words": [],
 
     // Enable / Disable compound words like 'errormessage'
     "cSpell.allowCompoundWords": false,
@@ -58,7 +35,7 @@
     "cSpell.ignoreWords": ["behaviour"],
 
     // User words to add to dictionary.  Should only be in the user settings.
-    "cSpell.userWords": [],
+    "cSpell.userWords": ["unprioritized"],
 
     // Specify paths/files to ignore.
     "cSpell.ignorePaths": [
