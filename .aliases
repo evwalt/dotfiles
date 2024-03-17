@@ -61,6 +61,8 @@ alias ud="yadm diff"
 alias up="yadm push"
 alias uavs="yadm add ./Library/Application\ Support/Code/User/settings.json"
 alias uavk="yadm add ./Library/Application\ Support/Code/User/keyboard.json"
+alias ul="yadm log"
+alias ulo="yadm log --oneline"
 
 ## npm
 alias ngo="npm -g outdated"
