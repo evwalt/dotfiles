@@ -53,14 +53,14 @@ alias gl="git log"
 alias glo="git log --oneline"
 
 ## yadm
-alias y="yadm "
-alias ys="yadm status"
-alias yc="yadm commit"
-alias ycm="yadm commit -m"
-alias yd="yadm diff"
-alias yp="yadm push"
-alias yavs="yadm add ./Library/Application\ Support/Code/User/settings.json"
-alias yavk="yadm add ./Library/Application\ Support/Code/User/keyboard.json"
+alias u="yadm "
+alias us="yadm status"
+alias uc="yadm commit"
+alias ucm="yadm commit -m"
+alias ud="yadm diff"
+alias up="yadm push"
+alias uavs="yadm add ./Library/Application\ Support/Code/User/settings.json"
+alias uavk="yadm add ./Library/Application\ Support/Code/User/keyboard.json"
 
 ## npm
 alias ngo="npm -g outdated"
