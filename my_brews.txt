@@ -29,4 +29,5 @@ sphinx
 sphinx-doc
 tree
 utf8proc
+yadm
 zegervdv/zathura/girara
