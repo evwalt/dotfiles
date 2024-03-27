@@ -14,7 +14,7 @@
         "typescriptreact"
     ],
     // Controls the maximum number of spelling errors per document.
-    "cSpell.maxNumberOfProblems": 100,
+    "cSpell.maxNumberOfProblems": 100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000,
 
     // Controls the number of suggestions shown.
     "cSpell.numSuggestions": 8,
@@ -337,7 +337,7 @@
             "commands": ["workbench.action.showCommands"]
         },
         {
-            "before": ["<leader>", "g", "i"],
+            "before": ["<leader>", "g", "g"],
             "commands": ["workbench.action.splitEditor"]
         },
         {
@@ -362,5 +362,6 @@
     "workbench.startupEditor": "none",
     "[markdown]": {
         "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
-    }
+    },
+    "cSpell.enableFiletypes": ["markdown"]
 }
