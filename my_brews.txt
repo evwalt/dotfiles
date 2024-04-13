@@ -3,6 +3,7 @@ bash-language-server
 bison
 coreutils
 desktop-file-utils
+docutils
 fd
 felixkratz/formulae/svim
 gcc
@@ -20,6 +21,10 @@ make
 meson
 neovim
 php
+pygments
+python-markupsafe
+python-packaging
+python-tabulate
 python@3.11
 railwaycat/emacsmacport/emacs-mac
 ripgrep
