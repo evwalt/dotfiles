@@ -86,6 +86,8 @@
     "redhat.telemetry.enabled": false,
     "vim.leader": " ",
 
+    "todohighlight.keywords": ["TODO"],
+
     "vim.normalModeKeyBindingsNonRecursive": [
         {
             "before": ["<leader>", "<space>"],
