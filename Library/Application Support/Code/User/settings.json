@@ -71,7 +71,7 @@
     "editor.cursorSurroundingLinesStyle": "all",
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.find.autoFindInSelection": "always",
-    "editor.fontSize": 14,
+    "editor.fontSize": 13,
     // "editor.fontSize": 14.5,
     "editor.lineHeight": 1,
     "editor.minimap.enabled": false,
