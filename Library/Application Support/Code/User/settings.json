@@ -49,6 +49,8 @@
         "**/*.dll" // Ignore all .dll files
     ],
 
+    "cSpell.enableFiletypes": ["markdown"],
+
     // flagWords - list of words to be always considered incorrect
     // This is useful for offensive words and common spelling errors.
     // For example "hte" should be "the"`
@@ -77,17 +79,23 @@
     "editor.minimap.enabled": false,
     "editor.stickyScroll.enabled": false,
     // "editor.stickyScroll.maxLineCount": 1,
+
     // Improve performance:
     "extensions.experimental.affinity": {
         "vscodevim.vim": 1
     },
+
     "git.openRepositoryInParentFolders": "always",
+
     "markdownlint.config": {
         "MD007": { "indent": 4 },
         "no-hard-tabs": false
     },
+
     "prettier.tabWidth": 4,
+
     "redhat.telemetry.enabled": false,
+
     "vim.leader": " ",
 
     "todohighlight.keywords": ["TODO"],
@@ -363,11 +371,12 @@
 
     "vim.smartRelativeLine": true,
     "vim.useSystemClipboard": true,
+
     "workbench.activityBar.location": "hidden",
     "workbench.colorTheme": "Tokyo Night",
     "workbench.startupEditor": "none",
+
     "[markdown]": {
         "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
-    },
-    "cSpell.enableFiletypes": ["markdown"]
+    }
 }
