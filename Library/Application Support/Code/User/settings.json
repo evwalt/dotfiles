@@ -14,7 +14,7 @@
         "typescriptreact"
     ],
     // Controls the maximum number of spelling errors per document.
-    "cSpell.maxNumberOfProblems": 100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000,
+    "cSpell.maxNumberOfProblems": 10000000000000000000000000000000000000000,
 
     // Controls the number of suggestions shown.
     "cSpell.numSuggestions": 8,
@@ -82,6 +82,10 @@
         "vscodevim.vim": 1
     },
     "git.openRepositoryInParentFolders": "always",
+    "markdownlint.config": {
+        "MD007": { "indent": 4 },
+        "no-hard-tabs": false
+    },
     "prettier.tabWidth": 4,
     "redhat.telemetry.enabled": false,
     "vim.leader": " ",
