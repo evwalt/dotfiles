@@ -89,8 +89,7 @@
     "git.openRepositoryInParentFolders": "always",
 
     "markdownlint.config": {
-        "MD007": { "indent": 4 },
-        "no-hard-tabs": false
+        "MD007": { "indent": 4 }
     },
 
     "prettier.tabWidth": 4,
