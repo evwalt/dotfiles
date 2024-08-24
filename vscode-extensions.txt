@@ -6,8 +6,6 @@ dsznajder.es7-react-js-snippets
 eamodio.gitlens
 enkia.tokyo-night
 esbenp.prettier-vscode
-github.copilot
-github.copilot-chat
 kamikillerto.vscode-colorize
 oderwat.indent-rainbow
 streetsidesoftware.code-spell-checker
