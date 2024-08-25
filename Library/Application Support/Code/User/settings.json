@@ -229,7 +229,8 @@
         },
         {
             "before": ["<leader>", "g", "c"],
-            "commands": ["md-shortcut.toggleCheckboxes"]
+            "commands": ["md-shortcut.toggleCheckboxes"],
+            "after": ["i"]
         },
         { "before": ["<C-e>"], "commands": ["vscode-harpoon.editEditors"] },
         {
