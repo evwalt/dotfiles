@@ -227,6 +227,10 @@
             "before": ["<leader>", "g", "e"],
             "commands": ["workbench.action.focusNextGroup"]
         },
+        {
+            "before": ["<leader>", "g", "c"],
+            "commands": ["md-shortcut.toggleCheckboxes"]
+        },
         { "before": ["<C-e>"], "commands": ["vscode-harpoon.editEditors"] },
         {
             "before": ["<C-o>"],
@@ -351,7 +355,7 @@
             "commands": ["workbench.action.showCommands"]
         },
         {
-            "before": ["<leader>", "g", "g"],
+            "before": ["<leader>", "g", "i"],
             "commands": ["workbench.action.splitEditor"]
         },
         {
@@ -361,6 +365,10 @@
         {
             "before": ["<leader>", "g", "e"],
             "commands": ["workbench.action.focusNextGroup"]
+        },
+        {
+            "before": ["<leader>", "g", "c"],
+            "commands": ["md-shortcut.toggleCheckboxes"]
         },
         { "before": ["<C-e>"], "commands": ["vscode-harpoon.editEditors"] },
         {
