@@ -6,6 +6,7 @@ dsznajder.es7-react-js-snippets
 eamodio.gitlens
 enkia.tokyo-night
 esbenp.prettier-vscode
+fregante.ghost-text
 kamikillerto.vscode-colorize
 mdickin.markdown-shortcuts
 oderwat.indent-rainbow
