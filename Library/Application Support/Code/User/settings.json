@@ -229,7 +229,10 @@
         },
         {
             "before": ["<leader>", "g", "c"],
-            "commands": ["md-shortcut.toggleCheckboxes"],
+            "commands": [
+                "editor.action.insertLineAfter",
+                "md-shortcut.toggleCheckboxes"
+            ],
             "after": ["i"]
         },
         { "before": ["<C-e>"], "commands": ["vscode-harpoon.editEditors"] },
@@ -369,7 +372,11 @@
         },
         {
             "before": ["<leader>", "g", "c"],
-            "commands": ["md-shortcut.toggleCheckboxes"]
+            "commands": [
+                "editor.action.insertLineAfter",
+                "md-shortcut.toggleCheckboxes"
+            ],
+            "after": ["i"]
         },
         { "before": ["<C-e>"], "commands": ["vscode-harpoon.editEditors"] },
         {
