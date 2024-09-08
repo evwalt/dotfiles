@@ -102,7 +102,11 @@
 
     "vim.normalModeKeyBindingsNonRecursive": [
         {
-            "before": ["<leader>", "<space>"],
+            "before": ["<leader>", "g", "g"],
+            "commands": ["workbench.action.quickOpen"]
+        },
+        {
+            "before": ["<leader>", "p", "g"],
             "commands": ["workbench.action.quickOpen"]
         },
         // Leader | Right Hand | Bottom Row
@@ -212,9 +216,12 @@
             "before": ["<leader>", "a"],
             "commands": ["vscode-harpoon.addEditor"]
         },
-        // Leader | Left Hand | Top Row
         {
-            "before": ["<leader>", "p"],
+            "before": ["<leader>", "c", "c"],
+            "commands": ["workbench.action.showCommands"]
+        },
+        {
+            "before": ["<leader>", ".", "."],
             "commands": ["workbench.action.showCommands"]
         },
         {
@@ -307,7 +314,11 @@
     // Copy and paste all settings from "vim.normalModeKeyBindingsNonRecursive" 😭.
     "vim.visualModeKeyBindingsNonRecursive": [
         {
-            "before": ["<leader>", "<space>"],
+            "before": ["<leader>", "g", "g"],
+            "commands": ["workbench.action.quickOpen"]
+        },
+        {
+            "before": ["<leader>", "p", "p"],
             "commands": ["workbench.action.quickOpen"]
         },
         // Leader | Right Hand | Bottom Row
@@ -417,9 +428,12 @@
             "before": ["<leader>", "a"],
             "commands": ["vscode-harpoon.addEditor"]
         },
-        // Leader | Left Hand | Top Row
         {
-            "before": ["<leader>", "p"],
+            "before": ["<leader>", "c", "c"],
+            "commands": ["workbench.action.showCommands"]
+        },
+        {
+            "before": ["<leader>", ".", "."],
             "commands": ["workbench.action.showCommands"]
         },
         {
