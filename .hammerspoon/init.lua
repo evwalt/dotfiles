@@ -1,3 +1,18 @@
+function reloadConfig(files)
+    doReload = false
+    for _,file in pairs(files) do
+        if file:sub(-4) == ".lua" then
+            doReload = true
+        end
+    end
+    if doReload then
+        hs.reload()
+    end
+end
+myWatcher = hs.pathwatcher.new(os.getenv("HOME") .. "/.hammerspoon/", reloadConfig):start()
+hs.alert.show("Config loaded")
+print(os.getenv("HOME") .. "/.hammerspoon/")
+
 --[[
 ** Application Focus
 --]]
@@ -44,47 +59,93 @@ end)
 ** Window Management
 ]]--
 --                   ldur
--- halves (home):    oeui dhtn
--- fourths (bottom): qjkx bmwv
--- thirds (top):     ,.py fgcr
+-- halves (top):    oeui dhtn
+-- thirds (top):     
+-- fourths:          
 local ca = {"ctrl", "alt"}
+local win = hs.window.focusedWindow()
+local f = win:frame()
+local screen = win:screen()
+local max = screen:frame()
 -- halves (home):    oeui dhtn
--- hs.hotkey.bind(ca, "o", function()
---     local win = hs.window.focusedWindow()
---     if not win then return end -- Make sure there is a focused window
---     local f = win:frame()
---     local screen = win:screen()
---     local max = screen:frame()
---     f.x = max.x
---     f.y = max.y
---     f.w = max.w / 2
---     f.h = max.h
---     win:setFrame(f)
--- end)
-
 hs.hotkey.bind(ca, "o", function()
-    local win = hs.window.focusedWindow()
-    if win then
-        win:moveToUnit(hs.layout.left50) -- Move window to the left half
-    end
+    if not win then return end
+    f.x = max.x
+    f.y = max.y
+    f.w = max.w / 2
+    f.h = max.h
+    win:setFrame(f)
 end)
-
--- hs.hotkey.bind(ca, "o", function()
---     local win = hs.window.focusedWindow()
---     if not win then return end -- Make sure there is a focused window
---     local screen = win:screen()
---     local max = screen:frame()
---     win:setFrame(hs.geometry.rect(max.x, max.y, max.w / 2, max.h))
--- end)
-
--- hs.hotkey.bind(ca, "o", function()
---     local win = hs.window.focusedWindow()
---     if not win then
---         hs.alert.show("No focused window")
---         return
---     end
---     local screen = win:screen()
---     local max = screen:frame()
---     win:setFrame(hs.geometry.rect(max.x, max.y, max.w / 2, max.h))
---     hs.alert.show("Snapped to left half")
--- end)
+hs.hotkey.bind(ca, "e", function()
+    if not win then return end
+    f.x = max.x
+    f.y = max.y + max.h / 2
+    f.w = max.w
+    f.h = max.h / 2
+    win:setFrame(f)
+end)
+hs.hotkey.bind(ca, "u", function()
+    if not win then return end
+    f.x = max.x / 2
+    f.y = max.y / 2
+    f.w = max.w
+    f.h = max.h / 2
+    win:setFrame(f)
+end)
+hs.hotkey.bind(ca, "i", function()
+    if not win then return end
+    f.x = max.x + max.w / 2
+    f.y = max.y
+    f.w = max.w / 2
+    f.h = max.h
+    win:setFrame(f)
+end)
+hs.hotkey.bind(ca, "d", function()
+    if not win then return end
+    f.x = max.x
+    f.y = max.y
+    f.w = max.w / 2
+    f.h = max.h
+    win:setFrame(f)
+end)
+hs.hotkey.bind(ca, "h", function()
+    if not win then return end
+    f.x = max.x
+    f.y = max.y + max.h / 2
+    f.w = max.w
+    f.h = max.h / 2
+    win:setFrame(f)
+end)
+hs.hotkey.bind(ca, "t", function()
+    if not win then return end
+    f.x = max.x / 2
+    f.y = max.y / 2
+    f.w = max.w
+    f.h = max.h / 2
+    win:setFrame(f)
+end)
+hs.hotkey.bind(ca, "n", function()
+    if not win then return end
+    f.x = max.x + max.w / 2
+    f.y = max.y
+    f.w = max.w / 2
+    f.h = max.h
+    win:setFrame(f)
+end)
+-- fourths: qk,p mvgr
+hs.hotkey.bind(ca, "q", function()
+    if not win then return end
+    f.x = max.x
+    f.y = max.y + max.h / 2
+    f.w = max.w / 2
+    f.h = max.h / 2
+    win:setFrame(f)
+end)
+hs.hotkey.bind(ca, "k", function()
+    if not win then return end
+    f.x = max.x
+    f.y = max.y + max.h / 2
+    f.w = max.w / 2
+    f.h = max.h / 2
+    win:setFrame(f)
+end)
