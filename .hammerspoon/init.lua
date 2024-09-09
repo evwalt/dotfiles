@@ -76,8 +76,8 @@ local function moveAndResize(xRatio, yRatio, wRatio, hRatio)
     f.h = max.h * hRatio
     win:setFrame(f)
 end
-
--- Define hotkeys for window management
+hs.hotkey.bind(ca, "return", function() moveAndResize(0, 0, 1, 1) end)  -- Maximized
+hs.hotkey.bind({"ctrl", "alt", "shift"}, "return", function() moveAndResize(0.05, 0.05, 0.9, 0.9) end)  -- Almost maximized
 -- Halves
 hs.hotkey.bind(ca, "o", function() moveAndResize(0, 0, 0.5, 1) end)  -- Left half
 hs.hotkey.bind(ca, "e", function() moveAndResize(0.25, 0, 0.5, 1) end)  -- Center half
