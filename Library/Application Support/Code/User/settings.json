@@ -102,19 +102,15 @@
 
     "vim.normalModeKeyBindingsNonRecursive": [
         {
+            "before": ["<leader>", "space"],
+            "commands": ["workbench.action.quickOpen"]
+        },
+        {
             "before": ["<leader>", "g", "g"],
-            "commands": ["workbench.action.quickOpen"]
-        },
-        {
-            "before": ["<leader>", "p", "p"],
-            "commands": ["workbench.action.quickOpen"]
-        },
-        {
-            "before": ["<leader>", "c", "c"],
             "commands": ["workbench.action.showCommands"]
         },
         {
-            "before": ["<leader>", ".", "."],
+            "before": ["<leader>", "p", "p"],
             "commands": ["workbench.action.showCommands"]
         },
         { "before": ["<leader>", "w"], "commands": [":w"] },
@@ -131,10 +127,6 @@
             "commands": ["editor.action.toggleWordWrap"]
         },
         { "before": ["<leader>", "q"], "commands": [":q"] },
-        {
-            "before": ["<leader>", "e", "e"],
-            "commands": ["workbench.view.explorer"]
-        },
         {
             "before": ["<leader>", "t", "t"],
             "commands": ["workbench.view.explorer"]
@@ -324,19 +316,15 @@
 
     "vim.visualModeKeyBindingsNonRecursive": [
         {
+            "before": ["<leader>", "space"],
+            "commands": ["workbench.action.quickOpen"]
+        },
+        {
             "before": ["<leader>", "g", "g"],
-            "commands": ["workbench.action.quickOpen"]
-        },
-        {
-            "before": ["<leader>", "p", "p"],
-            "commands": ["workbench.action.quickOpen"]
-        },
-        {
-            "before": ["<leader>", "c", "c"],
             "commands": ["workbench.action.showCommands"]
         },
         {
-            "before": ["<leader>", ".", "."],
+            "before": ["<leader>", "p", "p"],
             "commands": ["workbench.action.showCommands"]
         },
         { "before": ["<leader>", "w"], "commands": [":w"] },
@@ -353,10 +341,6 @@
             "commands": ["editor.action.toggleWordWrap"]
         },
         { "before": ["<leader>", "q"], "commands": [":q"] },
-        {
-            "before": ["<leader>", "e", "e"],
-            "commands": ["workbench.view.explorer"]
-        },
         {
             "before": ["<leader>", "t", "t"],
             "commands": ["workbench.view.explorer"]
