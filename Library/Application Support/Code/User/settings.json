@@ -73,9 +73,26 @@
     "editor.cursorSurroundingLinesStyle": "all",
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.find.autoFindInSelection": "always",
-    "editor.fontFamily": "Fira Code",
+    "editor.fontFamily": "'Cascadia Code', Menlo, Monaco, 'Courier New', monospace",
+    // "editor.fontLigatures": true,
     "editor.fontLigatures": "'calt', 'ss01', 'ss02', 'ss03', 'ss04', 'ss05', 'ss06', 'zero', 'onum'",
-    "editor.fontSize": 13,
+    "editor.tokenColorCustomizations": {
+        "textMateRules": [
+            {
+                "scope": [
+                    "comment",
+                    "keyword",
+                    "variable",
+                    "storage.type",
+                    "keyword.control"
+                ],
+                "settings": {
+                    "fontStyle": "italic"
+                }
+            }
+        ]
+    },
+    "editor.fontSize": 13.5,
     "editor.lineHeight": 1,
     "editor.minimap.enabled": false,
     "editor.stickyScroll.enabled": false,
