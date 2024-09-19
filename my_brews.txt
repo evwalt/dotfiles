@@ -10,6 +10,7 @@ gnuplot
 grep
 lazygit
 lua-language-server
+luarocks
 make
 neovim
 php

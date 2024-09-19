@@ -1,4 +1,4 @@
-font-fira-code
+font-cascadia-code
 font-hack-nerd-font
 hammerspoon
 wezterm
