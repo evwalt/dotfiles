@@ -1,23 +1,6 @@
-# aliases
-## daily housekeeping
-### brew and mackup
-alias b="brew update --verbose && brew upgrade --verbose && brew cleanup --verbose --prune=all && brew leaves > ~/my_brews.txt && brew list --cask > ~/my_brew_casks.txt && less ~/my_brews.txt && less ~/my_brew_casks.txt"
-alias r="rustup update"
-alias bmb="brew update --verbose && brew upgrade --verbose && brew cleanup --verbose --prune=all && mackup backup --verbose && cd ~/dev/utils/mackup-backups"
-alias bmr="brew update --verbose && brew upgrade --verbose && brew cleanup --verbose --prune=all && mackup restore --verbose && cd ~/dev/utils/mackup-backups"
-alias mb="mackup backup --verbose && cd ~/dev/utils/mackup-backups"
-alias mr="mackup restore --verbose && cd ~/dev/utils/mackup-backups"
-### see npm
-
-## tmux
-alias t="tmux"
-
-## Dropbox
-alias dp="cd ~/Dropbox"
-alias dpn="cd ~/Dropbox && n."
-
-## bashcrypto
-### change to the bashcrypto directory; decrypt swords to ~/Downloads; open file
+# Bashcrypto
+#
+# Change to the bashcrypto directory; decrypt swords to ~/Downloads; open file
 alias cdobds="cd ~/dev/utils/bashcrypto && ./bashcrypto -d -i ~/Dropbox/docs/swords/swords.txt.enc -o ~/Downloads/swords.txt && open ~/Downloads/swords.txt"
 alias cdobdsh="cd ~/dev/utils/bashcrypto && ./bashcrypto -d -i ~/Dropbox/docs/swords/swords.txt.enc -o ~/Downloads/swords.txt && open ~/Downloads/swords.txt && cd ~"
 alias cdobda="cd ~/dev/utils/bashcrypto && ./bashcrypto -d -i ~/Dropbox/docs/swords/ac.txt.enc -o ~/Downloads/ac.txt && open ~/Downloads/ac.txt"
@@ -32,31 +15,46 @@ alias be="./bashcrypto -e -i"
 ### decrypt with a password
 alias bd="./bashcrypto -d -i"
 
-## git
-### git develop and main, or git deploy
+# Homebrew
+#
+alias b="brew update --verbose && brew upgrade --verbose && brew cleanup --verbose --prune=all && brew leaves > ~/my_brews.txt && brew list --cask > ~/my_brew_casks.txt && less ~/my_brews.txt && less ~/my_brew_casks.txt"
+
+# Git
+#
+# git develop and main, or git deploy
 alias gdp="git checkout main && git merge dev && git push && git checkout dev"
-### common
-alias g="git"
+# common
 alias gs="git status"
-alias g1="git add"
-alias gad="git add ."
-alias gc="git commit"
 alias gcm="git commit -m"
 alias gam="git add . && git commit -m"
 alias gp="git push"
-alias gph="git push && -" # gph = git push && [hyphen, or -]
-alias gch="git checkout"
 alias gf="git fetch"
-### other
+# other
 alias gd="git diff"
 alias gl="git log"
 alias glo="git log --oneline"
 
-## yadm
+# Hammerspoon
+#
+alias upvs="cd ~/.hammerspoon/Spoons/VimMode.spoon && git pull"
+
+# Neovim
+#
+alias n="nvim"
+
+# NPM
+#
+alias ngo="npm -g outdated"
+
+# Rust
+#
+alias r="rustup update"
+
+# yadm
+#
 alias u="yadm "
 alias ua="yadm add"
 alias us="yadm status"
-alias uc="yadm commit"
 alias ucm="yadm commit -m"
 alias ud="yadm diff"
 alias up="yadm push"
@@ -65,140 +63,6 @@ alias uavk="yadm add ./Library/Application\ Support/Code/User/keyboard.json"
 alias ul="yadm log"
 alias ulo="yadm log --oneline"
 
-## npm
-alias ngo="npm -g outdated"
-alias ngi="npm -g i"
-alias ngl="npm -g list"
-alias no="npm outdated"
-alias ni="npm i"
-alias nl="npm list"
-alias ns="npm start"
-alias nrd="npm run dev"
-alias nrb="npm run build"
-alias nrc="npm run client"
-alias nrp="npm run prod"
-alias nrs="npm run server"
-alias nrw="npm run watch"
-
-## npx
-alias t="npx ts-node"
-
-## gatsby
-alias gyd="gatsby develop"
-alias gycd="gatsby clean && gatsby develop"
-alias gybs="gastby build && gatsby serve"
-alias gycbs="gatsby clean && gatsby build && gatsby serve"
-
-## neovim
-alias n.="nvim ."
-alias n="nvim"
-
-## pnpm
-alias p=pnpm
-alias pgo="pnpm -g outdated"
-alias pgi="pnpm -g i"
-alias pgl="pnpm -g list"
-alias po="pnpm outdated"
-alias pi="pnpm i"
-alias pl="pnpm list"
-alias ps="pnpm start"
-alias prd="pnpm run dev"
-alias prb="pnpm run build"
-alias prw="pnpm run watch"
-alias prs="pnpm run server"
-alias prc="pnpm run client"
-
-## python
-alias py3="python3"
-
-## theme kit
-### deploy
-alias d="theme deploy --env=com_prod"
-alias dc="theme deploy --env=com_prod_cust"
-alias dcc="theme deploy --env=com_prod_cust_1"
-alias dd="theme deploy --env=com_dev"
-alias ddc="theme deploy --env=com_dev_cust"
-alias ddcc="theme deploy --env=com_dev_cust_1"
-alias da="theme deploy --env=ca_prod"
-alias dac="theme deploy --env=ca_prod_cust"
-alias dacc="theme deploy --env=ca_prod_cust_1"
-alias dad="theme deploy --env=ca_dev"
-alias dadc="theme deploy --env=ca_dev_cust"
-alias dadcc="theme deploy --env=ca_dev_cust_1"
-### npm run dev and deploy
-alias nd="npm run dev && theme deploy --env=com_prod"
-alias ndc="npm run dev && theme deploy --env=com_prod_cust"
-alias ndcc="npm run dev && theme deploy --env=com_prod_cust_1"
-alias ndd="npm run dev && theme deploy --env=com_dev"
-alias nddc="npm run dev && theme deploy --env=com_dev_cust"
-alias nddcc="npm run dev && theme deploy --env=com_dev_cust_1"
-alias nda="npm run dev && theme deploy --env=ca_prod"
-alias ndac="npm run dev && theme deploy --env=ca_prod_cust"
-alias ndacc="npm run dev && theme deploy --env=ca_prod_cust_1"
-alias ndad="npm run dev && theme deploy --env=ca_dev"
-alias ndadc="npm run dev && theme deploy --env=ca_dev_cust"
-alias ndadcc="npm run dev && theme deploy --env=ca_dev_cust_1"
-### open
-alias o="theme open --env=com_prod"
-alias oc="theme open --env=com_prod_cust"
-alias occ="theme open --env=com_prod_cust_1"
-alias od="theme open --env=com_dev"
-alias odc="theme open --env=com_dev_cust"
-alias odcc="theme open --env=com_dev_cust_1"
-alias oa="theme open --env=ca_prod"
-alias oac="theme open --env=ca_prod_cust"
-alias oacc="theme open --env=ca_prod_cust_1"
-alias oad="theme open --env=ca_dev"
-alias oadc="theme open --env=ca_dev_cust"
-alias oadcc="theme open --env=ca_dev_cust_1"
-### deploy and open
-### `do` is a reserved word is zsh, so I use `doo` instead.
-alias doo="theme deploy --env=com_prod && theme open --env=com_prod"
-alias doc="theme deploy --env=com_prod_cust && theme open --env=com_prod_cust"
-alias docc="theme deploy --env=com_prod_cust_1 && theme open --env=com_prod_cust_1"
-alias dod="theme deploy --env=com_dev && theme open --env=com_dev"
-alias dodc="theme deploy --env=com_dev_cust && theme open --env=com_dev_cust"
-alias dodcc="theme deploy --env=com_dev_cust_1 && theme open --env=com_dev_cust_1"
-alias doa="theme deploy --env=ca_prod && theme open --env=ca_prod"
-alias doac="theme deploy --env=ca_prod_cust && theme open --env=ca_prod_cust"
-alias doacc="theme deploy --env=ca_prod_cust_1 && theme open --env=ca_prod_cust_1"
-alias doad="theme deploy --env=ca_dev && theme open --env=ca_dev"
-alias doadc="theme deploy --env=ca_dev_cust && theme open --env=ca_dev_cust"
-alias doadcc="theme deploy --env=ca_dev_cust_1 && theme open --env=ca_dev_cust_1"
-### npm run dev, deploy, and open
-alias ndo="npm run dev && theme deploy --env=com_prod && theme open --env=com_prod"
-alias ndoc="npm run dev && theme deploy --env=com_prod_cust && theme open --env=com_prod_cust"
-alias ndocc="npm run dev && theme deploy --env=com_prod_cust_1 && theme open --env=com_prod_cust_1"
-alias ndod="npm run dev && theme deploy --env=com_dev && theme open --env=com_dev"
-alias ndodc="npm run dev && theme deploy --env=com_dev_cust && theme open --env=com_dev_cust"
-alias ndodcc="npm run dev && theme deploy --env=com_dev_cust_1 && theme open --env=com_dev_cust_1"
-alias ndoa="npm run dev && theme deploy --env=ca_prod && theme open --env=ca_prod"
-alias ndoac="npm run dev && theme deploy --env=ca_prod_cust && theme open --env=ca_prod_cust"
-alias ndoacc="npm run dev && theme deploy --env=ca_prod_cust_1 && theme open --env=ca_prod_cust_1"
-alias ndoad="npm run dev && theme deploy --env=ca_dev && theme open --env=ca_dev"
-alias ndoadc="npm run dev && theme deploy --env=ca_dev_cust && theme open --env=ca_dev_cust"
-alias ndoadcc="npm run dev && theme deploy --env=ca_dev_cust_1 && theme open --env=ca_dev_cust_1"
-
-## vscode
-alias c="code"
-alias c.="code ."
-
-## vscode-insiders
-alias ci="code-insiders"
-alias ci.="code-insiders ."
-
-## misc
-### gb folders in vscode
-#### gb
-alias cdgb="cd ~/dev/jobs/gb/shopify-ghostbed"
-alias cgb="cd ~/dev/jobs/gb/shopify-ghostbed && c."
-alias cgbh="cd ~/dev/jobs/gb/shopify-ghostbed && c. && -"
-#### gb notes
-alias cdgbn="cd ~/dev/jobs/gb/gb-notes"
-alias cgbn="cd ~/dev/jobs/gb/gb-notes && c."
-alias cgbnh="cd ~/dev/jobs/gb/gb-notes && c. && -"
-#### speedtest cli
-alias sp="speedtest-cli"
-
-## zsh
+# zsh
+#
 alias l="ls -laF"
