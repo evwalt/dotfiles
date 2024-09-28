@@ -8,7 +8,7 @@ The `yadm` local repo is stored in `~/.local/share/yadm/repo.git`.
 
 ## Housekeeping
 
-Take the following steps with Z shell commands on a weekly or regular basis to keep global packages up-to-date. The following commands are aliases that can be found in `.aliases`.
+Take the following steps with Z shell commands on a weekly or regular basis to keep global packages up-to-date. The following commands are [aliases](./.aliases).
 
 ### Step 1
 
