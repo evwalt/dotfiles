@@ -10,15 +10,11 @@ The `yadm` local repo is stored in `~/.local/share/yadm/repo.git`.
 
 Take the following steps with shell commands ([aliases](./.aliases)) on a weekly or regular basis to keep global packages up-to-date.
 
-### Step 1
-
 Update global npm packages:
 
 ```zsh
 ngo
 ```
-
-### Step 2
 
 Open Neovim:
 
@@ -28,23 +24,17 @@ n
 
 Update LazyVim.
 
-### Step 3
-
 Update Rustup and Homebrew:
 
 ```zsh
 r && b
 ```
 
-### Step 4
-
 Update VimMode Spoon:
 
 ```zsh
 vms
 ```
-
-### Step 5
 
 Track changes in yadm with commits and pushes:
 
