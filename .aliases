@@ -36,7 +36,7 @@ alias glo="git log --oneline"
 
 # Hammerspoon
 #
-alias upvs="cd ~/.hammerspoon/Spoons/VimMode.spoon && git pull"
+alias vms="cd ~/.hammerspoon/Spoons/VimMode.spoon && git pull"
 
 # Neovim
 #
@@ -46,7 +46,7 @@ alias n="nvim"
 #
 alias ngo="npm -g outdated"
 
-# Rust
+# Rustup
 #
 alias r="rustup update"
 
