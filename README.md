@@ -46,7 +46,7 @@ us
 - Add specific files:
 
 ```zsh
-u add <file>
+u add [path/to/file...]
 ```
 
 - Commit and push changes:
