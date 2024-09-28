@@ -8,28 +8,37 @@ This repository leverages [yadm](https://yadm.io) to manage dotfiles, settings, 
 
 To ensure everything stays up-to-date, run the following commands (using the provided [aliases](./.aliases)) regularly, ideally on a weekly basis.
 
-### Update global npm packages
+### Update Global NPM Packages
+
+- Check for outdated packages:
 
 ```zsh
 ngo
 ```
 
-### Open Neovim
+- Update outdated packages (if applicable).
+
+```zsh
+npm -g update
+```
+
+### Update Neovim
+
+- Open Neovim:
 
 ```zsh
 n
 ```
 
-### Update LazyVim, Rustup, and Homebrew
+- Update LazyVim plugins. Inside Neovim, type "l" to open LazyVim and "U" to update plugins. And then, quit Neovim.
 
-- Update LazyVim (manual step).
-- Update Rustup and Homebrew:
+### Update Rustup and Homebrew
 
 ```zsh
 r && b
 ```
 
-### Update VimMode Spoon
+### Update Hammerspoon's VimMode Spoon
 
 ```zsh
 vms
