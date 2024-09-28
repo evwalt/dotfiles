@@ -2,7 +2,7 @@
 
 ## Overview
 
-This repository leverages [yadm](https://yadm.io) to manage dotfiles, settings, and text files in my macOS home directory. `yadm` simplifies tracking and synchronizing these files across systems. The local `yadm` repository is stored at [./.local/share/yadm/](./.local/share/yadm/).
+This repository leverages [yadm](https://yadm.io) to manage dotfiles, settings, and text files in my macOS home directory. `yadm` simplifies tracking and synchronizing these files across systems. The local `yadm` repository is stored at `.local/share/yadm/repo.git`.
 
 ## Regular Maintenance
 
@@ -22,7 +22,7 @@ n
 
 ### Update LazyVim, Rustup, and Homebrew
 
-- Update LazyVim (manual step if required).
+- Update LazyVim (manual step).
 - Update Rustup and Homebrew:
 
 ```zsh
