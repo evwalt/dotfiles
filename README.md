@@ -1,51 +1,56 @@
 # Dotfiles
 
-## About
+## Overview
 
-This repo leverages [yadm](https://yadm.io) to track dotfiles, settings, and text files in my macOS home directory.
+This repository leverages [yadm](https://yadm.io) to manage dotfiles, settings, and text files in my macOS home directory. `yadm` simplifies tracking and synchronizing these files across systems. The local `yadm` repository is stored at [./.local/share/yadm/](./.local/share/yadm/).
 
-The `yadm` local repo is stored in `~/.local/share/yadm/repo.git`.
+## Regular Maintenance
 
-## Housekeeping
+To ensure everything stays up-to-date, run the following commands (using the provided [aliases](./.aliases)) regularly, ideally on a weekly basis.
 
-Take the following steps with shell commands ([aliases](./.aliases)) on a weekly or regular basis to keep global packages up-to-date.
-
-Update global npm packages:
+### Update global npm packages
 
 ```zsh
 ngo
 ```
 
-Open Neovim:
+### Open Neovim
 
 ```zsh
 n
 ```
 
-Update LazyVim.
+### Update LazyVim, Rustup, and Homebrew
 
-Update Rustup and Homebrew:
+- Update LazyVim (manual step if required).
+- Update Rustup and Homebrew:
 
 ```zsh
 r && b
 ```
 
-Update VimMode Spoon:
+### Update VimMode Spoon
 
 ```zsh
 vms
 ```
 
-Track changes in yadm with commits and pushes:
+### Track and Push Changes in `yadm`
+
+- Stage changes:
 
 ```zsh
 us
 ```
 
-```zsh
-u add ...
-```
+- Add specific files:
 
 ```zsh
-ucm "..." && up
+u add <file>
+```
+
+- Commit and push changes:
+
+```zsh
+ucm "Commit message" && up
 ```
