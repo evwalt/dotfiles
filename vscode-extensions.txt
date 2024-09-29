@@ -12,5 +12,6 @@ oderwat.indent-rainbow
 streetsidesoftware.code-spell-checker
 takumii.markdowntable
 tobias-z.vscode-harpoon
+vscode-icons-team.vscode-icons
 vscodevim.vim
 wayou.vscode-todo-highlight

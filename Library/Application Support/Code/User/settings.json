@@ -1,11 +1,11 @@
 {
-    "workbench.editor.showTabs": "multiple",
     "accessibility.signals.lineHasError": {
         "sound": "off"
     },
     "accessibility.signals.lineHasWarning": {
         "sound": "off"
     },
+
     "colorize.include": ["**/*.ts", "**/*.tsx"],
     "colorize.languages": [
         "javascript",
@@ -13,30 +13,23 @@
         "typescript",
         "typescriptreact"
     ],
+
     // Controls the maximum number of spelling errors per document.
     "cSpell.maxNumberOfProblems": 10000000000000000000000000000000000000000,
-
     // Controls the number of suggestions shown.
     "cSpell.numSuggestions": 8,
-
     // The minimum length of a word before checking it against a dictionary.
     "cSpell.minWordLength": 4,
-
     // Enable / Disable the spell checker.
     "cSpell.enabled": true,
-
     // Display the spell checker status on the status bar.
     "cSpell.showStatus": true,
-
     // Enable / Disable compound words like 'errormessage'
     "cSpell.allowCompoundWords": false,
-
     // Words to be ignored and not suggested.
     "cSpell.ignoreWords": ["behaviour"],
-
     // User words to add to dictionary.  Should only be in the user settings.
     "cSpell.userWords": ["uncategorized", "unprioritized"],
-
     // Specify paths/files to ignore.
     "cSpell.ignorePaths": [
         "node_modules", // this will ignore anything the node_modules directory
@@ -48,17 +41,13 @@
         "*.dll", // Ignore all .dll files.
         "**/*.dll" // Ignore all .dll files
     ],
-
     "cSpell.enableFiletypes": ["markdown"],
-
     // flagWords - list of words to be always considered incorrect
     // This is useful for offensive words and common spelling errors.
     // For example "hte" should be "the"`
     "cSpell.flagWords": ["hte"],
-
     // Set the delay before spell checking the document. Default is 50.
     "cSpell.spellCheckDelayMs": 50,
-
     // Set Diagnostic Reporting Level
     //   Error - Report Spelling Issues as Errors
     //   Warning - Report Spelling Issues as Warnings
@@ -116,7 +105,6 @@
     "todohighlight.keywords": ["TODO"],
 
     "vim.leader": " ",
-
     "vim.normalModeKeyBindingsNonRecursive": [
         {
             "before": ["<leader>", "space"],
@@ -330,7 +318,6 @@
             "commands": ["vscode-harpoon.editorQuickPick"]
         }
     ],
-
     "vim.visualModeKeyBindingsNonRecursive": [
         {
             "before": ["<leader>", "space"],
@@ -544,12 +531,13 @@
             "commands": ["vscode-harpoon.editorQuickPick"]
         }
     ],
-
     "vim.smartRelativeLine": true,
     "vim.useSystemClipboard": true,
 
     "workbench.activityBar.location": "hidden",
     "workbench.colorTheme": "Tokyo Night",
+    "workbench.editor.showTabs": "multiple",
+    "workbench.iconTheme": "vscode-icons",
     "workbench.startupEditor": "none",
 
     "[markdown]": {
