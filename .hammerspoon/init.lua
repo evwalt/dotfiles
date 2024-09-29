@@ -109,10 +109,10 @@ hs.hotkey.bind(ca, "c", function() moveAndResize(0.25, 0, 0.5, 0.5) end)  -- Top
   * VimMode Spoon
 --]]
 -- TODO Regularly: to update, run `cd ~/.hammerspoon/Spoons/VimMode.spoon && git pull`.
-local VimMode = hs.loadSpoon('VimMode')
+local VimMode = hs.loadSpoon("VimMode")
 local vim = VimMode:new()
 vim
-  :disableForApp('Code')
-  :disableForApp('MacVim')
-  :disableForApp('zoom.us')
-  :enterWithSequence('jk')
+  :disableForApp("Code")
+  :disableForApp("MacVim")
+  :disableForApp("zoom.us")
+  :enterWithSequence("jk")
