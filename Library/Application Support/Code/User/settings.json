@@ -537,7 +537,6 @@
     "workbench.activityBar.location": "hidden",
     "workbench.colorTheme": "Tokyo Night",
     "workbench.editor.showTabs": "multiple",
-    "workbench.iconTheme": "vscode-icons",
     "workbench.startupEditor": "none",
 
     "[markdown]": {
