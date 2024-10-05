@@ -102,6 +102,52 @@
 
     "redhat.telemetry.enabled": false,
 
+    // Allows similar tags to be grouped under the same type, e.g. `{ "FIX": ["FIXME","FIXIT"] }`. *Note: All tags must also be in the `todo-tree.general.tags` tag list. If a tag group is defined, custom highlights apply to the group, not the tags within the group.*
+    "todo-tree.general.tagGroups": { "[x]": ["[x]", "[X]"] },
+
+    // List of tags. *Note, if one tag starts with another tag, the longer tag should be specified first to prevent the shorter tag being matched.*
+    "todo-tree.general.tags": [
+        "BUG",
+        "HACK",
+        "FIXME",
+        "TODO",
+        "XXX",
+        "[ ]",
+        "[x]",
+        "[X]"
+    ],
+    // Custom configuration for highlighting, [Read more...](https://github.com/Gruntfuggly/todo-tree#highlighting).
+    "todo-tree.highlights.customHighlight": {
+        "BUG": {
+            "icon": "bug"
+        },
+        "HACK": {
+            "icon": "tools"
+        },
+        "FIXME": {
+            "icon": "flame"
+        },
+        "XXX": {
+            "icon": "x"
+        },
+        "[ ]": {
+            "icon": "issue-draft"
+        },
+        "[x]": {
+            "icon": "issue-closed"
+        }
+    },
+    // If true, any subfolders containing a .git file will be ignored when searching.
+    "todo-tree.filtering.ignoreGitSubmodules": true,
+    // Show counts of TODOs in the tree.
+    "todo-tree.tree.showCountsInTree": true,
+    // Sort items in the tags only view alphabetically instead of by file and line number.
+    "todo-tree.tree.sortTagsOnlyViewAlphabetically": false,
+    // Show a button in the tree view title bar to create a file showing the tree content.
+    "todo-tree.tree.buttons.export": false,
+    // Show a button in the tree view title bar to enable grouping items by sub tag.
+    "todo-tree.tree.buttons.groupBySubTag": false,
+
     "todohighlight.keywords": ["TODO"],
 
     "vim.leader": " ",
@@ -533,8 +579,6 @@
     ],
     "vim.smartRelativeLine": true,
     "vim.useSystemClipboard": true,
-
-    "workbench.activityBar.location": "hidden",
     "workbench.colorTheme": "Tokyo Night",
     "workbench.editor.showTabs": "multiple",
     "workbench.startupEditor": "none",
