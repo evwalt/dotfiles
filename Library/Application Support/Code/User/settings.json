@@ -27,7 +27,7 @@
     // Enable / Disable compound words like 'errormessage'
     "cSpell.allowCompoundWords": false,
     // Words to be ignored and not suggested.
-    "cSpell.ignoreWords": ["behaviour"],
+    "cSpell.ignoreWords": ["behaviour", "colour", "colours"],
     // User words to add to dictionary.  Should only be in the user settings.
     "cSpell.userWords": ["uncategorized", "unprioritized"],
     // Specify paths/files to ignore.
@@ -104,7 +104,6 @@
 
     // Allows similar tags to be grouped under the same type, e.g. `{ "FIX": ["FIXME","FIXIT"] }`. *Note: All tags must also be in the `todo-tree.general.tags` tag list. If a tag group is defined, custom highlights apply to the group, not the tags within the group.*
     "todo-tree.general.tagGroups": { "[x]": ["[x]", "[X]"] },
-
     // List of tags. *Note, if one tag starts with another tag, the longer tag should be specified first to prevent the shorter tag being matched.*
     "todo-tree.general.tags": [
         "BUG",
@@ -113,54 +112,39 @@
         "TODO",
         "XXX",
         "[ ]",
-        "[x]",
-        "[X]"
+        "[x]"
     ],
     // Custom configuration for highlighting, [Read more...](https://github.com/Gruntfuggly/todo-tree#highlighting).
     "todo-tree.highlights.customHighlight": {
-        "BUG": {
-            "icon": "bug"
-        },
-        "HACK": {
-            "icon": "tools"
-        },
-        "FIXME": {
-            "icon": "flame"
-        },
-        "XXX": {
-            "icon": "x"
+        "TODO": {
+            "background": "#008000", // green
+            "foreground": "#fff" //white
         },
         "[ ]": {
-            "icon": "issue-draft"
+            // "background": "#4b0082", // indigo
+            // "foreground": "#fff", // white
+            "icon": "issue-draft",
+            "iconColour": "#fff",
+            "type": "none"
         },
         "[x]": {
-            "icon": "issue-closed"
+            "background": "#ee82ee", // violet
+            "foreground": "#000", // black
+            "icon": "issue-closed",
+            "iconColour": "#565f89"
         }
     },
-    // A list of colours which is applied to tag highlights in the same order as the tags. Repeats if necessary and is overridden by `todo-tree.highlights.customHighlight`.
-    "todo-tree.highlights.backgroundColourScheme": [
-        "red",
-        "orange",
-        "yellow",
-        "green",
-        "blue",
-        "", // "indigo",
-        "" // "violet"
-    ],
     // Default configuration for highlighting. [Read more...](https://github.com/Gruntfuggly/todo-tree#highlighting).
-    "todo-tree.highlights.defaultHighlight": {},
+    "todo-tree.highlights.defaultHighlight": {
+        "icon": "alert",
+        "type": "text",
+        "foreground": "#ff0000", // red
+        "background": "#fff", // white
+        "opacity": 50,
+        "iconColour": "#0000ff" // blue
+    },
     // Set to false to disable highlighting.
     "todo-tree.highlights.enabled": true,
-    // A list of colours which is applied to tag highlights in the same order as the tags. Repeats if necessary and is overridden by `todo-tree.highlights.customHighlight`.
-    "todo-tree.highlights.foregroundColourScheme": [
-        "white",
-        "black",
-        "black",
-        "white",
-        "white",
-        "", // "white",
-        "" // "black"
-    ],
     // Delay before highlighting tags within files (milliseconds).
     "todo-tree.highlights.highlightDelay": 500,
     // Use a colour scheme to colour the tags. This scheme is applied to the tags in the order of tags. The colours can be modified using `todo-tree.highlights.foregroundColourScheme` and `todo-tree.highlights.backgroundColourScheme`. The colour scheme overrides colours in the default highlight, but not the custom highlight.
@@ -175,8 +159,6 @@
     "todo-tree.tree.buttons.export": false,
     // Show a button in the tree view title bar to enable grouping items by sub tag.
     "todo-tree.tree.buttons.groupBySubTag": false,
-
-    "todohighlight.keywords": ["TODO"],
 
     "vim.leader": " ",
     "vim.normalModeKeyBindingsNonRecursive": [
