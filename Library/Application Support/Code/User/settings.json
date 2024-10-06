@@ -6,6 +6,8 @@
         "sound": "off"
     },
 
+    // Set this to false if you don't want to toggle the side bar if the same view is selected again
+    "activitusbar.toggleSidebar": false,
     "activitusbar.views": [
         {
             "name": "todo-tree-view",
