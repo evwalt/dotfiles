@@ -103,46 +103,69 @@
     "redhat.telemetry.enabled": false,
 
     // Allows similar tags to be grouped under the same type, e.g. `{ "FIX": ["FIXME","FIXIT"] }`. *Note: All tags must also be in the `todo-tree.general.tags` tag list. If a tag group is defined, custom highlights apply to the group, not the tags within the group.*
-    "todo-tree.general.tagGroups": { "[x]": ["[x]", "[X]"] },
+    "todo-tree.general.tagGroups": {
+        "[x]": ["[x]", "[X]"]
+    },
     // List of tags. *Note, if one tag starts with another tag, the longer tag should be specified first to prevent the shorter tag being matched.*
     "todo-tree.general.tags": [
-        "BUG",
-        "HACK",
-        "FIXME",
         "TODO",
-        "XXX",
         "[ ]",
-        "[x]"
+        "[x]",
+        "~branding",
+        "~career",
+        "~social",
+        "~spiritual"
     ],
     // Custom configuration for highlighting, [Read more...](https://github.com/Gruntfuggly/todo-tree#highlighting).
     "todo-tree.highlights.customHighlight": {
+        // Colors aligned with Tokyo Night theme
         "TODO": {
-            "background": "#008000", // green
-            "foreground": "#fff" //white
+            "background": "rgba(191,87,0,1)",
+            "foreground": "rgba(245,245,245,1)",
+            "icon": "tasklist",
+            "iconColour": "rgba(191,87,0,1)"
         },
         "[ ]": {
-            // "background": "#4b0082", // indigo
-            // "foreground": "#fff", // white
             "icon": "issue-draft",
-            "iconColour": "#fff",
+            "iconColour": "rgba(191,87,0,1)",
             "type": "none"
         },
         "[x]": {
-            "background": "#ee82ee", // violet
-            "foreground": "#000", // black
             "icon": "issue-closed",
-            "iconColour": "#565f89"
+            "iconColour": "#9aa5ce",
+            "type": "none"
+        },
+        "~branding": {
+            "background": "#ff9e64",
+            "foreground": "#414868",
+            "icon": "flame",
+            "iconColour": "#ff9e64",
+            "type": "text"
+        },
+        "~career": {
+            "background": "#bb9af7",
+            "foreground": "#24283b",
+            "icon": "tools",
+            "iconColour": "#bb9af7",
+            "type": "text"
+        },
+        "~social": {
+            "background": "#73daca",
+            "foreground": "#414868",
+            "icon": "person",
+            "iconColour": "#73daca",
+            "type": "text"
+        },
+        "~spiritual": {
+            "background": "#2ac3de",
+            "foreground": "#24283b",
+            "icon": "cloud",
+            "iconColour": "#2ac3de",
+            "type": "text"
         }
     },
     // Default configuration for highlighting. [Read more...](https://github.com/Gruntfuggly/todo-tree#highlighting).
-    "todo-tree.highlights.defaultHighlight": {
-        "icon": "alert",
-        "type": "text",
-        "foreground": "#ff0000", // red
-        "background": "#fff", // white
-        "opacity": 50,
-        "iconColour": "#0000ff" // blue
-    },
+    "todo-tree.highlights.defaultHighlight": {},
     // Set to false to disable highlighting.
     "todo-tree.highlights.enabled": true,
     // Delay before highlighting tags within files (milliseconds).
