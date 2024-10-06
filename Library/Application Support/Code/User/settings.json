@@ -15,7 +15,7 @@
     ],
 
     // Controls the maximum number of spelling errors per document.
-    "cSpell.maxNumberOfProblems": 10000000000000000000000000000000000000000,
+    "cSpell.maxNumberOfProblems": 10000,
     // Controls the number of suggestions shown.
     "cSpell.numSuggestions": 8,
     // The minimum length of a word before checking it against a dictionary.
