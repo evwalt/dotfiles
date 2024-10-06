@@ -6,6 +6,13 @@
         "sound": "off"
     },
 
+    "activitusbar.views": [
+        {
+            "name": "todo-tree-view",
+            "codicon": "list-tree"
+        }
+    ],
+
     "colorize.include": ["**/*.ts", "**/*.tsx"],
     "colorize.languages": [
         "javascript",
@@ -618,5 +625,6 @@
 
     "[markdown]": {
         "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
-    }
+    },
+    "workbench.activityBar.location": "hidden"
 }
