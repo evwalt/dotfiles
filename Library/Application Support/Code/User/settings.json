@@ -137,6 +137,34 @@
             "icon": "issue-closed"
         }
     },
+    // A list of colours which is applied to tag highlights in the same order as the tags. Repeats if necessary and is overridden by `todo-tree.highlights.customHighlight`.
+    "todo-tree.highlights.backgroundColourScheme": [
+        "red",
+        "orange",
+        "yellow",
+        "green",
+        "blue",
+        "indigo",
+        "violet"
+    ],
+    // Default configuration for highlighting. [Read more...](https://github.com/Gruntfuggly/todo-tree#highlighting).
+    "todo-tree.highlights.defaultHighlight": {},
+    // Set to false to disable highlighting.
+    "todo-tree.highlights.enabled": true,
+    // A list of colours which is applied to tag highlights in the same order as the tags. Repeats if necessary and is overridden by `todo-tree.highlights.customHighlight`.
+    "todo-tree.highlights.foregroundColourScheme": [
+        "white",
+        "black",
+        "black",
+        "white",
+        "white",
+        "white",
+        "black"
+    ],
+    // Delay before highlighting tags within files (milliseconds).
+    "todo-tree.highlights.highlightDelay": 500,
+    // Use a colour scheme to colour the tags. This scheme is applied to the tags in the order of tags. The colours can be modified using `todo-tree.highlights.foregroundColourScheme` and `todo-tree.highlights.backgroundColourScheme`. The colour scheme overrides colours in the default highlight, but not the custom highlight.
+    "todo-tree.highlights.useColourScheme": false,
     // If true, any subfolders containing a .git file will be ignored when searching.
     "todo-tree.filtering.ignoreGitSubmodules": true,
     // Show counts of TODOs in the tree.
