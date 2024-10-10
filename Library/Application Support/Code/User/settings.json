@@ -120,10 +120,11 @@
         "TODO",
         "[ ]",
         "[x]",
-        "~branding",
-        "~career",
-        "~social",
-        "~spiritual"
+        "@branding",
+        "@career",
+        "@dating",
+        "@social",
+        "@spiritual"
     ],
     // Custom configuration for highlighting, [Read more...](https://github.com/Gruntfuggly/todo-tree#highlighting).
     "todo-tree.highlights.customHighlight": {
@@ -144,28 +145,35 @@
             "iconColour": "#9aa5ce",
             "type": "none"
         },
-        "~branding": {
+        "@branding": {
             "background": "#ff9e64",
             "foreground": "#414868",
             "icon": "flame",
             "iconColour": "#ff9e64",
             "type": "text"
         },
-        "~career": {
+        "@career": {
             "background": "#bb9af7",
             "foreground": "#24283b",
             "icon": "tools",
             "iconColour": "#bb9af7",
             "type": "text"
         },
-        "~social": {
+        "@dating": {
+            "background": "#e6e7ed",
+            "foreground": "#8c4351",
+            "icon": "heart-fill",
+            "iconColour": "#e6e7ed",
+            "type": "text"
+        },
+        "@social": {
             "background": "#73daca",
             "foreground": "#414868",
             "icon": "person",
             "iconColour": "#73daca",
             "type": "text"
         },
-        "~spiritual": {
+        "@spiritual": {
             "background": "#2ac3de",
             "foreground": "#24283b",
             "icon": "cloud",
