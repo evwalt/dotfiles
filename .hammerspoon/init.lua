@@ -82,7 +82,7 @@ local function moveAndResize(xRatio, yRatio, wRatio, hRatio)
     f.y = max.y + (max.h * yRatio)
     f.w = max.w * wRatio
     f.h = max.h * hRatio
-    win:setFrame(f)
+    win:setFrameInScreenBounds(f, 0)
 end
 hs.hotkey.bind(ca, "return", function() moveAndResize(0, 0, 1, 1) end)  -- Maximized
 hs.hotkey.bind({"ctrl", "alt", "shift"}, "return", function() moveAndResize(0.05, 0.05, 0.9, 0.9) end)  -- Almost maximized
