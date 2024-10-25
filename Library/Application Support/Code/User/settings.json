@@ -471,6 +471,10 @@
             "commands": ["editor.action.revealDefinition"]
         },
         {
+            "before": ["<leader>", "p", "i"],
+            "commands": ["editor.action.revealDefinition"]
+        },
+        {
             "before": ["<leader>", "g", "c"],
             "commands": ["editor.action.commentLine"]
         },
