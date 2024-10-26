@@ -108,15 +108,3 @@ hs.hotkey.bind(ca, "v", function() moveAndResize(0.5, 0.5, 0.5, 0.5) end)  -- Bo
 hs.hotkey.bind(ca, "q", function() moveAndResize(0, 0.5, 0.5, 0.5) end)  -- Bottom left
 hs.hotkey.bind(ca, ".", function() moveAndResize(0.25, 0, 0.5, 0.5) end)  -- Top middle fourth
 hs.hotkey.bind(ca, "c", function() moveAndResize(0.25, 0, 0.5, 0.5) end)  -- Top middle fourth (same as ".")
-
---[[
-  * VimMode Spoon
---]]
--- TODO Regularly: to update, run `cd ~/.hammerspoon/Spoons/VimMode.spoon && git pull`.
-local VimMode = hs.loadSpoon("VimMode")
-local vim = VimMode:new()
-vim
-  :disableForApp("Code")
-  :disableForApp("MacVim")
-  :disableForApp("zoom.us")
-  :enterWithSequence("jk")
