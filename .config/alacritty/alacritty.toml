@@ -2,6 +2,8 @@
 normal = { family = "Hack Nerd Font" }
 size = 13.5
 
+# Color Theme - Tokyo Night
+#
 [colors.bright]
 black = "#444b6a"
 blue = "#7da6ff"
