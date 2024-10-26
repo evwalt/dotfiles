@@ -13,5 +13,6 @@ mdickin.markdown-shortcuts
 oderwat.indent-rainbow
 streetsidesoftware.code-spell-checker
 takumii.markdowntable
+tamasfe.even-better-toml
 tobias-z.vscode-harpoon
 vscodevim.vim
