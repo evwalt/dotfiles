@@ -38,12 +38,6 @@ n
 r && b
 ```
 
-### Update Hammerspoon's VimMode Spoon
-
-```zsh
-vms
-```
-
 ### Track and Push Changes in `yadm`
 
 - Stage changes:
