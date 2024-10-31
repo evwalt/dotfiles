@@ -18,5 +18,6 @@ railwaycat/emacsmacport/emacs-mac
 ripgrep
 sc-im
 shellcheck
+tmux
 tree
 yadm
