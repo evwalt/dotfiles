@@ -12,6 +12,10 @@
         {
             "name": "todo-tree-view",
             "codicon": "list-tree"
+        },
+        {
+            "name": "scm",
+            "codicon": "source-control-view-icon"
         }
     ],
 
