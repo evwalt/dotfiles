@@ -5,14 +5,14 @@ alias cdobds="cd ~/dev/utils/bashcrypto && ./bashcrypto -d -i ~/Dropbox/docs/swo
 alias cdobdsh="cd ~/dev/utils/bashcrypto && ./bashcrypto -d -i ~/Dropbox/docs/swords/swords.txt.enc -o ~/Downloads/swords.txt && open ~/Downloads/swords.txt && cd ~"
 alias cdobda="cd ~/dev/utils/bashcrypto && ./bashcrypto -d -i ~/Dropbox/docs/swords/ac.txt.enc -o ~/Downloads/ac.txt && open ~/Downloads/ac.txt"
 alias cdobdah="cd ~/dev/utils/bashcrypto && ./bashcrypto -d -i ~/Dropbox/docs/swords/ac.txt.enc -o ~/Downloads/ac.txt && open ~/Downloads/ac.txt && cd ~"
-### remove swords
+# remove swords
 alias rms="rm -r ~/Downloads/swords.txt"
 alias rma="rm -r ~/Downloads/ac.txt"
-### encrypt swords
+# encrypt swords
 alias ens="cd ~/dev/utils/bashcrypto && ./bashcrypto -e -i ~/Downloads/swords.txt -o ~/Dropbox/docs/swords/swords.txt.enc"
-### encrypt with a password
+# encrypt with a password
 alias be="./bashcrypto -e -i"
-### decrypt with a password
+# decrypt with a password
 alias bd="./bashcrypto -d -i"
 
 # Homebrew
@@ -23,13 +23,13 @@ alias b="brew update --verbose && brew upgrade --verbose && brew cleanup --verbo
 #
 # git develop and main, or git deploy
 alias gdp="git checkout main && git merge dev && git push && git checkout dev"
-# common
+# Common
 alias gs="git status"
 alias gcm="git commit -m"
 alias gam="git add . && git commit -m"
 alias gp="git push"
 alias gf="git fetch"
-# other
+# Other
 alias gd="git diff"
 alias gl="git log"
 alias glo="git log --oneline"
