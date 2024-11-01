@@ -17,7 +17,7 @@ alias bd="./bashcrypto -d -i"
 
 # Homebrew
 #
-alias b="brew update --verbose && brew upgrade --verbose && brew cleanup --verbose --prune=all && brew leaves > ~/my_brews.txt && brew list --cask > ~/my_brew_casks.txt && less ~/my_brews.txt && less ~/my_brew_casks.txt"
+alias b="brew update --verbose && brew upgrade --verbose && brew cleanup --verbose --prune=all && brew leaves > ~/brew-leaves.txt && brew list > ~/brew-list.txt && brew list --cask > ~/brew-list-cask.txt && less ~/brew-leaves.txt && less ~/brew-list.txt && less ~/brew-list-cask.txt"
 
 # Git
 #
