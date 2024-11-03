@@ -37,7 +37,6 @@ grep
 harfbuzz
 highway
 hunspell
-icu4c@75
 icu4c@76
 imath
 isl
