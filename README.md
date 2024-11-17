@@ -30,7 +30,7 @@ npm -g update
 n
 ```
 
-- Update LazyVim plugins. Inside Neovim, type "l" to open LazyVim and "U" to update plugins. And then, quit Neovim.
+- Update LazyVim plugins. Inside Neovim, type "l" to open LazyVim and "S" to sync plugins. And then, quit Neovim.
 
 ### Update Rustup and Homebrew
 
