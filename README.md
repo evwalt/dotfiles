@@ -38,7 +38,7 @@ n
 r && b
 ```
 
-### Track and Push Changes in `yadm`
+### Track and Push Changes with `yadm`
 
 - Track changes:
 
