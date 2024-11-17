@@ -40,19 +40,19 @@ r && b
 
 ### Track and Push Changes in `yadm`
 
-- Stage changes:
+- Track changes:
 
 ```zsh
 us
 ```
 
-- Add specific files:
+- Stage specific files:
 
 ```zsh
 u add [path/to/file...]
 ```
 
-- Commit and push changes:
+- Commit and push:
 
 ```zsh
 ucm "Commit message" && up
