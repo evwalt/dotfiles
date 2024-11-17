@@ -4,6 +4,6 @@
     { "key": "ctrl+2", "command": "workbench.action.openEditorAtIndex2" },
     { "key": "ctrl+3", "command": "workbench.action.openEditorAtIndex3" },
     { "key": "ctrl+4", "command": "workbench.action.openEditorAtIndex4" },
-    { "key": "ctrl+5", "command": "workbench.action.openEditorAtIndex5" },
+    { "key": "ctrl+5", "command": "workbench.action.openEditorAtIndex5" }
     // { "key": "ctrl+s", "command": "vscode-harpoon.gotoEditor4" }
 ]
