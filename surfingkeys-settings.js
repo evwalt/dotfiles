@@ -1,26 +1,32 @@
 /**
+ * Useful Links
+ *
+ */
+// https://github.com/brookhong/Surfingkeys/wiki
+
+/**
  * Modified Keybindings
  */
-api.unmap(";dh");
-api.unmap(";t");
-api.map("gH", "H");
-api.unmap("H");
-api.map("H", "S");
-api.map("L", "D");
+api.unmap(';dh');
+api.unmap(';t');
+api.map('gH', 'H');
+api.unmap('H');
+api.map('H', 'S');
+api.map('L', 'D');
 
 /**
  * Examples
  */
 // an example to create a new mapping `ctrl-y`
-api.mapkey("<Ctrl-y>", "Show me the money", function () {
+api.mapkey('<Ctrl-y>', 'Show me the money', function () {
     Front.showPopup(
-        "a well-known phrase uttered by characters in the 1996 film Jerry Maguire (Escape to close)."
+        'a well-known phrase uttered by characters in the 1996 film Jerry Maguire (Escape to close).'
     );
 });
 // an example to replace `T` with `gt`, click `Default mappings` to see how `T` works.
-// api.map("gt", "T");
+// api.map('gt', 'T');
 // an example to remove mapkey `Ctrl-i`
-// api.unmap("<Ctrl-i>");
+// api.unmap('<Ctrl-i>');
 
 /**
  * Theme

@@ -112,6 +112,8 @@
         "MD024": { "siblings_only": true }
     },
 
+    "prettier.jsxSingleQuote": true,
+    "prettier.singleQuote": true,
     "prettier.tabWidth": 4,
 
     "redhat.telemetry.enabled": false,
