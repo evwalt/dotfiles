@@ -1,4 +1,13 @@
 /**
+ * Modified Keybindings
+ */
+api.unmap(";dh");
+api.unmap(";t");
+api.unmap("H");
+api.map("H", "S");
+api.map("L", "D");
+
+/**
  * Examples
  */
 // an example to create a new mapping `ctrl-y`
