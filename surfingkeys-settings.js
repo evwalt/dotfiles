@@ -3,6 +3,7 @@
  */
 api.unmap(";dh");
 api.unmap(";t");
+api.map("gH", "H");
 api.unmap("H");
 api.map("H", "S");
 api.map("L", "D");
