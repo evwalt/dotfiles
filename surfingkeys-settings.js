@@ -9,6 +9,7 @@
  */
 api.unmap(';dh');
 api.unmap(';t');
+api.unmap('r');
 api.map('gH', 'H');
 api.unmap('H');
 api.map('H', 'S');
