@@ -109,7 +109,8 @@
 
     "markdownlint.config": {
         "MD007": { "indent": 4 },
-        "MD024": { "siblings_only": true }
+        "MD024": { "siblings_only": true },
+        "MD029": false
     },
 
     "prettier.jsxSingleQuote": true,
