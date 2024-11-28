@@ -38,6 +38,10 @@ alias glo="git log --oneline"
 #
 alias vms="cd ~/.hammerspoon/Spoons/VimMode.spoon && git pull"
 
+# Misc
+#
+alias tn="ts-node"
+
 # Neovim
 #
 alias n="nvim"
