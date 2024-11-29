@@ -42,10 +42,6 @@ alias vms="cd ~/.hammerspoon/Spoons/VimMode.spoon && git pull"
 #
 alias tn="ts-node"
 
-# Neovim
-#
-alias n="nvim"
-
 # NPM
 #
 alias ngo="npm -g outdated"
