@@ -49,6 +49,8 @@ alias n="nvim"
 # NPM
 #
 alias ngo="npm -g outdated"
+alias nrd="npm run dev"
+alias nrb="npm run build"
 
 # Rustup
 #
