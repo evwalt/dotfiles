@@ -5,6 +5,11 @@ TERM = "xterm-256color"
 normal = { family = "Hack Nerd Font" }
 size = 13.5
 
+# Option as Alt
+#
+[window]
+option_as_alt = "Both" # (macos only)
+
 # Color Theme - Midnight Haze: <https://github.com/hafiz-muhammad/midnight-haze-alacritty-theme/blob/main/midnight-haze.toml>
 #
 # Default colors
