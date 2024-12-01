@@ -2,7 +2,6 @@ aom
 apr
 apr-util
 argon2
-aspell
 assimp
 autoconf
 automake
@@ -93,6 +92,7 @@ mpfr
 msgpack
 ncurses
 neovim
+net-snmp
 nettle
 node
 oniguruma
