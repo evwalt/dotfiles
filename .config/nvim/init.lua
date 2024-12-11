@@ -1,7 +1,8 @@
 -- Leader Key
 --
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
+-- See lazy.nvim configuration for this setting.
+-- vim.g.mapleader = ' '
+-- vim.g.maplocalleader = ' '
 
 -- Line Numbers
 --
@@ -26,3 +27,5 @@ vim.opt.clipboard = 'unnamedplus'
 
 -- Plugin Management
 --
+require('config.lazy')
+
