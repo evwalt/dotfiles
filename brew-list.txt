@@ -31,6 +31,7 @@ gmp
 gnu-which
 gnuplot
 gnutls
+go
 graphite2
 grep
 harfbuzz
@@ -70,8 +71,6 @@ libxau
 libxcb
 libxdmcp
 libxext
-libxls
-libxlsxwriter
 libxml2
 libxrender
 libzip
@@ -112,7 +111,6 @@ qt
 readline
 ripgrep
 rtmpdump
-sc-im
 shellcheck
 sqlite
 svim

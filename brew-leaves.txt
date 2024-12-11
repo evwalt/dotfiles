@@ -7,6 +7,7 @@ gcc
 git
 gnu-which
 gnuplot
+go
 grep
 lazygit
 lua-language-server
@@ -16,7 +17,6 @@ neovim
 php
 railwaycat/emacsmacport/emacs-mac
 ripgrep
-sc-im
 shellcheck
 tmux
 tree
