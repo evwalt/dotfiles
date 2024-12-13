@@ -91,8 +91,8 @@ hs.hotkey.bind(ca, "n", function() moveAndResize(0.5, 0, 0.5, 1) end)  -- Right 
 
 -- Horisontal Halves
 --
-hs.hotkey.bind(ca, "p", function() moveAndResize(0, 0, 1, 0.5) end)  -- Top half
-hs.hotkey.bind(ca, "g", function() moveAndResize(0.5, 0.5, 1, 0.5) end)  -- Bottom half
+hs.hotkey.bind(ca, "y", function() moveAndResize(0, 0, 1, 0.5) end)  -- Top half
+hs.hotkey.bind(ca, "f", function() moveAndResize(0.5, 0.5, 1, 0.5) end)  -- Bottom half
 
 -- Fourths - Corners
 --
@@ -105,8 +105,8 @@ hs.hotkey.bind(ca, "q", function() moveAndResize(0, 0.5, 0.5, 0.5) end)  -- Bott
 --
 hs.hotkey.bind(ca, ".", function() moveAndResize(0.25, 0, 0.5, 0.5) end)  -- Top middle fourth
 hs.hotkey.bind(ca, "c", function() moveAndResize(0.25, 0, 0.5, 0.5) end)  -- Top middle fourth (same as ".")
--- hs.hotkey.bind(ca, ".", function() moveAndResize(0.75, 0, 0.5, 0.5) end)  -- Center fourth
--- hs.hotkey.bind(ca, "c", function() moveAndResize(0.75, 0, 0.5, 0.5) end)  -- Center fourth (same as ".")
+hs.hotkey.bind(ca, "p", function() moveAndResize(0.25, 0.25, 0.5, 0.5) end)  -- Center fourth
+hs.hotkey.bind(ca, "g", function() moveAndResize(0.25, 0.25, 0.5, 0.5) end)  -- Center fourth (same as "p")
 
 -- Vertical Thirds
 --
