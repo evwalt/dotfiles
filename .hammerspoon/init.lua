@@ -92,8 +92,6 @@ hs.hotkey.bind(ca, "n", function() moveAndResize(0.5, 0, 0.5, 1) end)  -- Right 
 -- Horisontal Halves
 --
 hs.hotkey.bind(ca, "p", function() moveAndResize(0, 0, 1, 0.5) end)  -- Top half
-hs.hotkey.bind(ca, "y", function() moveAndResize(0, 0.25, 1, 0.5) end)  -- Center half
-hs.hotkey.bind(ca, "f", function() moveAndResize(0, 0.25, 1, 0.5) end)  -- Center half (same as "e")
 hs.hotkey.bind(ca, "g", function() moveAndResize(0.5, 0.5, 1, 0.5) end)  -- Bottom half
 
 -- Fourths - Corners
