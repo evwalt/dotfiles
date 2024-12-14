@@ -27,7 +27,7 @@ npm -g update
 - Open Neovim:
 
 ```zsh
-n
+nvim
 ```
 
 - Update LazyVim plugins. Inside Neovim, type "l" to open LazyVim and "S" to sync plugins. And then, quit Neovim.
