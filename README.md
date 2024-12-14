@@ -24,6 +24,8 @@ npm -g update
 
 ### Update Neovim
 
+TODO: Update these instructions as I incrementally create my own nvim config with lazy.nvim.
+
 - Open Neovim:
 
 ```zsh
