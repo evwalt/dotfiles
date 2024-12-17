@@ -26,13 +26,13 @@ hs.hotkey.bind(hyper, "R", function()
     hs.application.launchOrFocus("Alacritty")
 end)
 hs.hotkey.bind(hyper, "L", function()
-    hs.application.launchOrFocus("Simplenote")
+    hs.application.launchOrFocus("Microsoft PowerPoint")
 end)
 hs.hotkey.bind(hyper, "T", function()
     hs.application.launchOrFocus("Visual Studio Code")
 end)
 hs.hotkey.bind(hyper, "N", function()
-    hs.application.launchOrFocus("Discord")
+    hs.application.launchOrFocus("UTM")
 end)
 hs.hotkey.bind(hyper, "S", function()
     hs.application.launchOrFocus("GitHub Desktop")
@@ -47,16 +47,16 @@ hs.hotkey.bind(hyper, "Z", function()
     hs.application.launchOrFocus("System Settings")
 end)
 hs.hotkey.bind(hyper, "G", function()
-    hs.application.launchOrFocus("LibreOffice")
+    hs.application.launchOrFocus("Privileges")
 end)
 hs.hotkey.bind(hyper, "F", function()
     hs.application.launchOrFocus("Activity Monitor")
 end)
 hs.hotkey.bind(hyper, "D", function()
-    hs.application.launchOrFocus("Reminders")
+    hs.application.launchOrFocus("Electron")
 end)
 hs.hotkey.bind(hyper, "B", function()
-    hs.application.launchOrFocus("Messages")
+    hs.application.launchOrFocus("Microsoft Teams")
 end)
 
 -- Window Management
@@ -121,3 +121,13 @@ hs.hotkey.bind(ca, "x", function() moveAndResize(0, 0, 2/3, 1) end)  -- Left two
 hs.hotkey.bind(ca, "i", function() moveAndResize(1/6, 0, 2/3, 1) end)  -- Middle two-thirds
 hs.hotkey.bind(ca, "d", function() moveAndResize(1/6, 0, 2/3, 1) end)  -- Middle two-thirds (same as "i")
 hs.hotkey.bind(ca, "b", function() moveAndResize(1/3, 0, 2/3, 1) end)  -- Right two-thirds
+
+-- Vertical Thirds with Horizontal Halves
+--
+hs.hotkey.bind(ca, "'", function() moveAndResize(0, 0, 1/3, 1/2) end)  -- Left upper third
+hs.hotkey.bind(ca, "a", function() moveAndResize(1/3, 0, 1/3, 1/2) end)  -- Middle upper third
+hs.hotkey.bind(ca, "s", function() moveAndResize(1/3, 1/2, 1/3, 1/2) end)  -- Middle lower third
+hs.hotkey.bind(ca, "l", function() moveAndResize(2/3, 0, 1/3, 1/2) end)  -- Right upper third
+hs.hotkey.bind(ca, ";", function() moveAndResize(0, 1/2, 1/3, 1/2) end)  -- Left lower third
+hs.hotkey.bind(ca, "z", function() moveAndResize(2/3, 1/2, 1/3, 1/2) end)  -- Right lower third
+
