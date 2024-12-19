@@ -95,7 +95,7 @@
         ]
     },
     // "editor.fontSize": 13.5,
-    "editor.fontSize": 14.5,
+    "editor.fontSize": 14,
     "editor.lineHeight": 1,
     "editor.minimap.enabled": false,
     "editor.stickyScroll.enabled": false,
