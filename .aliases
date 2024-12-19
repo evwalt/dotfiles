@@ -1,20 +1,3 @@
-# Bashcrypto
-#
-# Change to the bashcrypto directory; decrypt swords to ~/Downloads; open file
-alias cdobds="cd ~/dev/utils/bashcrypto && ./bashcrypto -d -i ~/Dropbox/docs/swords/swords.txt.enc -o ~/Downloads/swords.txt && open ~/Downloads/swords.txt"
-alias cdobdsh="cd ~/dev/utils/bashcrypto && ./bashcrypto -d -i ~/Dropbox/docs/swords/swords.txt.enc -o ~/Downloads/swords.txt && open ~/Downloads/swords.txt && cd ~"
-alias cdobda="cd ~/dev/utils/bashcrypto && ./bashcrypto -d -i ~/Dropbox/docs/swords/ac.txt.enc -o ~/Downloads/ac.txt && open ~/Downloads/ac.txt"
-alias cdobdah="cd ~/dev/utils/bashcrypto && ./bashcrypto -d -i ~/Dropbox/docs/swords/ac.txt.enc -o ~/Downloads/ac.txt && open ~/Downloads/ac.txt && cd ~"
-# remove swords
-alias rms="rm -r ~/Downloads/swords.txt"
-alias rma="rm -r ~/Downloads/ac.txt"
-# encrypt swords
-alias ens="cd ~/dev/utils/bashcrypto && ./bashcrypto -e -i ~/Downloads/swords.txt -o ~/Dropbox/docs/swords/swords.txt.enc"
-# encrypt with a password
-alias be="./bashcrypto -e -i"
-# decrypt with a password
-alias bd="./bashcrypto -d -i"
-
 # Homebrew
 #
 alias b="brew update --verbose && brew upgrade --verbose && brew cleanup --verbose --prune=all && brew leaves > ~/brew-leaves.txt && brew list > ~/brew-list.txt && brew list --cask > ~/brew-list-cask.txt && less ~/brew-leaves.txt && less ~/brew-list.txt && less ~/brew-list-cask.txt"
@@ -34,12 +17,9 @@ alias gd="git diff"
 alias gl="git log"
 alias glo="git log --oneline"
 
-# Hammerspoon
-#
-alias vms="cd ~/.hammerspoon/Spoons/VimMode.spoon && git pull"
-
 # Misc
 #
+alias cdd="cd ~/Dropbox/"
 alias tn="ts-node"
 
 # NPM
