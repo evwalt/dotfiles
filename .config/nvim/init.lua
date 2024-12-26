@@ -1,9 +1,3 @@
--- Leader Key
---
--- See lazy.nvim configuration for this setting.
--- vim.g.mapleader = ' '
--- vim.g.maplocalleader = ' '
-
 -- Line Numbers
 --
 vim.opt.number = true
