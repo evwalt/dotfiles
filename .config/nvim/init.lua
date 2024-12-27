@@ -8,7 +8,6 @@ vim.opt.cursorline = true
 --
 vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
-vim.opt.expandtab = false
 
 -- Cases
 --
@@ -19,12 +18,20 @@ vim.opt.smartcase = true
 --
 vim.opt.clipboard = 'unnamedplus'
 
+-- Keymaps
+--
+vim.keymap.set('n', '<space>w', ':w<CR>')
+vim.keymap.set('n', '<space>q', ':q<CR>')
+vim.keymap.set('n', '<space>e', function()
+    if vim.bo.filetype == 'netrw' then
+        vim.cmd(':e #')
+    else
+        vim.cmd(':Ex')
+    end
+end, { desc = 'Toggle :Ex or return to previous file' })
+vim.keymap.set('n', '<space>z', ':set wrap!<CR>')
+
 -- Plugin Management
 --
 require('config.lazy')
 
--- Keymaps
---
-vim.keymap.set('n', '<space>w', '<cmd>w<CR>')
-vim.keymap.set('n', '<space>q', '<cmd>q<CR>')
-vim.keymap.set('n', '<space>z', '<cmd>set wrap!<CR>')
