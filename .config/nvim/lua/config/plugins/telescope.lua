@@ -10,14 +10,8 @@ return {
             extensions = {
                 fzf = {}
             },
-            pickers = {
-                find_files = {
-                    theme = 'ivy',
-                },
-                help_tags = {
-                    theme = 'ivy',
-                },
-            },
+
+            defaults = require('telescope.themes').get_ivy {},
         }
 
         require('telescope').load_extension('fzf')
