@@ -76,6 +76,10 @@ vim.keymap.set('n', '<space>e', function()
     end
 end, { desc = 'Toggle :Ex or return to previous file' })
 vim.keymap.set('n', '<space>z', ':set wrap!<CR>')
+vim.keymap.set('n', '<space>hc', ':set cursorcolumn!<CR>')
+vim.keymap.set('n', '<space>hc', ':set cursorcolumn!<CR>')
+vim.keymap.set('n', '<space>u.', ':set cursorcolumn!<CR>')
+vim.keymap.set('n', '<space>so', ':source %<CR>')
 
 -- Keymaps - LSP Default Settings in Neovim Nightly Build
 --
