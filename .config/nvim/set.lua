@@ -17,6 +17,20 @@ vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
 vim.opt.smartindent = true
 
+-- Newline
+--
+-- Automatically add a newline at the end of the file on save
+vim.api.nvim_create_autocmd("BufWritePre", {
+    pattern = "*",
+    callback = function()
+        local last_line = vim.api.nvim_buf_get_lines(0, -2, -1, false)[1]
+        if last_line ~= "" then
+            vim.api.nvim_buf_set_lines(0, -1, -1, false, { "" })
+        end
+    end,
+    desc = "Ensure newline at end of files",
+})
+
 -- Cases
 --
 vim.opt.ignorecase = true
@@ -40,3 +54,4 @@ require('set-search-highlighting')
 -- Clipboard
 --
 vim.opt.clipboard = 'unnamedplus'
+
