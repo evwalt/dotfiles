@@ -1,4 +1,5 @@
 alacritty
+breaktimer
 font-cascadia-code
 font-hack-nerd-font
 hammerspoon
