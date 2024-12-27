@@ -23,3 +23,8 @@ vim.opt.clipboard = 'unnamedplus'
 --
 require('config.lazy')
 
+-- Keymaps
+--
+vim.keymap.set('n', '<space>w', '<cmd>w<CR>')
+vim.keymap.set('n', '<space>q', '<cmd>q<CR>')
+vim.keymap.set('n', '<space>z', '<cmd>set wrap!<CR>')
