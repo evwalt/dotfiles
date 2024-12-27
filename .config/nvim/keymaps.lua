@@ -4,6 +4,11 @@
 -- Generic
 --
 vim.keymap.set('n', '<space>w', ':w<CR>')
+vim.keymap.set('n', '<space>v', function() vim.lsp.buf.format() end)
+vim.keymap.set('n', '<space>m', function()
+    vim.lsp.buf.format()
+    vim.cmd('w')
+end, { desc = 'Save and format file' })
 vim.keymap.set('n', '<space>q', ':q<CR>')
 vim.keymap.set('n', '<space>e', function()
     if vim.bo.filetype == 'netrw' then
@@ -26,4 +31,3 @@ vim.keymap.set('n', 'grr', vim.lsp.buf.references)
 vim.keymap.set('n', 'gri', vim.lsp.buf.implementation)
 vim.keymap.set('n', 'gO', vim.lsp.buf.document_symbol)
 vim.keymap.set('n', '<C-s>', vim.lsp.buf.signature_help)
-
