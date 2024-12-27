@@ -53,7 +53,7 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 
 -- Search Highlighting
 --
-require('set-search-highlighting')
+require('config.set-search-highlighting')
 
 -- Clipboard
 --
