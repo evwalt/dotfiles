@@ -38,3 +38,4 @@ vim.keymap.set('n', '#', function()
     vim.cmd("normal! #") -- Perform the default # action
     temporary_hlsearch()
 end, { desc = "Search word under cursor (reverse) and highlight temporarily" })
+
