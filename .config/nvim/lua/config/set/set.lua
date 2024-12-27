@@ -1,6 +1,10 @@
 -- Set
 --
 
+-- EditorConfig
+--
+-- vim.opt.editorconfig = true
+
 -- Line Numbers
 --
 vim.opt.number = true
@@ -36,3 +40,4 @@ require('config.set.search-highlighting')
 -- Clipboard
 --
 vim.opt.clipboard = 'unnamedplus'
+
