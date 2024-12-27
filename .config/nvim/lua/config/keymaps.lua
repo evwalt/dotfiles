@@ -23,7 +23,7 @@ vim.keymap.set('n', '<space>hc', ':set cursorcolumn!<CR>')
 vim.keymap.set('n', '<space>u.', ':set cursorcolumn!<CR>')
 vim.keymap.set('n', '<space>so', ':source %<CR>')
 
--- LSP Default Settings in Neovim Nightly Build
+-- LSP Default Keymaps in Neovim Nightly Build
 --
 vim.keymap.set('n', 'grn', vim.lsp.buf.rename)
 vim.keymap.set('n', 'gra', vim.lsp.buf.code_action)
