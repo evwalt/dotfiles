@@ -1,3 +1,7 @@
+-- `:Inspect` command temporary workaround
+--
+vim.hl = vim.highlight
+
 -- Line Numbers
 --
 vim.opt.number = true
@@ -8,6 +12,7 @@ vim.opt.cursorline = true
 --
 vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
+vim.opt.smartindent = true
 
 -- Cases
 --
