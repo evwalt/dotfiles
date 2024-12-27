@@ -24,15 +24,13 @@ npm -g update
 
 ### Update Neovim
 
-TODO: Update these instructions as I incrementally create my own nvim config with lazy.nvim.
-
 - Open Neovim:
 
 ```zsh
 nvim
 ```
 
-- Update LazyVim plugins. Inside Neovim, type "l" to open LazyVim and "S" to sync plugins. And then, quit Neovim.
+- Update lazy.nvim plugins. Inside Neovim, run `:Lazy` to open lazy.nvim and "S" to sync plugins. And then, quit Neovim.
 
 ### Update Rustup and Homebrew
 
@@ -59,3 +57,4 @@ u add [path/to/file...]
 ```zsh
 ucm "Commit message" && up
 ```
+
