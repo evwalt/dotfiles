@@ -3,7 +3,7 @@
 
 -- EditorConfig
 --
--- vim.opt.editorconfig = true
+vim.g.editorconfig = true
 
 -- Line Numbers
 --
@@ -35,9 +35,8 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 
 -- Search Highlighting
 --
-require('config.set.search-highlighting')
+require('set-search-highlighting')
 
 -- Clipboard
 --
 vim.opt.clipboard = 'unnamedplus'
-

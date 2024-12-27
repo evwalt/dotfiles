@@ -9,13 +9,12 @@ vim.hl = vim.highlight
 
 -- Settings
 --
-require('config.set.set')
+require('set')
 
 -- Keymaps
 --
-require('config.keymaps')
+require('keymaps')
 
 -- Plugin Management
 --
 require('config.lazy')
-
