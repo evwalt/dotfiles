@@ -31,6 +31,10 @@ vim.api.nvim_create_autocmd("BufWritePre", {
     desc = "Ensure newline at end of files",
 })
 
+-- Text Width (Print Width)
+--
+vim.opt.textwidth = 80
+
 -- Cases
 --
 vim.opt.ignorecase = true
