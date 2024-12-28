@@ -11,10 +11,10 @@ vim.keymap.set('n', '<space>m', function()
 end, { desc = 'Save and format file' })
 vim.keymap.set('n', '<space>q', ':q<CR>')
 vim.keymap.set('n', '<space>e', function()
-    if vim.bo.filetype == 'netrw' then
-        vim.cmd(':e #')
+    if vim.bo.filetype == 'oil' then
+        vim.cmd(':bdelete')
     else
-        vim.cmd(':Ex')
+        vim.cmd(':e .')
     end
 end, { desc = 'Toggle :Ex or return to previous file' })
 vim.keymap.set('n', '<space>z', ':set wrap!<CR>')
