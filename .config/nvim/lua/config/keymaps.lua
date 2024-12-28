@@ -22,6 +22,8 @@ vim.keymap.set('n', '<space>hc', ':set cursorcolumn!<CR>')
 vim.keymap.set('n', '<space>hc', ':set cursorcolumn!<CR>')
 vim.keymap.set('n', '<space>u.', ':set cursorcolumn!<CR>')
 vim.keymap.set('n', '<space>so', ':source %<CR>')
+vim.keymap.set('n', '<space>u', '<C-w>')
+vim.keymap.set('n', '<space>h', '<C-w>')
 
 -- LSP Default Keymaps in Neovim Nightly Build
 --
