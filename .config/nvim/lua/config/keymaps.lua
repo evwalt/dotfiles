@@ -22,8 +22,21 @@ vim.keymap.set('n', '<space>hc', ':set cursorcolumn!<CR>')
 vim.keymap.set('n', '<space>hc', ':set cursorcolumn!<CR>')
 vim.keymap.set('n', '<space>u.', ':set cursorcolumn!<CR>')
 vim.keymap.set('n', '<space>so', ':source %<CR>')
+
+-- Windows
+--
 vim.keymap.set('n', '<space>u', '<C-w>')
 vim.keymap.set('n', '<space>h', '<C-w>')
+
+-- Terminal
+--
+vim.keymap.set('n', '<space>j', function()
+    vim.cmd.vnew()
+    vim.cmd.term()
+    vim.cmd.wincmd('J')
+    vim.api.nvim_win_set_height(0, 15)
+end)
+vim.keymap.set('t', '<esc>', '<C-\\><C-n>')
 
 -- LSP Default Keymaps in Neovim Nightly Build
 --
