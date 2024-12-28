@@ -36,6 +36,13 @@ vim.keymap.set('n', '<space>j', function()
     vim.cmd.wincmd('J')
     vim.api.nvim_win_set_height(0, 15)
 end)
+vim.keymap.set('n', '<space>l', function()
+    -- local current_height = vim.api.nvim_win_get_height(0)
+    vim.cmd.vnew()
+    vim.cmd.term()
+    vim.cmd.wincmd('L')
+    -- vim.api.nvim_win_set_height(0, current_height)
+end)
 vim.keymap.set('t', '<esc>', '<C-\\><C-n>')
 
 -- LSP Default Keymaps in Neovim Nightly Build
