@@ -1,22 +1,23 @@
 return {
     {
-        'stevearc/oil.nvim',
-        -- enable = false,
+        "stevearc/oil.nvim",
         ---@module 'oil'
         ---@type oil.SetupOpts
-        opts = {},
-        -- Optional dependencies
         dependencies = { { "echasnovski/mini.icons", opts = {} } },
         -- dependencies = { "nvim-tree/nvim-web-devicons" }, -- use if prefer nvim-web-devicons
+        opts = {},
         config = function()
+            require("oil").setup({
+                view_options = { show_hidden = true },
+            })
             vim.keymap.set('n', '<space>e', function()
                 if vim.bo.filetype == 'oil' then
-                    oil.close()
+                    vim.cmd(':e #')
                 else
-                    oil.open()
+                    vim.cmd(':Oil')
                 end
             end)
-        end
-    }
+        end,
+    },
 }
 
