@@ -16,6 +16,16 @@ vim.keymap.set('n', '<space>hc', ':set cursorcolumn!<CR>')
 vim.keymap.set('n', '<space>u.', ':set cursorcolumn!<CR>')
 vim.keymap.set('n', '<space>so', ':source %<CR>')
 
+-- Netrw
+--
+-- vim.keymap.set('n', '<space>e', function()
+--     if vim.bo.filetype == 'netrw' then
+--         vim.cmd(':e #')
+--     else
+--         vim.cmd(':Ex')
+--     end
+-- end)
+
 -- Windows
 --
 vim.keymap.set('n', '<space>u', '<C-w>')

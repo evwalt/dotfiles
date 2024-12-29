@@ -1,6 +1,7 @@
 return {
     {
         'stevearc/oil.nvim',
+        -- enable = false,
         ---@module 'oil'
         ---@type oil.SetupOpts
         opts = {},
@@ -10,9 +11,11 @@ return {
         config = function()
             vim.keymap.set('n', '<space>e', function()
                 if vim.bo.filetype == 'oil' then
-                    vim.cmd(':bdelete')
+                    -- vim.cmd(':bdelete')
+                    oil.close()
                 else
-                    vim.cmd(':Oil')
+                    -- vim.cmd(':Oil')
+                    oil.open()
                 end
             end)
         end
