@@ -22,6 +22,7 @@ return {
                     vim.cmd(':Oil')
                 end
             end)
+            vim.keymap.set('n', '-', ':Oil<CR>')
         end,
     },
 }
