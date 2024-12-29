@@ -12,7 +12,6 @@ end, { desc = 'Save and format file' })
 vim.keymap.set('n', '<space>q', ':q<CR>')
 vim.keymap.set('n', '<space>z', ':set wrap!<CR>')
 vim.keymap.set('n', '<space>hc', ':set cursorcolumn!<CR>')
-vim.keymap.set('n', '<space>hc', ':set cursorcolumn!<CR>')
 vim.keymap.set('n', '<space>u.', ':set cursorcolumn!<CR>')
 vim.keymap.set('n', '<space>so', ':source %<CR>')
 
@@ -26,6 +25,11 @@ vim.keymap.set('n', '<space>so', ':source %<CR>')
 --     end
 -- end)
 
+-- Buffers
+--
+vim.keymap.set('n', '<space>k', ':bprevious<CR>')
+vim.keymap.set('n', '<space>j', ':bnext<CR>')
+
 -- Windows
 --
 vim.keymap.set('n', '<space>u', '<C-w>')
@@ -33,13 +37,13 @@ vim.keymap.set('n', '<space>h', '<C-w>')
 
 -- Terminal
 --
-vim.keymap.set('n', '<space>j', function()
+vim.keymap.set('n', '<space>tj', function()
     vim.cmd.vnew()
     vim.cmd.term()
     vim.cmd.wincmd('J')
     vim.api.nvim_win_set_height(0, 15)
 end)
-vim.keymap.set('n', '<space>l', function()
+vim.keymap.set('n', '<space>tl', function()
     -- local current_height = vim.api.nvim_win_get_height(0)
     vim.cmd.vnew()
     vim.cmd.term()

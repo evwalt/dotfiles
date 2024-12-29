@@ -55,6 +55,10 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 --
 require('config.set-search-highlighting')
 
+-- Terminal GUI Colors
+--
+vim.opt.termguicolors = true
+
 -- Clipboard
 --
 vim.opt.clipboard = 'unnamedplus'
