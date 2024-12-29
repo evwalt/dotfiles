@@ -10,13 +10,6 @@ vim.keymap.set('n', '<space>m', function()
     vim.cmd('w')
 end, { desc = 'Save and format file' })
 vim.keymap.set('n', '<space>q', ':q<CR>')
-vim.keymap.set('n', '<space>e', function()
-    if vim.bo.filetype == 'oil' then
-        vim.cmd(':bdelete')
-    else
-        vim.cmd(':e .')
-    end
-end, { desc = 'Toggle :Ex or return to previous file' })
 vim.keymap.set('n', '<space>z', ':set wrap!<CR>')
 vim.keymap.set('n', '<space>hc', ':set cursorcolumn!<CR>')
 vim.keymap.set('n', '<space>hc', ':set cursorcolumn!<CR>')
