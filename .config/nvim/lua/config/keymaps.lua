@@ -29,8 +29,8 @@ vim.keymap.set('n', '<space>so', ':source %<CR>')
 --
 vim.keymap.set('n', '<space>k', ':bprevious<CR>')
 vim.keymap.set('n', '<space>j', ':bnext<CR>')
-vim.keymap.set('n', '<space>bd', ':bd<CR>')
-vim.keymap.set('n', '<space>bdf', ':bd!<CR>')
+vim.keymap.set('n', '<space>dd', ':bd<CR>')
+vim.keymap.set('n', '<space>df', ':bd!<CR>')
 
 -- Windows
 --
@@ -54,11 +54,12 @@ vim.keymap.set('n', '<space>tl', function()
 end)
 vim.keymap.set('t', '<esc>', '<C-\\><C-n>')
 
--- LSP Default Keymaps in Neovim Nightly Build
+-- Edit Specific Files
 --
-vim.keymap.set('n', 'grn', vim.lsp.buf.rename)
-vim.keymap.set('n', 'gra', vim.lsp.buf.code_action)
-vim.keymap.set('n', 'grr', vim.lsp.buf.references)
-vim.keymap.set('n', 'gri', vim.lsp.buf.implementation)
-vim.keymap.set('n', 'gO', vim.lsp.buf.document_symbol)
-vim.keymap.set('n', '<C-s>', vim.lsp.buf.signature_help)
+local prod_personal_path = '~/Dropbox/docs/notes/productivity-personal/'
+vim.keymap.set('n', '<space>d', function()
+    vim.cmd('e ' .. prod_personal_path .. 'daily-planning.md')
+end)
+vim.keymap.set('n', '<space>l', function()
+    vim.cmd('e ' .. prod_personal_path .. 'jots.md')
+end)
