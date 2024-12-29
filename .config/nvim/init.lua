@@ -1,4 +1,4 @@
--- Top-Level Configuration
+-- Top-Level Configurationq
 --
 -- Note: many settings come from [Advent of Neovim](https://www.youtube.com/playlist?list=PLep05UYkc6wTyBe7kPjQFWVXTlhKeQejM). Some settings were created as I was going through it.
 
