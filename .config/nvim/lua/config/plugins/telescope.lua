@@ -17,6 +17,9 @@ return {
         require('telescope').load_extension('fzf')
 
         vim.keymap.set('n', '<space><space>', require('telescope.builtin').find_files)
+        -- vim.keymap.set('n', '<space>fd', require('telescope.builtin').find_files {
+        --     cwd = require('telescope.utils').buffer_dir(),
+        -- })
         vim.keymap.set('n', '<space>fh', require('telescope.builtin').help_tags)
 
         require 'config.telescope.multigrep'.setup()

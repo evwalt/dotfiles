@@ -8,7 +8,12 @@ return {
         opts = {},
         config = function()
             require("oil").setup({
-                view_options = { show_hidden = true },
+                view_options = {
+                    show_hidden = true,
+                    is_always_hidden = function(name, _)
+                        return name == '..'
+                    end,
+                },
             })
             vim.keymap.set('n', '<space>e', function()
                 if vim.bo.filetype == 'oil' then
