@@ -18,4 +18,3 @@ require('config.keymaps')
 -- Plugin Management
 --
 require('config.lazy')
-

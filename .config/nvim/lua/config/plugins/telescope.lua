@@ -22,4 +22,3 @@ return {
         require 'config.telescope.multigrep'.setup()
     end,
 }
-

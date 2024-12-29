@@ -3,8 +3,8 @@ return {
         "stevearc/oil.nvim",
         ---@module 'oil'
         ---@type oil.SetupOpts
-        dependencies = { { "echasnovski/mini.icons", opts = {} } },
-        -- dependencies = { "nvim-tree/nvim-web-devicons" }, -- use if prefer nvim-web-devicons
+        -- dependencies = { { "echasnovski/mini.icons", opts = {} } },
+        dependencies = { "nvim-tree/nvim-web-devicons" }, -- use if prefer nvim-web-devicons
         opts = {},
         config = function()
             require("oil").setup({
@@ -20,4 +20,3 @@ return {
         end,
     },
 }
-
