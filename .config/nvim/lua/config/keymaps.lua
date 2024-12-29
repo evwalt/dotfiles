@@ -29,6 +29,7 @@ vim.keymap.set('n', '<space>so', ':source %<CR>')
 --
 vim.keymap.set('n', '<space>k', ':bprevious<CR>')
 vim.keymap.set('n', '<space>j', ':bnext<CR>')
+vim.keymap.set('n', '<space>bdf', ':bd!<CR>')
 
 -- Windows
 --
