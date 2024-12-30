@@ -11,6 +11,7 @@ brotli
 c-ares
 ca-certificates
 cairo
+cmake
 coreutils
 curl
 dbus
@@ -65,7 +66,6 @@ libtool
 libunistring
 libuv
 libvmaf
-libvterm
 libx11
 libxau
 libxcb
@@ -75,12 +75,10 @@ libxml2
 libxrender
 libzip
 little-cms2
-lpeg
 lua
 lua-language-server
 luajit
 luarocks
-luv
 lz4
 lzo
 m4
@@ -88,11 +86,10 @@ make
 md4c
 mpdecimal
 mpfr
-msgpack
 ncurses
-neovim
 net-snmp
 nettle
+ninja
 node
 oniguruma
 openexr
@@ -120,7 +117,6 @@ tmux
 tree
 tree-sitter
 unbound
-unibilium
 unixodbc
 utf8proc
 webp

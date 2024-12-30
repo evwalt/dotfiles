@@ -1,5 +1,6 @@
 bash-language-server
 bison
+cmake
 coreutils
 fd
 felixkratz/formulae/svim
@@ -11,9 +12,10 @@ go
 grep
 lazygit
 lua-language-server
+luajit
 luarocks
 make
-neovim
+ninja
 php
 railwaycat/emacsmacport/emacs-mac
 ripgrep

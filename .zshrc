@@ -105,8 +105,8 @@ for file in ~/.aliases; do
 done
 
 # export EDITOR="/Applications/Visual\ Studio\ Code\ -\ Insiders.app/Contents/MacOS/Electron"
-export PATH="/opt/homebrew/opt/node@18/bin:$PATH"
-export PATH="$PATH:/opt/homebrew/opt/node@18/bin"
+# export PATH="/opt/homebrew/opt/node@18/bin:$PATH"
+# export PATH="$PATH:/opt/homebrew/opt/node@18/bin"
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
 export PATH="$PATH:$HOME/.rvm/bin"
 
@@ -117,3 +117,7 @@ export NVM_DIR="$HOME/.nvm"
 echo -ne "\e[2 q"
 
 trap 'echo -ne "\e[2 q"' EXIT
+
+# sbin fix per `brew doctor`
+#
+export PATH="/usr/local/sbin:$PATH"
