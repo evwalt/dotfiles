@@ -62,3 +62,8 @@ vim.opt.termguicolors = true
 -- Clipboard
 --
 vim.opt.clipboard = 'unnamedplus'
+
+-- Spell
+--
+vim.opt.spell = true
+vim.opt.spelllang = 'en_us'

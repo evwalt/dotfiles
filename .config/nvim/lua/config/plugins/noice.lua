@@ -31,6 +31,32 @@ return {
                     inc_rename = false,           -- enables an input dialog for inc-rename.nvim
                     lsp_doc_border = false,       -- add a border to hover docs and signature help
                 },
+                -- Show @recording messages
+                -- Show as a notify message
+                -- routes = {
+                --     view = 'notify',
+                --     filter = { event = 'msg_showmode' },
+                -- },
+                -- Show in the statusline
+                -- sections = {
+                --     lualine_x = {
+                --         {
+                --             require("noice").api.statusline.mode.get,
+                --             cond = require("noice").api.statusline.mode.has,
+                --             color = { fg = "#ff9e64" },
+                --         }
+                --     },
+                -- },
+                -- cmdline = {
+                --     format = {
+                --         search_down = {
+                --             view = "cmdline",
+                --         },
+                --         search_up = {
+                --             view = "cmdline",
+                --         },
+                --     },
+                -- },
             })
         end
     }
