@@ -1,6 +1,6 @@
 # Homebrew
 #
-alias b="brew update --verbose && brew upgrade --verbose && brew cleanup --verbose --prune=all && brew leaves > ~/brew-leaves.txt && brew list > ~/brew-list.txt && brew list --cask > ~/brew-list-cask.txt && less ~/brew-leaves.txt && less ~/brew-list.txt && less ~/brew-list-cask.txt"
+alias b="brew update --verbose && brew upgrade --verbose && brew cleanup --verbose --prune=all && brew doctor && brew leaves > ~/brew-leaves.txt && brew list > ~/brew-list.txt && brew list --cask > ~/brew-list-cask.txt && less ~/brew-leaves.txt && less ~/brew-list.txt && less ~/brew-list-cask.txt"
 
 # Git
 #

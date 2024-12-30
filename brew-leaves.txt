@@ -11,10 +11,9 @@ gnuplot
 go
 grep
 lazygit
-lua-language-server
-luajit
 luarocks
 make
+neovim
 ninja
 php
 railwaycat/emacsmacport/emacs-mac
