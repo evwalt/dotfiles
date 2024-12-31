@@ -294,6 +294,15 @@
             "commands": ["workbench.action.nextEditorInGroup"]
         },
         {
+            "before": ["<leader>", "j"],
+            "commands": ["workbench.action.previousEditorInGroup"]
+        },
+        {
+            "before": ["<leader>", "k"],
+            "commands": ["workbench.action.nextEditorInGroup"]
+        },
+
+        {
             "before": ["<leader>", "a"],
             "commands": ["vscode-harpoon.addEditor"]
         },
@@ -510,6 +519,15 @@
             "before": ["shift+K"],
             "commands": ["workbench.action.nextEditorInGroup"]
         },
+        {
+            "before": ["<leader>", "j"],
+            "commands": ["workbench.action.previousEditorInGroup"]
+        },
+        {
+            "before": ["<leader>", "k"],
+            "commands": ["workbench.action.nextEditorInGroup"]
+        },
+
         {
             "before": ["<leader>", "a"],
             "commands": ["vscode-harpoon.addEditor"]
