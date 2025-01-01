@@ -33,6 +33,8 @@ return {
 					timeout_ms = 1000,
 				})
 
+				require("lint").try_lint()
+
 				vim.cmd("w")
 			end)
 		end,
