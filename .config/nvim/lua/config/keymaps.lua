@@ -4,11 +4,11 @@
 -- Generic
 --
 vim.keymap.set('n', '<space>w', ':w<CR>')
-vim.keymap.set('n', '<space>v', function() vim.lsp.buf.format() end)
-vim.keymap.set('n', '<space>m', function()
-    vim.lsp.buf.format()
-    vim.cmd('w')
-end, { desc = 'Save and format file' })
+-- vim.keymap.set('n', '<space>v', function() vim.lsp.buf.format() end)
+-- vim.keymap.set('n', '<space>m', function()
+--     vim.lsp.buf.format()
+--     vim.cmd('w')
+-- end)
 vim.keymap.set('n', '<space>q', ':q<CR>')
 vim.keymap.set('n', '<space>z', ':set wrap!<CR>')
 vim.keymap.set('n', '<space>hc', ':set cursorcolumn!<CR>')
