@@ -21,4 +21,5 @@ ripgrep
 shellcheck
 tmux
 tree
+utf8proc
 yadm
