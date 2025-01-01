@@ -63,3 +63,10 @@ end)
 vim.keymap.set("n", "<space>l", function()
 	vim.cmd("e " .. prod_personal_path .. "jots.md")
 end)
+
+-- Comments
+--
+vim.api.nvim_set_keymap("n", "<space>gc", "gcc", { noremap = false, silent = true })
+vim.api.nvim_set_keymap("n", "<space>p.", "gcc", { noremap = false, silent = true })
+vim.api.nvim_set_keymap("v", "<space>gc", "gc", { noremap = false, silent = true })
+vim.api.nvim_set_keymap("v", "<space>p.", "gc", { noremap = false, silent = true })

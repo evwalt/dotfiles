@@ -8,10 +8,10 @@ return {
 		-- 		},
 		-- 	},
 		-- },
-		event = {
-			"BufReadPre",
-			"BufNewFile",
-		},
+		-- event = {
+		-- 	"BufReadPre",
+		-- 	"BufNewFile",
+		-- },
 		config = function()
 			local lint = require("lint")
 
