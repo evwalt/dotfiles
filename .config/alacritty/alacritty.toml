@@ -10,6 +10,7 @@ size = 14
 #
 [window]
 option_as_alt = "Both" # (macos only)
+decorations = 'None'
 
 # Color Theme - Midnight Haze: <https://github.com/hafiz-muhammad/midnight-haze-alacritty-theme/blob/main/midnight-haze.toml>
 #
