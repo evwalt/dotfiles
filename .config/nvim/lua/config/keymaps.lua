@@ -1,7 +1,7 @@
 -- Keymaps
 --
 
--- Generic
+-- Write, Quit, Wrap, Set Cursor Column, & Source
 --
 vim.keymap.set("n", "<space>w", ":w<CR>")
 -- vim.keymap.set('n', '<space>v', function() vim.lsp.buf.format() end)

@@ -18,6 +18,11 @@ return {
 					markdown = { "markdownlint" },
 				},
 			})
+			-- conform.formatters.stylua = {
+			-- 	prepend_args = function()
+			-- 		return { "--use-spaces" }
+			-- 	end,
+			-- }
 
 			vim.keymap.set("n", "<space>v", function()
 				conform.format({
