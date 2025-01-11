@@ -27,8 +27,6 @@ vim.keymap.set("n", "<space>so", ":source %<CR>")
 
 -- Buffers
 --
-vim.keymap.set("n", "<space>k", ":bprevious<CR>")
-vim.keymap.set("n", "<space>j", ":bnext<CR>")
 vim.keymap.set("n", "<space>xx", ":bd<CR>")
 vim.keymap.set("n", "<space>xf", ":bd!<CR>")
 
