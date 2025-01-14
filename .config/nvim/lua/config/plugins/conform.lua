@@ -17,11 +17,11 @@ return {
 					-- typescript = { "prettierd", "prettier", stop_after_first = true },
 					markdown = { "markdownlint" },
 				},
-				-- formatters = {
-				--     stylua = {
-				--         args = { "--config-path", vim.fn.expand("~/.config/stylua/stylua.toml"), "$FILENAME" },
-				--     },
-				-- },
+				formatters = {
+					-- stylua = {
+					-- 	args = { "--config-path", vim.fn.expand("~/.config/stylua/stylua.toml"), "$FILENAME" },
+					-- },
+				},
 			})
 
 			vim.keymap.set("n", "<space>v", function()
