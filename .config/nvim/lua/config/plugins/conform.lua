@@ -17,12 +17,12 @@ return {
 					-- typescript = { "prettierd", "prettier", stop_after_first = true },
 					markdown = { "markdownlint" },
 				},
+				-- formatters = {
+				--     stylua = {
+				--         args = { "--config-path", vim.fn.expand("~/.config/stylua/stylua.toml"), "$FILENAME" },
+				--     },
+				-- },
 			})
-			-- conform.formatters.stylua = {
-			-- 	prepend_args = function()
-			-- 		return { "--use-spaces" }
-			-- 	end,
-			-- }
 
 			vim.keymap.set("n", "<space>v", function()
 				conform.format({
