@@ -9,7 +9,7 @@ vim.keymap.set("n", "<space>w", ":w<CR>")
 --     vim.lsp.buf.format()
 --     vim.cmd('w')
 -- end)
-vim.keymap.set("n", "<space>q", ":q<CR>")
+-- vim.keymap.set("n", "<space>q", ":q<CR>")
 vim.keymap.set("n", "<space>z", ":set wrap!<CR>")
 vim.keymap.set("n", "<space>hc", ":set cursorcolumn!<CR>")
 vim.keymap.set("n", "<space>u.", ":set cursorcolumn!<CR>")
@@ -27,6 +27,7 @@ vim.keymap.set("n", "<space>so", ":source %<CR>")
 
 -- Buffers
 --
+vim.keymap.set("n", "<space>q", ":bd<CR>")
 vim.keymap.set("n", "<space>xx", ":bd<CR>")
 vim.keymap.set("n", "<space>xf", ":bd!<CR>")
 
