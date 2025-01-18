@@ -209,72 +209,72 @@
     // Show a button in the tree view title bar to enable grouping items by sub tag.
     "todo-tree.tree.buttons.groupBySubTag": false,
 
-    "vim.leader": " ",
     "vim.normalModeKeyBindingsNonRecursive": [
         {
-            "before": ["<leader>", "space"],
+            "before": ["space", "space"],
             "commands": ["workbench.action.quickOpen"]
         },
         {
-            "before": ["<leader>", "g", "g"],
+            "before": ["space", "g", "g"],
             "commands": ["workbench.action.showCommands"]
         },
         {
-            "before": ["<leader>", "p", "p"],
+            "before": ["space", "p", "p"],
             "commands": ["workbench.action.showCommands"]
         },
-        { "before": ["<leader>", "w"], "commands": [":w"] },
+        { "before": ["space", "w"], "commands": [":w"] },
         {
-            "before": ["<leader>", "v"],
+            "before": ["space", "v"],
             "commands": ["editor.action.formatDocument"]
         },
         {
-            "before": ["<leader>", "m"],
+            "before": ["space", "m"],
             "commands": ["editor.action.formatDocument", ":w"]
         },
         {
-            "before": ["<leader>", "z"],
+            "before": ["space", "z"],
             "commands": ["editor.action.toggleWordWrap"]
         },
-        { "before": ["<leader>", "q"], "commands": [":q"] },
+        { "before": ["space", "q"], "commands": [":q"] },
+        { "before": ["space", "x", "x"], "commands": [":q"] },
         {
-            "before": ["<leader>", "t", "t"],
+            "before": ["space", "t", "t"],
             "commands": ["workbench.view.explorer"]
         },
         {
-            "before": ["<leader>", "f", "f"],
+            "before": ["space", "f", "f"],
             "commands": ["workbench.view.search"]
         },
         {
-            "before": ["<leader>", "y", "y"],
+            "before": ["space", "y", "y"],
             "commands": ["workbench.view.search"]
         },
         {
-            "before": ["<leader>", "g", "h"],
+            "before": ["space", "g", "h"],
             "commands": ["editor.action.showDefinitionPreviewHover"]
         },
         {
-            "before": ["<leader>", "p", "u"],
+            "before": ["space", "p", "u"],
             "commands": ["editor.action.showDefinitionPreviewHover"]
         },
         {
-            "before": ["<leader>", "g", "d"],
+            "before": ["space", "g", "d"],
             "commands": ["editor.action.revealDefinition"]
         },
         {
-            "before": ["<leader>", "p", "i"],
+            "before": ["space", "p", "i"],
             "commands": ["editor.action.revealDefinition"]
         },
         {
-            "before": ["<leader>", "g", "c"],
+            "before": ["space", "g", "c"],
             "commands": ["editor.action.commentLine"]
         },
         {
-            "before": ["<leader>", "p", "."],
+            "before": ["space", "p", "."],
             "commands": ["editor.action.commentLine"]
         },
         {
-            "before": ["<leader>", "g", "p"],
+            "before": ["space", "g", "p"],
             "commands": ["markdown.showPreview"]
         },
         {
@@ -294,84 +294,83 @@
             "commands": ["workbench.action.nextEditorInGroup"]
         },
         {
-            "before": ["<leader>", "j"],
+            "before": ["space", "j"],
             "commands": ["workbench.action.previousEditorInGroup"]
         },
         {
-            "before": ["<leader>", "k"],
+            "before": ["space", "k"],
             "commands": ["workbench.action.nextEditorInGroup"]
         },
-
         {
-            "before": ["<leader>", "a"],
+            "before": ["space", "a"],
             "commands": ["vscode-harpoon.addEditor"]
         },
         {
-            "before": ["<leader>", "h", "q"],
+            "before": ["space", "h", "q"],
             "commands": ["workbench.action.splitEditorLeft"]
         },
         {
-            "before": ["<leader>", "h", "j"],
+            "before": ["space", "h", "j"],
             "commands": ["workbench.action.splitEditorDown"]
         },
         {
-            "before": ["<leader>", "h", "k"],
+            "before": ["space", "h", "k"],
             "commands": ["workbench.action.splitEditorUp"]
         },
         {
-            "before": ["<leader>", "h", "x"],
+            "before": ["space", "h", "x"],
             "commands": ["workbench.action.splitEditorRight"]
         },
         {
-            "before": ["<leader>", "u", "b"],
+            "before": ["space", "u", "b"],
             "commands": ["workbench.action.splitEditorLeft"]
         },
         {
-            "before": ["<leader>", "u", "m"],
+            "before": ["space", "u", "m"],
             "commands": ["workbench.action.splitEditorDown"]
         },
         {
-            "before": ["<leader>", "u", "w"],
+            "before": ["space", "u", "w"],
             "commands": ["workbench.action.splitEditorUp"]
         },
         {
-            "before": ["<leader>", "u", "v"],
+            "before": ["space", "u", "v"],
             "commands": ["workbench.action.splitEditorRight"]
         },
         {
-            "before": ["<leader>", "h", "o"],
+            "before": ["space", "h", "o"],
             "commands": ["workbench.action.focusLeftGroup"]
         },
         {
-            "before": ["<leader>", "h", "e"],
+            "before": ["space", "h", "e"],
             "commands": ["workbench.action.focusBelowGroup"]
         },
         {
-            "before": ["<leader>", "h", "u"],
+            "before": ["space", "h", "u"],
             "commands": ["workbench.action.focusAboveGroup"]
         },
         {
-            "before": ["<leader>", "h", "i"],
+            "before": ["space", "h", "i"],
             "commands": ["workbench.action.focusRightGroup"]
         },
         {
-            "before": ["<leader>", "u", "d"],
+            "before": ["space", "u", "d"],
             "commands": ["workbench.action.focusLeftGroup"]
         },
         {
-            "before": ["<leader>", "u", "h"],
+            "before": ["space", "u", "h"],
             "commands": ["workbench.action.focusBelowGroup"]
         },
         {
-            "before": ["<leader>", "u", "t"],
+            "before": ["space", "u", "t"],
             "commands": ["workbench.action.focusAboveGroup"]
         },
         {
-            "before": ["<leader>", "u", "n"],
+            "before": ["space", "u", "n"],
             "commands": ["workbench.action.focusRightGroup"]
         },
         {
-            "before": ["<leader>", "h", "t"],
+            "before": ["space", "h", "t"],
             "commands": [
                 "editor.action.insertLineAfter",
                 "md-shortcut.toggleCheckboxes"
@@ -379,7 +378,7 @@
             "after": ["i"]
         },
         {
-            "before": ["<leader>", "u", "e"],
+            "before": ["space", "u", "e"],
             "commands": [
                 "editor.action.insertLineAfter",
                 "md-shortcut.toggleCheckboxes"
@@ -389,277 +388,70 @@
         // Third Party
         // vsnetrw
         {
-            "before": ["<leader>", "e"],
+            "before": ["space", "e"],
+            "commands": ["vsnetrw.open"],
+            "when": "editorLangId != vsnetrw"
+        },
+        {
+            "before": ["-"],
             "commands": ["vsnetrw.open"],
             "when": "editorLangId != vsnetrw"
         },
         // Harpoon
         {
-            "before": ["<leader>", "h"],
+            "before": ["space", "h"],
             "commands": ["vscode-harpoon.gotoEditor1"]
         },
         {
-            "before": ["<leader>", "t"],
+            "before": ["space", "t"],
             "commands": ["vscode-harpoon.gotoEditor2"]
         },
         {
-            "before": ["<leader>", "n"],
+            "before": ["space", "n"],
             "commands": ["vscode-harpoon.gotoEditor3"]
         },
         {
-            "before": ["<leader>", "s"],
+            "before": ["space", "s"],
             "commands": ["vscode-harpoon.gotoEditor4"]
         },
         {
-            "before": ["<leader>", "d"],
+            "before": ["space", "d"],
             "commands": ["vscode-harpoon.gotoEditor5"]
         },
         {
-            "before": ["<leader>", "c"],
+            "before": ["space", "c"],
             "commands": ["vscode-harpoon.gotoEditor6"]
         },
         {
-            "before": ["<leader>", "r"],
+            "before": ["space", "r"],
             "commands": ["vscode-harpoon.gotoEditor7"]
         },
         {
-            "before": ["<leader>", "l"],
+            "before": ["space", "l"],
             "commands": ["vscode-harpoon.gotoEditor8"]
         },
         {
-            "before": ["<leader>", "b"],
+            "before": ["space", "b"],
             "commands": ["vscode-harpoon.gotoEditor9"]
         },
         { "before": ["<C-e>"], "commands": ["vscode-harpoon.editEditors"] },
         {
             "before": ["<C-o>"],
             "commands": ["vscode-harpoon.editorQuickPick"]
+        },
+        {
+            "before": ["space", "t", "j"],
+            "commands": ["workbench.action.terminal.toggleTerminal"]
         }
     ],
     "vim.visualModeKeyBindingsNonRecursive": [
         {
-            "before": ["<leader>", "space"],
-            "commands": ["workbench.action.quickOpen"]
-        },
-        {
-            "before": ["<leader>", "g", "g"],
-            "commands": ["workbench.action.showCommands"]
-        },
-        {
-            "before": ["<leader>", "p", "p"],
-            "commands": ["workbench.action.showCommands"]
-        },
-        { "before": ["<leader>", "w"], "commands": [":w"] },
-        {
-            "before": ["<leader>", "v"],
-            "commands": ["editor.action.formatDocument"]
-        },
-        {
-            "before": ["<leader>", "m"],
-            "commands": ["editor.action.formatDocument", ":w"]
-        },
-        {
-            "before": ["<leader>", "z"],
-            "commands": ["editor.action.toggleWordWrap"]
-        },
-        { "before": ["<leader>", "q"], "commands": [":q"] },
-        {
-            "before": ["<leader>", "t", "t"],
-            "commands": ["workbench.view.explorer"]
-        },
-        {
-            "before": ["<leader>", "f", "f"],
-            "commands": ["workbench.view.search"]
-        },
-        {
-            "before": ["<leader>", "y", "y"],
-            "commands": ["workbench.view.search"]
-        },
-        {
-            "before": ["<leader>", "g", "h"],
-            "commands": ["editor.action.showDefinitionPreviewHover"]
-        },
-        {
-            "before": ["<leader>", "p", "u"],
-            "commands": ["editor.action.showDefinitionPreviewHover"]
-        },
-        {
-            "before": ["<leader>", "g", "d"],
-            "commands": ["editor.action.revealDefinition"]
-        },
-        {
-            "before": ["<leader>", "p", "i"],
-            "commands": ["editor.action.revealDefinition"]
-        },
-        {
-            "before": ["<leader>", "g", "c"],
+            "before": ["space", "g", "c"],
             "commands": ["editor.action.commentLine"]
         },
         {
-            "before": ["<leader>", "p", "."],
+            "before": ["space", "p", "."],
             "commands": ["editor.action.commentLine"]
-        },
-        {
-            "before": ["<leader>", "g", "p"],
-            "commands": ["markdown.showPreview"]
-        },
-        {
-            "before": ["<", "<"],
-            "commands": ["workbench.action.moveEditorLeftInGroup"]
-        },
-        {
-            "before": [">", ">"],
-            "commands": ["workbench.action.moveEditorRightInGroup"]
-        },
-        {
-            "before": ["shift+J"],
-            "commands": ["workbench.action.previousEditorInGroup"]
-        },
-        {
-            "before": ["shift+K"],
-            "commands": ["workbench.action.nextEditorInGroup"]
-        },
-        {
-            "before": ["<leader>", "j"],
-            "commands": ["workbench.action.previousEditorInGroup"]
-        },
-        {
-            "before": ["<leader>", "k"],
-            "commands": ["workbench.action.nextEditorInGroup"]
-        },
-
-        {
-            "before": ["<leader>", "a"],
-            "commands": ["vscode-harpoon.addEditor"]
-        },
-        {
-            "before": ["<leader>", "h", "q"],
-            "commands": ["workbench.action.splitEditorLeft"]
-        },
-        {
-            "before": ["<leader>", "h", "j"],
-            "commands": ["workbench.action.splitEditorDown"]
-        },
-        {
-            "before": ["<leader>", "h", "k"],
-            "commands": ["workbench.action.splitEditorUp"]
-        },
-        {
-            "before": ["<leader>", "h", "x"],
-            "commands": ["workbench.action.splitEditorRight"]
-        },
-        {
-            "before": ["<leader>", "u", "b"],
-            "commands": ["workbench.action.splitEditorLeft"]
-        },
-        {
-            "before": ["<leader>", "u", "m"],
-            "commands": ["workbench.action.splitEditorDown"]
-        },
-        {
-            "before": ["<leader>", "u", "w"],
-            "commands": ["workbench.action.splitEditorUp"]
-        },
-        {
-            "before": ["<leader>", "u", "v"],
-            "commands": ["workbench.action.splitEditorRight"]
-        },
-        {
-            "before": ["<leader>", "h", "o"],
-            "commands": ["workbench.action.focusLeftGroup"]
-        },
-        {
-            "before": ["<leader>", "h", "e"],
-            "commands": ["workbench.action.focusBelowGroup"]
-        },
-        {
-            "before": ["<leader>", "h", "u"],
-            "commands": ["workbench.action.focusAboveGroup"]
-        },
-        {
-            "before": ["<leader>", "h", "i"],
-            "commands": ["workbench.action.focusRightGroup"]
-        },
-        {
-            "before": ["<leader>", "u", "d"],
-            "commands": ["workbench.action.focusLeftGroup"]
-        },
-        {
-            "before": ["<leader>", "u", "h"],
-            "commands": ["workbench.action.focusBelowGroup"]
-        },
-        {
-            "before": ["<leader>", "u", "t"],
-            "commands": ["workbench.action.focusAboveGroup"]
-        },
-        {
-            "before": ["<leader>", "u", "n"],
-            "commands": ["workbench.action.focusRightGroup"]
-        },
-        {
-            "before": ["<leader>", "h", "t"],
-            "commands": [
-                "editor.action.insertLineAfter",
-                "md-shortcut.toggleCheckboxes"
-            ],
-            "after": ["i"]
-        },
-        {
-            "before": ["<leader>", "u", "e"],
-            "commands": [
-                "editor.action.insertLineAfter",
-                "md-shortcut.toggleCheckboxes"
-            ],
-            "after": ["i"]
-        },
-        // Third Party
-        // vsnetrw
-        {
-            "before": ["<leader>", "e"],
-            "commands": ["vsnetrw.open"],
-            "when": "editorLangId != vsnetrw"
-        },
-        // Harpoon
-        {
-            "before": ["<leader>", "h"],
-            "commands": ["vscode-harpoon.gotoEditor1"]
-        },
-        {
-            "before": ["<leader>", "t"],
-            "commands": ["vscode-harpoon.gotoEditor2"]
-        },
-        {
-            "before": ["<leader>", "n"],
-            "commands": ["vscode-harpoon.gotoEditor3"]
-        },
-        {
-            "before": ["<leader>", "s"],
-            "commands": ["vscode-harpoon.gotoEditor4"]
-        },
-        {
-            "before": ["<leader>", "d"],
-            "commands": ["vscode-harpoon.gotoEditor5"]
-        },
-        {
-            "before": ["<leader>", "c"],
-            "commands": ["vscode-harpoon.gotoEditor6"]
-        },
-        {
-            "before": ["<leader>", "r"],
-            "commands": ["vscode-harpoon.gotoEditor7"]
-        },
-        {
-            "before": ["<leader>", "l"],
-            "commands": ["vscode-harpoon.gotoEditor8"]
-        },
-        {
-            "before": ["<leader>", "b"],
-            "commands": ["vscode-harpoon.gotoEditor9"]
-        },
-        { "before": ["<C-e>"], "commands": ["vscode-harpoon.editEditors"] },
-        {
-            "before": ["<C-o>"],
-            "commands": ["vscode-harpoon.editorQuickPick"]
         }
     ],
     "vim.smartRelativeLine": true,
