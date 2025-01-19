@@ -3,3 +3,4 @@ for file in ~/.aliases; do
 done
 . "$HOME/.cargo/env"
 
+source ${HOME}/.ghcup/env
