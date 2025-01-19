@@ -67,3 +67,7 @@ vim.opt.clipboard = "unnamedplus"
 --
 vim.opt.spell = true
 vim.opt.spelllang = "en_us"
+
+-- Sessions
+--
+vim.o.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions" -- from `:checkhealth` warning
