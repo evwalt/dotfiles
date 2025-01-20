@@ -11,4 +11,7 @@ return {
 		-- auto_restore_last_session = true,
 		show_auto_restore_notif = true,
 	},
+	keys = {
+		{ "<space>uus", ":SessionSearch<CR>" },
+	},
 }
