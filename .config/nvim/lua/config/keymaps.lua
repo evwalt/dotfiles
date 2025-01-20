@@ -38,13 +38,13 @@ vim.keymap.set("n", "<space>h", "<C-w>")
 
 -- Terminal
 --
-vim.keymap.set("n", "<space>tj", function()
+vim.keymap.set("n", "<space>ttj", function()
 	vim.cmd.vnew()
 	vim.cmd.term()
 	vim.cmd.wincmd("J")
 	vim.api.nvim_win_set_height(0, 15)
 end)
-vim.keymap.set("n", "<space>tl", function()
+vim.keymap.set("n", "<space>ttl", function()
 	-- local current_height = vim.api.nvim_win_get_height(0)
 	vim.cmd.vnew()
 	vim.cmd.term()
