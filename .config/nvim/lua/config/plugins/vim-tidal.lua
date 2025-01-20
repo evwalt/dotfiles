@@ -1,7 +1,5 @@
 return {
-	{
-		"tidalcycles/vim-tidal",
-		-- enabled = false,
-		config = function() end,
-	},
+	"tidalcycles/vim-tidal",
+	-- enabled = false,
+	config = function() end,
 }
