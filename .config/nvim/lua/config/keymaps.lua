@@ -38,13 +38,13 @@ vim.keymap.set("n", "<space>h", "<C-w>")
 
 -- Terminal
 --
-vim.keymap.set("n", "<space>ttj", function()
+vim.keymap.set("n", "<space>tj", function()
 	vim.cmd.vnew()
 	vim.cmd.term()
 	vim.cmd.wincmd("J")
 	vim.api.nvim_win_set_height(0, 15)
 end)
-vim.keymap.set("n", "<space>ttl", function()
+vim.keymap.set("n", "<space>tl", function()
 	-- local current_height = vim.api.nvim_win_get_height(0)
 	vim.cmd.vnew()
 	vim.cmd.term()
@@ -59,7 +59,7 @@ local prod_personal_path = "~/Dropbox/docs/notes/productivity-personal/"
 vim.keymap.set("n", "<space>d", function()
 	vim.cmd("e " .. prod_personal_path .. "daily-planning.md")
 end)
-vim.keymap.set("n", "<space>l", function()
+vim.keymap.set("n", "<space>n", function()
 	vim.cmd("e " .. prod_personal_path .. "jots.md")
 end)
 
