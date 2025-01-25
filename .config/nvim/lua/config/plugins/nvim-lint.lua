@@ -1,16 +1,17 @@
+local HOME = os.getenv("HOME")
 return {
 	"mfussenegger/nvim-lint",
-	-- opts = {
-	-- 	linters = {
-	-- 		["markdownlint-cli2"] = {
-	-- 			args = { "--config", os.getenv("HOME") .. "/.markdownlint.jsonc", "--" },
-	-- 		},
-	-- 	},
-	-- },
-	-- event = {
-	-- 	"BufReadPre",
-	-- 	"BufNewFile",
-	-- },
+	opts = {
+		linters = {
+			-- 	stylua = {
+			-- 		args = { "--config", HOME .. "/.config/stylua/stylua.toml", "--" },
+			-- 	},
+			["markdownlint-cli2"] = {
+				args = { "--config", HOME .. "/.config/markdownlint/.markdownlint.json", "--" },
+			},
+		},
+	},
+	event = { "BufReadPre", "BufNewFile" },
 	config = function()
 		local lint = require("lint")
 
@@ -30,7 +31,6 @@ return {
 		-- 		lint.try_lint()
 		-- 	end,
 		-- })
-
 		vim.keymap.set("n", "<space>li", function()
 			lint.try_lint()
 		end, { desc = "Trigger linting for current file" })
