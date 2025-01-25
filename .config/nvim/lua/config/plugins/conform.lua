@@ -14,7 +14,6 @@ return {
 			-- },
 		})
 
-		-- Keybindings for manual formatting
 		vim.keymap.set("n", "<space>v", function()
 			conform.format({
 				lsp_fallback = true,
