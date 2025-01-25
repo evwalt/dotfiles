@@ -22,5 +22,10 @@ return {
 			end
 		end)
 		vim.keymap.set("n", "-", ":Oil<CR>")
+		vim.keymap.set("n", "<esc>", function()
+			if vim.bo.filetype == "oil" then
+				vim.cmd(":e #")
+			end
+		end)
 	end,
 }
