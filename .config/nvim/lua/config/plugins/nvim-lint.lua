@@ -6,6 +6,9 @@ return {
 			-- 	stylua = {
 			-- 		args = { "--config", HOME .. "/.config/stylua/stylua.toml", "--" },
 			-- 	},
+			-- ["markdownlint-cli"] = {
+			-- 	args = { "--config", HOME .. "/.markdownlint.json", "--" },
+			-- },
 		},
 	},
 	config = function()
