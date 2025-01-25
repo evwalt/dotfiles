@@ -1,4 +1,4 @@
-local HOME = os.getenv("HOME")
+-- local HOME = os.getenv("HOME")
 return {
 	"stevearc/conform.nvim",
 	opts = {},
