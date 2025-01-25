@@ -1,7 +1,6 @@
 local HOME = os.getenv("HOME")
 return {
 	"stevearc/conform.nvim",
-	-- enable = false,
 	opts = {},
 	config = function()
 		local conform = require("conform")
@@ -11,18 +10,11 @@ return {
 				json = { "prettierd", "prettier", stop_after_first = true },
 				markdown = { "markdownlint-cli2" },
 			},
-			formatters = {
-				-- json = {
-				-- 	args = { "--config-path", HOME .. "/.config/prettier/.prettierrc.jsonc", "--" },
-				-- 	stylua = {
-				-- 		args = { "--config-path", HOME .. "/.config/stylua/stylua.toml", "--" },
-				-- 	},
-				markdown = {
-					args = { "--config", HOME .. "/.config/markdownlint/.markdownlint.json", "--" },
-				},
-			},
+			-- formatters = {
+			-- },
 		})
 
+		-- Keybindings for manual formatting
 		vim.keymap.set("n", "<space>v", function()
 			conform.format({
 				lsp_fallback = true,
@@ -30,6 +22,7 @@ return {
 				timeout_ms = 1000,
 			})
 		end)
+
 		vim.keymap.set("n", "<space>m", function()
 			conform.format({
 				lsp_fallback = true,
