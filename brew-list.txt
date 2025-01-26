@@ -6,6 +6,7 @@ assimp
 autoconf
 automake
 bash-language-server
+bdw-gc
 bison
 brotli
 c-ares
@@ -122,6 +123,7 @@ unbound
 unibilium
 unixodbc
 utf8proc
+w3m
 webp
 xorgproto
 xz

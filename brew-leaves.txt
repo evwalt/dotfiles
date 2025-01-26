@@ -22,4 +22,5 @@ shellcheck
 tmux
 tree
 utf8proc
+w3m
 yadm

@@ -56,10 +56,16 @@ vim.keymap.set("t", "<esc>", "<C-\\><C-n>")
 -- Edit Specific Files
 --
 local prod_personal_path = "~/Dropbox/docs/notes/productivity-personal/"
-vim.keymap.set("n", "<space>d", function()
+vim.keymap.set("n", "<space><space>d", function()
 	vim.cmd("e " .. prod_personal_path .. "daily-planning.md")
 end)
-vim.keymap.set("n", "<space>n", function()
+vim.keymap.set("n", "<space><space>c", function()
+	vim.cmd("e " .. prod_personal_path .. "../notes-generic.md")
+end)
+vim.keymap.set("n", "<space><space>r", function()
+	vim.cmd("e " .. prod_personal_path .. "plan-overview-to-do-items.md")
+end)
+vim.keymap.set("n", "<space><space>l", function()
 	vim.cmd("e " .. prod_personal_path .. "jots.md")
 end)
 
