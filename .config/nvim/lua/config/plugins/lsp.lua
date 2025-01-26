@@ -36,6 +36,8 @@ return {
 			ensure_installed = {
 				"hls",
 				"lua_ls",
+				"tailwindcss",
+				"ts_ls",
 			},
 			automatic_installation = true,
 		})
