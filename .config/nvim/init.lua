@@ -1,4 +1,4 @@
--- Top-Level Configurationq
+-- Top-level Configuration
 --
 -- Note: many settings come from [Advent of Neovim](https://www.youtube.com/playlist?list=PLep05UYkc6wTyBe7kPjQFWVXTlhKeQejM). Some settings were created as I was going through it.
 
@@ -9,12 +9,12 @@ vim.hl = vim.highlight
 
 -- Settings
 --
-require('config.set')
+require("config.set")
 
 -- Keymaps
 --
-require('config.keymaps')
+require("config.keymaps")
 
 -- Plugin Management
 --
-require('config.lazy')
+require("config.lazy")
