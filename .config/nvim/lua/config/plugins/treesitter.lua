@@ -6,13 +6,18 @@ return {
 			-- A list of parser names, or "all" (the listed parsers MUST always be installed)
 			ensure_installed = {
 				"c",
+				"css",
+				"javascript",
+				"json",
 				"lua",
-				"vim",
-				"vimdoc",
-				"query",
 				"markdown",
 				"markdown_inline",
-				"javascript",
+				"query",
+				"vim",
+				"vimdoc",
+				"svelte",
+				"toml",
+				"tsx",
 				"typescript",
 			},
 
