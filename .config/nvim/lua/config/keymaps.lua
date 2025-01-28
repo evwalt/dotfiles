@@ -75,3 +75,21 @@ vim.api.nvim_set_keymap("n", "<space>gc", "gcc", { noremap = false, silent = tru
 vim.api.nvim_set_keymap("n", "<space>p.", "gcc", { noremap = false, silent = true })
 vim.api.nvim_set_keymap("v", "<space>gc", "gc", { noremap = false, silent = true })
 vim.api.nvim_set_keymap("v", "<space>p.", "gc", { noremap = false, silent = true })
+
+-- Markdown
+--
+local function insert_to_do()
+	if vim.bo.filetype == "markdown" then
+		vim.api.nvim_command("normal! o")
+		vim.api.nvim_put({ "- [ ] " }, "c", true, true)
+		vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("a", true, false, true), "n", true)
+	else
+		print("Not a markdown file")
+	end
+end
+vim.keymap.set("n", "<space>ue", function()
+	insert_to_do()
+end, { desc = "Insert to-do item" })
+vim.keymap.set("n", "<space>ht", function()
+	insert_to_do()
+end, { desc = "Insert to-do item" })
