@@ -67,6 +67,7 @@ libtool
 libunistring
 libuv
 libvmaf
+libvterm
 libx11
 libxau
 libxcb
@@ -88,6 +89,7 @@ make
 md4c
 mpdecimal
 mpfr
+msgpack
 ncurses
 neovim
 net-snmp
