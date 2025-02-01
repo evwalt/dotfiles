@@ -68,6 +68,18 @@ end)
 vim.keymap.set("n", "<space><space>l", function()
 	vim.cmd("e " .. prod_personal_path .. "jots.md")
 end)
+vim.keymap.set("n", "<space><space>i", function()
+	vim.cmd("e " .. prod_personal_path .. "daily-planning.md")
+end)
+vim.keymap.set("n", "<space><space>.", function()
+	vim.cmd("e " .. prod_personal_path .. "../notes-generic.md")
+end)
+vim.keymap.set("n", "<space><space>,", function()
+	vim.cmd("e " .. prod_personal_path .. "plan-overview-to-do-items.md")
+end)
+vim.keymap.set("n", "<space><space>'", function()
+	vim.cmd("e " .. prod_personal_path .. "jots.md")
+end)
 
 -- Comments
 --
