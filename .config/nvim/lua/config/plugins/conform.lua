@@ -1,4 +1,4 @@
--- local HOME = os.getenv("HOME")
+local HOME = os.getenv("HOME")
 return {
 	"stevearc/conform.nvim",
 	opts = {},
@@ -14,8 +14,12 @@ return {
 				json = { "prettierd", "prettier", stop_after_first = true },
 				markdown = { "markdownlint-cli2" },
 			},
-			-- formatters = {
-			-- },
+			formatters = {
+				["markdownlint-cli2"] = {
+					command = HOME .. "/.local/share/nvim/mason/bin/markdownlint-cli2",
+					prepend_args = { "--fix", "--config", HOME .. "/.markdownlint.json" },
+				},
+			},
 		})
 
 		vim.keymap.set("n", "<space>v", function()
