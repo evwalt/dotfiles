@@ -33,7 +33,7 @@ vim.opt.smartindent = true
 
 -- Text Width (Print Width)
 --
-vim.opt.textwidth = 80
+vim.opt.textwidth = 2000
 
 -- Cases
 --
