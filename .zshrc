@@ -122,5 +122,7 @@ trap 'echo -ne "\e[2 q"' EXIT
 # sbin fix per `brew doctor`
 #
 export PATH="/usr/local/sbin:$PATH"
+
 source ${HOME}/.ghcup/env
+
 export PATH="/usr/local/bin/w3m:$PATH"
