@@ -15,8 +15,6 @@ return {
 				},
 			},
 		},
-		"williamboman/mason.nvim",
-		"williamboman/mason-lspconfig.nvim",
 	},
 	config = function()
 		local capabilities = require("blink.cmp").get_lsp_capabilities()
@@ -31,15 +29,5 @@ return {
 		-- vim.keymap.set('n', 'gO', vim.lsp.buf.document_symbol)
 		-- vim.keymap.set('n', '<C-s>', vim.lsp.buf.signature_help)
 		--
-		require("mason").setup({})
-		require("mason-lspconfig").setup({
-			ensure_installed = {
-				"hls",
-				"lua_ls",
-				"tailwindcss",
-				"ts_ls",
-			},
-			automatic_installation = true,
-		})
 	end,
 }
