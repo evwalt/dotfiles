@@ -4,6 +4,7 @@ return {
 	version = false,
 	config = function()
 		require("mini.cursorword").setup({})
+		require("mini.animate").setup({})
 
 		local hipatterns = require("mini.hipatterns")
 		hipatterns.setup({
@@ -20,4 +21,3 @@ return {
 		})
 	end,
 }
-
