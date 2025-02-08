@@ -3,7 +3,7 @@
 
 -- EditorConfig
 --
-vim.g.editorconfig = true
+-- vim.g.editorconfig = true
 
 -- Line Numbers
 --
