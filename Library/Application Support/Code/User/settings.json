@@ -236,7 +236,7 @@
             "commands": ["editor.action.toggleWordWrap"]
         },
         { "before": ["space", "q"], "commands": [":q"] },
-        { "before": ["space", "x", "x"], "commands": [":q"] },
+        { "before": ["space", "x"], "commands": [":q"] },
         {
             "before": ["space", "t", "t"],
             "commands": ["workbench.view.explorer"]
