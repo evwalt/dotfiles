@@ -40,3 +40,9 @@ blue    = "#9bb3d3"
 magenta = "#ffa1ff"
 cyan    = "#9cd8d8"
 white   = "#ffffff"
+
+[keyboard]
+bindings = [
+  # { key = "Q", mods = "Command", action = "None" }, # This setting is not working. Remapped "Command + Q" to "Hide alacritty" in macOS System Settings instead.
+  { key = "W", mods = "Command", action = "None" },
+]
