@@ -10,7 +10,9 @@ gnu-which
 gnuplot
 go
 grep
+haskell-language-server
 lazygit
+lua-language-server
 luarocks
 make
 neovim
@@ -19,6 +21,7 @@ php
 railwaycat/emacsmacport/emacs-mac
 ripgrep
 shellcheck
+stylua
 tmux
 tree
 utf8proc
