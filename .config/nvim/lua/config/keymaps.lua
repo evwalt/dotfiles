@@ -28,8 +28,8 @@ vim.keymap.set("n", "<space>so", ":source %<CR>")
 -- Buffers
 --
 vim.keymap.set("n", "<space>q", ":bd<CR>")
-vim.keymap.set("n", "<space>xx", ":bd<CR>")
-vim.keymap.set("n", "<space>xf", ":bd!<CR>")
+vim.keymap.set("n", "<space>x", ":bd<CR>")
+vim.keymap.set("n", "<space><space>xf", ":bd!<CR>")
 
 -- Windows
 --
