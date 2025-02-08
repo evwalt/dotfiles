@@ -25,6 +25,7 @@ alias tn="ts-node"
 # NPM
 #
 alias ngo="npm -g outdated"
+alias ngu="npm -g update && npm -g list && npm -g list > global-npm-packages.txt"
 alias nrd="npm run dev"
 alias nrb="npm run build"
 
