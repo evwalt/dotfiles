@@ -15,7 +15,7 @@ return {
 		}
 
 		local markdownlint_cli2 = lint.linters["markdownlint-cli2"]
-		markdownlint_cli2.cmd = HOME .. "/.local/share/nvim/mason/bin/markdownlint-cli2"
+		markdownlint_cli2.cmd = "markdownlint-cli2"
 		markdownlint_cli2.args = { "--config", HOME .. "/.markdownlint.json", "--" }
 
 		local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })

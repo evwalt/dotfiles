@@ -16,7 +16,7 @@ return {
 			},
 			formatters = {
 				["markdownlint-cli2"] = {
-					command = HOME .. "/.local/share/nvim/mason/bin/markdownlint-cli2",
+					command = "markdownlint-cli2",
 					prepend_args = { "--fix", "--config", HOME .. "/.markdownlint.json" },
 				},
 			},
