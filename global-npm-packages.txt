@@ -1,8 +1,8 @@
 /Users/evan/.nvm/versions/node/v23.3.0/lib
 ├── @fsouza/prettierd@0.26.1
-├── @tailwindcss/language-server@0.14.3
+├── @tailwindcss/language-server@0.14.4
 ├── corepack@0.31.0
-├── eslint@9.20.0
+├── eslint@9.20.1
 ├── markdownlint-cli2@0.17.2
 ├── npm@11.1.0
 ├── ts-node@10.9.2
