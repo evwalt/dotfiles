@@ -214,14 +214,14 @@
             "before": ["space", "space"],
             "commands": ["workbench.action.quickOpen"]
         },
-        {
-            "before": ["space", "g", "g"],
-            "commands": ["workbench.action.showCommands"]
-        },
-        {
-            "before": ["space", "p", "p"],
-            "commands": ["workbench.action.showCommands"]
-        },
+        // {
+        //     "before": ["space", "g", "g"],
+        //     "commands": ["workbench.action.showCommands"]
+        // },
+        // {
+        //     "before": ["space", "p", "p"],
+        //     "commands": ["workbench.action.showCommands"]
+        // },
         { "before": ["space", "w"], "commands": [":w"] },
         {
             "before": ["space", "v"],
@@ -245,16 +245,56 @@
             "before": ["space", "f", "f"],
             "commands": ["workbench.view.search"]
         },
+        // {
+        //     "before": ["space", "y", "y"],
+        //     "commands": ["workbench.view.search"]
+        // },
+        {
+            "before": ["space", "g", "g"],
+            "commands": ["workbench.action.openEditorAtIndex1"]
+        },
+        {
+            "before": ["space", "p", "p"],
+            "commands": ["workbench.action.openEditorAtIndex1"]
+        },
+        {
+            "before": ["space", "c", "c"],
+            "commands": ["workbench.action.openEditorAtIndex2"]
+        },
+        {
+            "before": ["space", ".", "."],
+            "commands": ["workbench.action.openEditorAtIndex2"]
+        },
+        {
+            "before": ["space", "r", "r"],
+            "commands": ["workbench.action.openEditorAtIndex3"]
+        },
+        {
+            "before": ["space", ",", ","],
+            "commands": ["workbench.action.openEditorAtIndex3"]
+        },
+        {
+            "before": ["space", "l", "l"],
+            "commands": ["workbench.action.openEditorAtIndex4"]
+        },
+        {
+            "before": ["space", "'", "'"],
+            "commands": ["workbench.action.openEditorAtIndex4"]
+        },
         {
             "before": ["space", "y", "y"],
-            "commands": ["workbench.view.search"]
+            "commands": ["workbench.action.openEditorAtIndex5"]
         },
+        // {
+        //     "before": ["space", "g", "h"],
+        //     "commands": ["editor.action.showDefinitionPreviewHover"]
+        // },
+        // {
+        //     "before": ["space", "p", "u"],
+        //     "commands": ["editor.action.showDefinitionPreviewHover"]
+        // },
         {
-            "before": ["space", "g", "h"],
-            "commands": ["editor.action.showDefinitionPreviewHover"]
-        },
-        {
-            "before": ["space", "p", "u"],
+            "before": ["shift+K"],
             "commands": ["editor.action.showDefinitionPreviewHover"]
         },
         {
@@ -285,14 +325,14 @@
             "before": [">", ">"],
             "commands": ["workbench.action.moveEditorRightInGroup"]
         },
-        {
-            "before": ["shift+J"],
-            "commands": ["workbench.action.previousEditorInGroup"]
-        },
-        {
-            "before": ["shift+K"],
-            "commands": ["workbench.action.nextEditorInGroup"]
-        },
+        // {
+        //     "before": ["shift+J"],
+        //     "commands": ["workbench.action.previousEditorInGroup"]
+        // },
+        // {
+        //     "before": ["shift+K"],
+        //     "commands": ["workbench.action.nextEditorInGroup"]
+        // },
         {
             "before": ["space", "j"],
             "commands": ["workbench.action.previousEditorInGroup"]
