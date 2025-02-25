@@ -57,3 +57,9 @@ vim.opt.spelllang = "en_us"
 -- Sessions
 --
 vim.o.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions,globals" -- from `:checkhealth` warning and auto-session docs
+
+-- netrw
+--
+-- Disable netrw per nvim-tree docs
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
