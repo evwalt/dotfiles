@@ -2,8 +2,7 @@ return {
 	"nvim-tree/nvim-tree.lua",
 	opts = {},
 	config = function()
-		local nvim_tree = require("nvim-tree")
-		nvim_tree.setup({
+		require("nvim-tree").setup({
 			sort = {
 				sorter = "case_sensitive",
 			},
