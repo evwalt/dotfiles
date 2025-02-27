@@ -32,13 +32,22 @@ return {
 			-- vim.api.nvim_set_hl(0, "RainbowCyan", { fg = "#56B6C2" })
 
 			-- TokyoNight colors:
-			vim.api.nvim_set_hl(0, "RainbowRed", { fg = "#f7768e" })
-			vim.api.nvim_set_hl(0, "RainbowYellow", { fg = "#e0af68" })
-			vim.api.nvim_set_hl(0, "RainbowBlue", { fg = "#7aa2f7" })
-			vim.api.nvim_set_hl(0, "RainbowOrange", { fg = "#ff9e64" })
-			vim.api.nvim_set_hl(0, "RainbowGreen", { fg = "#9ece6a" })
-			vim.api.nvim_set_hl(0, "RainbowViolet", { fg = "#bb9af7" })
-			vim.api.nvim_set_hl(0, "RainbowCyan", { fg = "#7dcfff" })
+			-- vim.api.nvim_set_hl(0, "RainbowRed", { fg = "#f7768e" })
+			-- vim.api.nvim_set_hl(0, "RainbowYellow", { fg = "#e0af68" })
+			-- vim.api.nvim_set_hl(0, "RainbowBlue", { fg = "#7aa2f7" })
+			-- vim.api.nvim_set_hl(0, "RainbowOrange", { fg = "#ff9e64" })
+			-- vim.api.nvim_set_hl(0, "RainbowGreen", { fg = "#9ece6a" })
+			-- vim.api.nvim_set_hl(0, "RainbowViolet", { fg = "#bb9af7" })
+			-- vim.api.nvim_set_hl(0, "RainbowCyan", { fg = "#7dcfff" })
+
+			-- Alternative palette: distinct from TokyoNight yet harmonizing with its dark background
+			vim.api.nvim_set_hl(0, "RainbowRed", { fg = "#ff8c8c" }) -- Soft Red
+			vim.api.nvim_set_hl(0, "RainbowYellow", { fg = "#ffd47e" }) -- Warm, muted Yellow
+			vim.api.nvim_set_hl(0, "RainbowBlue", { fg = "#91a7ff" }) -- Light, pastel Blue
+			vim.api.nvim_set_hl(0, "RainbowOrange", { fg = "#ffb86c" }) -- Muted Orange
+			vim.api.nvim_set_hl(0, "RainbowGreen", { fg = "#a3be8c" }) -- Subdued Green
+			vim.api.nvim_set_hl(0, "RainbowViolet", { fg = "#cfa9e0" }) -- Soft Violet
+			vim.api.nvim_set_hl(0, "RainbowCyan", { fg = "#88ffff" }) -- Light Cyan
 		end)
 
 		vim.g.rainbow_delimiters = { highlight = highlight }
