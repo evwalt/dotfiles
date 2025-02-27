@@ -1,12 +1,12 @@
 /Users/evan/.nvm/versions/node/v23.3.0/lib
-├── @tailwindcss/language-server@0.14.7
+├── @tailwindcss/language-server@0.14.8
 ├── corepack@0.31.0
 ├── eslint@9.21.0
 ├── markdownlint-cli2@0.17.2
 ├── npm@11.1.0
 ├── prettier@3.5.2
 ├── ts-node@10.9.2
-├── typescript-language-server@4.3.3
+├── typescript-language-server@4.3.4
 ├── typescript@5.7.3
 └── vscode-json-languageserver@1.3.4
 
