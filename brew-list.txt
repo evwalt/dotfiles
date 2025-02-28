@@ -141,4 +141,5 @@ font-cascadia-code
 font-hack-nerd-font
 hammerspoon
 qbittorrent
+qutebrowser
 wezterm
