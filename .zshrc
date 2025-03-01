@@ -131,8 +131,16 @@ source ${HOME}/.ghcup/env
 #
 export PATH="/usr/local/bin/w3m:$PATH"
 
-# pyenv virtualenv
+# Created by `pipx` on 2025-03-01 04:08:58
+export PATH="$PATH:/Users/evan/.local/bin"
+
+# pyenv
 #
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init --path)"
+
+# pyenv-virtualenv
+#
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
