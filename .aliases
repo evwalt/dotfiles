@@ -31,12 +31,17 @@ alias nrb="npm run build"
 
 # pipx
 #
-alias pxo="pipx list | grep package"  # Check outdated packages
-alias pxu="pipx upgrade-all && pipx list > ~/pipx-packages.txt"
+alias pxu="pipx upgrade-all && pipx list > ~/pipx-packages.txt && less pipx-packages.txt"
 
 # Rustup
 #
 alias r="rustup update"
+
+# tmuxinator
+#
+alias txn="tmuxinator"
+alias txns="tmuxinator start"
+alias txnss="tmuxinator start starter"
 
 # yadm
 #
