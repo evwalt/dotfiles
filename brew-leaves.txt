@@ -16,7 +16,6 @@ make
 neovim
 ninja
 php
-pipx
 pyenv-virtualenv
 railwaycat/emacsmacport/emacs-mac
 ripgrep
