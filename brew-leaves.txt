@@ -1,13 +1,11 @@
 bash-language-server
 bison
 cmake
-coreutils
 fd
 felixkratz/formulae/svim
 gcc
 git
 gnu-which
-gnuplot
 go
 grep
 haskell-language-server
@@ -18,6 +16,8 @@ make
 neovim
 ninja
 php
+pipx
+pyenv-virtualenv
 railwaycat/emacsmacport/emacs-mac
 ripgrep
 shellcheck
