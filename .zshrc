@@ -123,9 +123,14 @@ trap 'echo -ne "\e[2 q"' EXIT
 #
 export PATH="/usr/local/sbin:$PATH"
 
+# ghcup
+#
 source ${HOME}/.ghcup/env
 
+# w3m
+#
 export PATH="/usr/local/bin/w3m:$PATH"
 
-# Created by `pipx` on 2025-03-01 04:08:58
-export PATH="$PATH:/Users/evan/.local/bin"
+# pyenv virtualenv
+#
+eval "$(pyenv virtualenv-init -)"
