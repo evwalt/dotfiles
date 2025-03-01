@@ -29,6 +29,11 @@ alias ngu="npm -g update && npm -g list && npm -g list > global-npm-packages.txt
 alias nrd="npm run dev"
 alias nrb="npm run build"
 
+# pipx
+#
+alias pxo="pipx list | grep package"  # Check outdated packages
+alias pxu="pipx upgrade-all && pipx list | tee ~/pipx-packages.txt"
+
 # Rustup
 #
 alias r="rustup update"

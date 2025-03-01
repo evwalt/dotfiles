@@ -126,3 +126,6 @@ export PATH="/usr/local/sbin:$PATH"
 source ${HOME}/.ghcup/env
 
 export PATH="/usr/local/bin/w3m:$PATH"
+
+# Created by `pipx` on 2025-03-01 04:08:58
+export PATH="$PATH:/Users/evan/.local/bin"
