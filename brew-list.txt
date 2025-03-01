@@ -14,6 +14,7 @@ cmake
 coreutils
 curl
 emacs-mac
+expat
 fd
 fontconfig
 freetds
@@ -68,6 +69,7 @@ luv
 lz4
 m4
 make
+mpdecimal
 mpfr
 msgpack
 ncurses
@@ -83,9 +85,11 @@ openssl@3
 p11-kit
 pcre2
 php
+pipx
 pkgconf
 pyenv
 pyenv-virtualenv
+python@3.13
 readline
 ripgrep
 rtmpdump
