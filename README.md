@@ -16,10 +16,18 @@ To ensure everything stays up-to-date, run the following commands (using the pro
 ngo
 ```
 
-- Update outdated packages (if applicable).
+- Update outdated packages (if applicable) and log to `global-npm-packages.txt`.
 
 ```zsh
-npm -g update
+ngu
+```
+
+### Update pipx
+
+- Update packages (if applicable) and log to `pipx-packages.txt`.
+
+```zsh
+pxu
 ```
 
 ### Update Neovim
@@ -33,6 +41,8 @@ nvim
 - Update lazy.nvim plugins. Inside Neovim, run `:Lazy` to open lazy.nvim and "S" to sync plugins. And then, quit Neovim.
 
 ### Update Rustup and Homebrew
+
+- Update rustup toolchain and brews (if applicable); log brews to text files.
 
 ```zsh
 r && b
@@ -57,4 +67,3 @@ u add [path/to/file...]
 ```zsh
 ucm "Commit message" && up
 ```
-
