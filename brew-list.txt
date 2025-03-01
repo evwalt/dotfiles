@@ -57,6 +57,7 @@ libuv
 libvmaf
 libvterm
 libxml2
+libyaml
 libzip
 little-cms2
 lpeg
@@ -92,6 +93,7 @@ python@3.13
 readline
 ripgrep
 rtmpdump
+ruby
 shellcheck
 sqlite
 stylua
@@ -99,6 +101,8 @@ svim
 texinfo
 tidy-html5
 tmux
+tmuxinator
+tmuxinator-completion
 tree
 tree-sitter
 unbound

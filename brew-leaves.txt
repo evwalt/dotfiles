@@ -22,7 +22,7 @@ railwaycat/emacsmacport/emacs-mac
 ripgrep
 shellcheck
 stylua
-tmux
+tmuxinator
 tree
 utf8proc
 w3m
