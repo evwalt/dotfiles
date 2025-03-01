@@ -133,4 +133,4 @@ export PATH="/usr/local/bin/w3m:$PATH"
 
 # pyenv virtualenv
 #
-eval "$(pyenv virtualenv-init -)"
+# eval "$(pyenv virtualenv-init -)"
