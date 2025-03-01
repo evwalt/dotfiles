@@ -33,6 +33,11 @@ api.mapkey('<Ctrl-y>', 'Show me the money', function () {
 // api.unmap('<Ctrl-i>');
 
 /**
+ * Hint Align
+ */
+settings.hintAlign = 'left';
+
+/**
  * Theme
  */
 settings.theme = `
