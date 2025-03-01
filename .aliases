@@ -39,9 +39,9 @@ alias r="rustup update"
 
 # tmuxinator
 #
-alias txn="tmuxinator"
-alias txns="tmuxinator start"
-alias txnss="tmuxinator start starter"
+alias tx="tmuxinator"
+alias txs="tmuxinator start"
+alias txss="tmuxinator start evwalt"
 
 # yadm
 #

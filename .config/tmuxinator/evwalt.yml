@@ -1,7 +1,7 @@
-# /Users/evan/.config/tmuxinator/starter.yml
+# /Users/evan/.config/tmuxinator/evwalt.yml
 
-name: starter
-root: ~
+name: evwalt
+root: ~/
 
 # Optional tmux socket
 # socket_name: foo
