@@ -7,11 +7,12 @@ return {
 		local lint = require("lint")
 		lint.linters_by_ft = {
 			javascript = { "eslint" },
-			typescript = { "eslint" },
 			javascriptreact = { "eslint" },
-			typescriptreact = { "eslint" },
-			svelte = { "eslint" },
 			markdown = { "markdownlint-cli2" },
+			python = { "ruff" },
+			svelte = { "eslint" },
+			typescript = { "eslint" },
+			typescriptreact = { "eslint" },
 		}
 
 		local markdownlint_cli2 = lint.linters["markdownlint-cli2"]

@@ -7,18 +7,25 @@ return {
 		local conform = require("conform")
 		conform.setup({
 			formatters_by_ft = {
-				lua = { "stylua" },
 				javascript = { "prettier" },
-				typescript = { "prettier" },
 				javascriptreact = { "prettier" },
-				typescriptreact = { "prettier" },
-				json = { "prettier", "prettier" },
+				json = { "prettier" },
+				lua = { "stylua" },
 				markdown = { "markdownlint-cli2" },
+				python = { "black" },
+				typescript = { "prettier" },
+				typescriptreact = { "prettier" },
 			},
 			formatters = {
+				black = {
+					command = "black",
+				},
 				["markdownlint-cli2"] = {
 					command = "markdownlint-cli2",
 					prepend_args = { "--fix", "--config", HOME .. "/.markdownlint.json" },
+				},
+				prettier = {
+					command = "prettier",
 				},
 			},
 		})
