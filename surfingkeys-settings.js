@@ -1,6 +1,5 @@
 /**
  * Useful Links
- *
  */
 // https://github.com/brookhong/Surfingkeys/wiki
 
@@ -23,9 +22,9 @@ api.map('ot', 'on');
  */
 // an example to create a new mapping `ctrl-y`
 api.mapkey('<Ctrl-y>', 'Show me the money', function () {
-    Front.showPopup(
-        'a well-known phrase uttered by characters in the 1996 film Jerry Maguire (Escape to close).'
-    );
+  Front.showPopup(
+    'a well-known phrase uttered by characters in the 1996 film Jerry Maguire (Escape to close).',
+  );
 });
 // an example to replace `T` with `gt`, click `Default mappings` to see how `T` works.
 // api.map('gt', 'T');
