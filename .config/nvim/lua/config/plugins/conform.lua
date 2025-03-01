@@ -27,6 +27,13 @@ return {
 				},
 				prettier = {
 					command = "prettier",
+					args = {
+						"--config",
+						HOME .. "/.config/prettier/.prettierrc.json",
+						"--stdin-filepath",
+						"$FILENAME",
+					},
+					stdin = true,
 				},
 				-- ["taplo"] = {
 				-- 	command = "taplo",
