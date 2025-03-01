@@ -139,3 +139,10 @@ config.set('content.local_content_can_access_file_urls', False, 'file:///Users/e
 # image inversion": qutebrowser default settings.
 # Type: Bool
 c.colors.webpage.darkmode.enabled = True
+
+# Tab Focus
+config.bind('<Meta-1>', 'tab-focus 1')
+config.bind('<Meta-2>', 'tab-focus 2')
+config.bind('<Meta-3>', 'tab-focus 3')
+config.bind('<Meta-4>', 'tab-focus 4')
+config.bind('<Meta-5>', 'tab-focus 5')
