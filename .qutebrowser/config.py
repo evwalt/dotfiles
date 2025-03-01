@@ -141,8 +141,19 @@ config.set('content.local_content_can_access_file_urls', False, 'file:///Users/e
 c.colors.webpage.darkmode.enabled = True
 
 # Tab Focus
+#
 config.bind('<Meta-1>', 'tab-focus 1')
 config.bind('<Meta-2>', 'tab-focus 2')
 config.bind('<Meta-3>', 'tab-focus 3')
 config.bind('<Meta-4>', 'tab-focus 4')
 config.bind('<Meta-5>', 'tab-focus 5')
+
+# Completion Item Focus
+#
+# config.bind('<Ctrl-P>', 'completion-item-focus prev-category', mode='command')
+# config.bind('<Ctrl-N>', 'completion-item-focus next-category', mode='command')
+
+# Command History Next
+#
+# config.bind('<Ctrl-Shift-P>', 'command-history-next', mode='command')
+# config.bind('<Ctrl-Shift-N>', 'command-history-prev', mode='command')
