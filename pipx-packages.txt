@@ -1,0 +1,10 @@
+venvs are in /Users/evan/.local/pipx/venvs
+apps are exposed on your $PATH at /Users/evan/.local/bin
+manual pages are exposed at /Users/evan/.local/share/man
+   package black 25.1.0, installed using Python 3.13.2
+    - black
+    - blackd
+   package poetry 2.1.1, installed using Python 3.13.2
+    - poetry
+   package ruff 0.9.9, installed using Python 3.13.2
+    - ruff
