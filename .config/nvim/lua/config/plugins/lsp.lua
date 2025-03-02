@@ -16,6 +16,7 @@ return {
 			},
 		},
 	},
+
 	config = function()
 		local lspconfig = require("lspconfig")
 		local capabilities = require("blink.cmp").get_lsp_capabilities()

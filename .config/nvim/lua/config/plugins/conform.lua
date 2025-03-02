@@ -2,6 +2,7 @@ local HOME = os.getenv("HOME")
 return {
 	"stevearc/conform.nvim",
 	opts = {},
+
 	config = function()
 		local conform = require("conform")
 		conform.setup({
@@ -42,14 +43,13 @@ return {
 			},
 		})
 
-		-- -- Helper Fuctions
-		-- --
+		-- Helper Fuctions
+		--
 		-- local function parens_escape(path)
 		-- 	return path:gsub("%(", "\\("):gsub("%)", "\\)")
 		-- end
 		local function handle_view_and_format()
 			local view = vim.fn.winsaveview()
-
 			conform.format({
 				lsp_fallback = true,
 				async = false,
