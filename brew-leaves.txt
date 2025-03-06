@@ -5,6 +5,7 @@ fd
 felixkratz/formulae/svim
 gcc
 git
+git-delta
 gnu-which
 go
 grep
@@ -15,6 +16,7 @@ luarocks
 make
 neovim
 ninja
+pandoc
 php
 pipx
 pyenv-virtualenv

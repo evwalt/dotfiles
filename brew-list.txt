@@ -24,6 +24,7 @@ gd
 gettext
 giflib
 git
+git-delta
 gmp
 gnu-which
 gnutls
@@ -42,6 +43,7 @@ lazygit
 libavif
 libdeflate
 libevent
+libgit2
 libidn2
 libmpc
 libnghttp2
@@ -83,6 +85,7 @@ openexr
 openldap
 openssl@3
 p11-kit
+pandoc
 pcre2
 php
 pipx
