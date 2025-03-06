@@ -30,6 +30,7 @@ vim.keymap.set("n", "<space>so", ":source %<CR>")
 vim.keymap.set("n", "<space>q", ":bd<CR>")
 vim.keymap.set("n", "<space>x", ":bd<CR>")
 vim.keymap.set("n", "<space><space>xf", ":bd!<CR>")
+vim.keymap.set("n", "<space><space>qf", ":bd!<CR>")
 
 -- Windows
 --
@@ -42,7 +43,8 @@ vim.keymap.set("n", "<space>tj", function()
 	vim.cmd.vnew()
 	vim.cmd.term()
 	vim.cmd.wincmd("J")
-	vim.api.nvim_win_set_height(0, 15)
+	-- vim.api.nvim_win_set_height(0, 15)
+	vim.cmd("resize 50%")
 end)
 vim.keymap.set("n", "<space>tl", function()
 	-- local current_height = vim.api.nvim_win_get_height(0)
