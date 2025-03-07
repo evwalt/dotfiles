@@ -4,7 +4,7 @@ TERM = "xterm-256color"
 [font]
 normal = { family = "Hack Nerd Font" }
 # size = 13.5
-size = 14
+size = 14.5
 
 # Option as Alt
 #
