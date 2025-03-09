@@ -10,6 +10,7 @@ gnu-which
 go
 grep
 haskell-language-server
+keith/formulae/reminders-cli
 lazygit
 lua-language-server
 luarocks
