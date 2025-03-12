@@ -21,7 +21,7 @@ alias glo="git log --oneline"
 
 # Misc
 #
-alias cdd="cd ~/Dropbox/"
+alias cdd="cd ~/Library/CloudStorage/Dropbox/"
 alias tn="ts-node"
 
 # NPM
