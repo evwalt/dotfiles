@@ -51,6 +51,6 @@ windows:
   - "8":
       root: ~/dev
   - "9":
-      root: ~/Library/CloudStorage/Dropbox
+      root: ~/vault
   - "6":
       root: ~/.config/nvim
