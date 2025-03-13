@@ -27,6 +27,7 @@ git
 git-delta
 gmp
 gnu-which
+gnupg
 gnutls
 go
 grep
@@ -40,11 +41,15 @@ jpeg-turbo
 jpeg-xl
 krb5
 lazygit
+libassuan
 libavif
 libdeflate
 libevent
+libgcrypt
 libgit2
+libgpg-error
 libidn2
+libksba
 libmpc
 libnghttp2
 libpng
@@ -55,6 +60,7 @@ libtasn1
 libtiff
 libtool
 libunistring
+libusb
 libuv
 libvmaf
 libvterm
@@ -80,6 +86,7 @@ net-snmp
 nettle
 ninja
 node
+npth
 oniguruma
 openexr
 openldap
@@ -88,6 +95,7 @@ p11-kit
 pandoc
 pcre2
 php
+pinentry
 pipx
 pkgconf
 pyenv

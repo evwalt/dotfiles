@@ -7,6 +7,7 @@ gcc
 git
 git-delta
 gnu-which
+gnupg
 go
 grep
 haskell-language-server
