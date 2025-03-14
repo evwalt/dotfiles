@@ -2,6 +2,7 @@
 
 return {
 	"neovim/nvim-lspconfig",
+	-- enabled = false,
 	dependencies = {
 		"saghen/blink.cmp",
 		{
@@ -52,7 +53,21 @@ return {
 
 		lspconfig.pyright.setup({ capabilities = capabilities })
 
-		lspconfig.tailwindcss.setup({ capabilities = capabilities })
+		lspconfig.tailwindcss.setup({
+			capabilities = capabilities,
+			filetypes = {
+				"css",
+				"html",
+				"javascript",
+				"javascriptreact",
+				"less",
+				"sass",
+				"scss",
+				"svelte",
+				"typescriptreact",
+				"vue",
+			},
+		})
 
 		lspconfig.ts_ls.setup({ capabilities = capabilities })
 

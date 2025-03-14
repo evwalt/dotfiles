@@ -57,7 +57,7 @@ vim.keymap.set("t", "<esc>", "<C-\\><C-n>")
 
 -- Edit Specific Files
 --
-local prod_personal_path = "~/vault/productivity-personal/"
+local prod_personal_path = "~/Library/CloudStorage/Dropbox/docs/notes/productivity-personal/"
 vim.keymap.set("n", "<space><space>d", function()
 	vim.cmd("e " .. prod_personal_path .. "daily-planning.md")
 end)

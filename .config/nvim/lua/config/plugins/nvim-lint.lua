@@ -1,6 +1,7 @@
 local HOME = os.getenv("HOME")
 return {
 	"mfussenegger/nvim-lint",
+	-- enabled = false,
 	opts = {},
 
 	config = function()

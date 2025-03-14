@@ -1,6 +1,7 @@
 local HOME = os.getenv("HOME")
 return {
 	"stevearc/conform.nvim",
+	-- enabled = false,
 	opts = {},
 
 	config = function()
