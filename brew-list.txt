@@ -102,7 +102,6 @@ pyenv
 pyenv-virtualenv
 python@3.13
 readline
-reminders-cli
 ripgrep
 rtmpdump
 ruby
