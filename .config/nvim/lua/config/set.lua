@@ -74,3 +74,22 @@ vim.api.nvim_create_autocmd("FileType", {
 		vim.opt_local.expandtab = true
 	end,
 })
+
+-- Scroll Position
+--
+-- Save scroll position when leaving a buffer
+vim.api.nvim_create_autocmd("BufLeave", {
+	pattern = "*",
+	callback = function()
+		vim.b.view = vim.fn.winsaveview()
+	end,
+})
+-- Restore scroll position when entering a buffer
+vim.api.nvim_create_autocmd("BufEnter", {
+	pattern = "*",
+	callback = function()
+		if vim.b.view then
+			vim.fn.winrestview(vim.b.view)
+		end
+	end,
+})
