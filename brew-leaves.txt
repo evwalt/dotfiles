@@ -3,6 +3,7 @@ bison
 cmake
 fd
 felixkratz/formulae/svim
+gcalcli
 gcc
 git
 git-delta
