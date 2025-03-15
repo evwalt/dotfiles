@@ -48,6 +48,10 @@ nvim
 r && b
 ```
 
+### Update Chrome Extensions as Neede
+
+Whenever you add or modify Chrome Extensions, go to `chrome://extensions`, select all, copy, and paste to overwrite into `chrome-extensions.txt`.
+
 ### Track and Push Changes with `yadm`
 
 - Track changes:
@@ -65,5 +69,5 @@ u add [path/to/file...]
 - Commit and push:
 
 ```zsh
-ucm "Commit message" && up
+ucm "Commit message" && ups
 ```
