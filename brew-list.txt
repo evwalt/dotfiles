@@ -36,6 +36,7 @@ grep
 haskell-language-server
 highway
 icu4c@76
+icu4c@77
 imath
 isl
 jansson
