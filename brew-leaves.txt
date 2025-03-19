@@ -26,6 +26,7 @@ railwaycat/emacsmacport/emacs-mac
 ripgrep
 shellcheck
 stylua
+sword
 tmuxinator
 tree
 utf8proc

@@ -112,6 +112,7 @@ shellcheck
 sqlite
 stylua
 svim
+sword
 texinfo
 tidy-html5
 tmux
