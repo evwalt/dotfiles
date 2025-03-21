@@ -13,5 +13,8 @@ return {
 		search = {
 			pattern = [[\b(KEYWORDS)\b]], -- match without the extra colon. You'll likely get false positives
 		},
+		keywords = {
+			PROJECT = { icon = "󰴊", color = "hint", alt = { "SUBPROJECT" } },
+		},
 	},
 }
