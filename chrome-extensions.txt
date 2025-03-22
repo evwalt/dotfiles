@@ -19,7 +19,7 @@ ColorZilla
 Advanced Eyedropper, Color Picker, Gradient Generator and other colorful goodies
 ID: bhlhnicpbhignbdhedgjhgdocnmhomnp
 Inspect views
-service worker (Inactive),
+service worker,
  1 more…
 
 Consent-O-Matic
@@ -27,12 +27,19 @@ Consent-O-Matic
 Automatic handling of GDPR consent forms
 ID: mdjildafknihdffpkfmmpnpoiajfjnjd
 Inspect views
-service worker (Inactive)
+service worker
 
 Privacy Badger
 2025.3.3
 Privacy Badger automatically learns to block invisible trackers.
 ID: pkehgijcmpdhfbdbbnkijodmdjhbjlgp
+Inspect views
+service worker
+
+Raindrop.io
+5.6.76
+All-in-one bookmark manager
+ID: ldgfbffkinooeloadekpmfoklnobpien
 Inspect views
 service worker
 
@@ -60,8 +67,8 @@ Surfingkeys
 Rich shortcuts to click links/switch tabs/scroll, capture pages, use your browser like vim for productivity.
 ID: gfbliohnnapiefjpjlpjnehglfpaknnc
 Inspect views
-service worker (Inactive),
- 5 more…
+service worker,
+ 11 more…
 
 uBlock Origin Lite
 2025.3.16.1281
