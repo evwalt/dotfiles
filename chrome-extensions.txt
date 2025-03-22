@@ -8,7 +8,7 @@ Inspect views
 service worker
 
 Bitwarden Password Manager
-2025.2.2
+2025.3.0
 At home, at work, or on the go, Bitwarden easily secures all your passwords, passkeys, and sensitive information
 ID: nngceckbapebfimnlniiiahkandclblb
 Inspect views
@@ -48,10 +48,10 @@ Redux DevTools
 Redux DevTools for debugging application's state changes.
 ID: lmhkpmbekcpmknklioeibfkpmmfibljd
 Inspect views
-service worker (Inactive)
+service worker
 
 Simplify Copilot - Autofill job applications
-2.0.58
+2.0.60
 The better way to job search. Quick apply and autofill job applications in one click. Track jobs, companies, resumes & more!
 ID: pbanhockgagggenencehbnadejlgchfc
 
@@ -61,10 +61,10 @@ Rich shortcuts to click links/switch tabs/scroll, capture pages, use your browse
 ID: gfbliohnnapiefjpjlpjnehglfpaknnc
 Inspect views
 service worker (Inactive),
- 3 more…
+ 5 more…
 
 uBlock Origin Lite
-2025.3.8.1350
+2025.3.16.1281
 A permission-less content blocker. Blocks ads, trackers, miners, and more immediately upon installation.
 ID: ddkjiahejlhfcafbddmgiahcphecmpfh
 Inspect views
@@ -75,4 +75,9 @@ Wappalyzer - Technology profiler
 Identify web technologies
 ID: gppongmhjkpfnbhagpmjfkannfbllamg
 Inspect views
-service worker (Inactive)
+service worker
+
+YouTube Speed Controls
+2.4
+Click ` (backtick) to toggle between normal (1x) and 2x speed, or Ctrl + ` to play at 3x speed.
+ID: naalfmaaomhjpbndelnlijacdniggpjn
