@@ -38,7 +38,7 @@ alias pxu="pipx upgrade-all && pipx list > ~/pipx-packages.txt && less pipx-pack
 
 # Rustup
 #
-alias r="rustup update"
+alias r="rustup update && rustc --version > ~/rust-version.txt && less ~/rust-version.txt"
 
 # tmuxinator
 #
