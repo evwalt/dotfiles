@@ -56,7 +56,7 @@ Update rustup toolchain (if applicable); log rust version to text file.
 r
 ```
 
-### Update Chrome Extensions as Neede
+### Update Chrome Extensions as Needed
 
 Whenever you add or modify Chrome Extensions, go to `chrome://extensions`, select all, copy, and paste to overwrite into `chrome-extensions.txt`.
 
@@ -77,5 +77,5 @@ u add [path/to/file...]
 - Commit and push:
 
 ```zsh
-ucm "Commit message" && ups
+ucm "[Commit message]" && ups
 ```
