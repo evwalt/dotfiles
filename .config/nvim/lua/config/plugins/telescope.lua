@@ -15,7 +15,17 @@ return {
 				fzf = {},
 			},
 
-			defaults = require("telescope.themes").get_ivy({}),
+			-- defaults = require("telescope.themes").get_ivy({}),
+			defaults = {
+				layout_strategy = "vertical",
+				layout_config = {
+					vertical = {
+						prompt_position = "top",
+						mirror = "false",
+					},
+				},
+				sorting_strategy = "ascending",
+			},
 		})
 
 		telescope.load_extension("fzf")
