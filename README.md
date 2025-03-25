@@ -24,7 +24,7 @@ ngu
 
 ### Update pipx
 
-- Update packages (if applicable) and log to `pipx-packages.txt`.
+Update packages (if applicable) and log to `pipx-packages.txt`.
 
 ```zsh
 pxu
@@ -40,12 +40,20 @@ nvim
 
 - Update lazy.nvim plugins. Inside Neovim, run `:Lazy` to open lazy.nvim and "S" to sync plugins. And then, quit Neovim.
 
-### Update Rustup and Homebrew
+### Update Homebrew
 
-- Update rustup toolchain and brews (if applicable); log brews to text files.
+Update brews (if applicable); log brews to text files.
 
 ```zsh
-r && b
+b
+```
+
+### Update Rustup
+
+Update rustup toolchain (if applicable); log rust version to text file.
+
+```zsh
+r
 ```
 
 ### Update Chrome Extensions as Neede
