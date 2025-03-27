@@ -6,7 +6,7 @@ manual pages are exposed at /Users/evan/.local/share/man
     - blackd
    package poetry 2.1.1, installed using Python 3.13.2
     - poetry
-   package pyright 1.1.397, installed using Python 3.13.2
+   package pyright 1.1.398, installed using Python 3.13.2
     - pyright
     - pyright-langserver
     - pyright-python

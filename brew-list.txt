@@ -66,7 +66,6 @@ libunistring
 libusb
 libuv
 libvmaf
-libvterm
 libxml2
 libyaml
 libzip
@@ -82,7 +81,6 @@ m4
 make
 mpdecimal
 mpfr
-msgpack
 ncurses
 neovim
 net-snmp
