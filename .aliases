@@ -1,13 +1,23 @@
 # Daily Combos
 #
+# Just sync lazy.nvim plugins and then run `dua` regularly (every day, week, or two weeks)
+# "daily update"
 alias du="pxu && ngu && ru && bu"
+# "daily log"
 alias dl="pxl && ngl && rl && bl"
-alias dul="du && dl"
+# "yadm update all"
+alias uua="u add ~/.config/nvim/lazy-lock.json ~/pipx-packages.txt ~/global-npm-packages.txt ~/rust-version.txt ~/brew-leaves.txt ~/brew-list.txt ~/brew-list-cask.txt && ucm 'chore: update deps' && ups"
+# "daily update, log, and yadm track all"
+alias dua="du && dl && uua"
 
 # Homebrew
 #
+# "brew update"
 alias bu="brew update --verbose && brew upgrade --verbose && brew cleanup --verbose --prune=all && brew doctor"
-alias bl="brew leaves > ~/brew-leaves.txt && brew list > ~/brew-list.txt && brew list --cask > ~/brew-list-cask.txt && less ~/brew-leaves.txt && less ~/brew-list.txt && less ~/brew-list-cask.txt"
+# "brew log"
+alias bl="brew leaves > ~/brew-leaves.txt && brew list > ~/brew-list.txt && brew list --cask > ~/brew-list-cask.txt"
+# "brew display logs"
+alias bdl="less ~/brew-leaves.txt && less ~/brew-list.txt && less ~/brew-list-cask.txt"
 
 # Git
 #
@@ -36,19 +46,28 @@ alias tn="ts-node"
 #
 alias ngo="npm -g outdated"
 alias ngu="npm -g update"
-alias ngl="npm -g list && npm -g list > global-npm-packages.txt"
+# "npm -g log"
+alias ngl="npm -g list > global-npm-packages.txt"
+# "npm -g display logs"
+alias ngdl="less ~/global-npm-packages.txt"
 alias nrd="npm run dev"
 alias nrb="npm run build"
 
 # pipx
 #
 alias pxu="pipx upgrade-all"
-alias pxl="pipx list > ~/pipx-packages.txt && less pipx-packages.txt"
+# "pipx log"
+alias pxl="pipx list > ~/pipx-packages.txt"
+# "pipx display logs"
+alias pxdl="less ~/pipx-packages.txt"
 
 # Rustup
 #
 alias ru="rustup update"
-alias rl="rustc --version > ~/rust-version.txt && less ~/rust-version.txt"
+# "rustc log"
+alias rl="rustc --version > ~/rust-version.txt"
+# "rustc display logs"
+alias rdl="less ~/rust-version.txt"
 
 # tmuxinator
 #
