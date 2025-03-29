@@ -51,7 +51,7 @@ vim.opt.clipboard = "unnamedplus"
 
 -- Spell
 --
-vim.opt.spell = true
+vim.opt.spell = false
 vim.opt.spelllang = "en_us"
 
 -- Sessions

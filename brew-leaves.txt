@@ -13,6 +13,7 @@ go
 grep
 haskell-language-server
 lazygit
+ltex-ls
 lua-language-server
 luarocks
 make

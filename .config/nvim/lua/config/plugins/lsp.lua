@@ -51,6 +51,27 @@ return {
 
 		lspconfig.lua_ls.setup({ capabilities = capabilities })
 
+		lspconfig.ltex.setup({
+			settings = {
+				ltex = {
+					language = "en-US",
+					disabledRules = {
+						-- For options, see the following:
+						-- <https://community.languagetool.org/rule/list>
+						-- <https://www.reddit.com/r/neovim/comments/1hsmyod/disable_some_diagnostics_within_ltexls/?utm_source=chatgpt.com>
+						-- <https://www.reddit.com/r/neovim/comments/1hsmyod/comment/m5z2i66/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button>
+						["en-US"] = { "EN_SPECIFIC_CASE", "I_LOWERCASE", "UPPERCASE_SENTENCE_START" },
+					},
+					completionEnabled = true,
+				},
+			},
+			on_attach = function(client, bufnr)
+				if client.name == "ltex" then
+					vim.keymap.set("n", "KK", ":lua print(vim.diagnostic.open_float())<CR>")
+				end
+			end,
+		})
+
 		lspconfig.pyright.setup({ capabilities = capabilities })
 
 		lspconfig.tailwindcss.setup({
