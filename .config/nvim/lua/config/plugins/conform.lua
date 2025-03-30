@@ -32,7 +32,7 @@ return {
 					command = "prettier",
 					args = {
 						"--config",
-						HOME .. "/.config/prettier/.prettierrc.json",
+						HOME .. "/.config/prettier/.prettierrc.yaml",
 						"--stdin-filepath",
 						"$FILENAME",
 					},
