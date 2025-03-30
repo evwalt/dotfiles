@@ -117,5 +117,6 @@ vim.api.nvim_create_autocmd("FileType", {
 	pattern = { "javascript", "typescript", "javascriptreact", "typescriptreact" },
 	callback = function()
 		vim.keymap.set("n", "<space><space>on", "iconsole.log();<Esc>F)i", { noremap = true, silent = true })
+		vim.keymap.set("v", "<space><space>on", "yoconsole.log(': ', );<Esc>F:Pf,lp", { noremap = true, silent = true })
 	end,
 })
