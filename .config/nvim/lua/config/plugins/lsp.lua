@@ -63,6 +63,10 @@ return {
 						["en-US"] = { "EN_SPECIFIC_CASE", "I_LOWERCASE", "UPPERCASE_SENTENCE_START" },
 					},
 					completionEnabled = true,
+					dictionary = {
+						["en-US"] = { "js", "TODO" },
+					},
+					checkFrequency = "save",
 				},
 			},
 			on_attach = function(client, bufnr)
