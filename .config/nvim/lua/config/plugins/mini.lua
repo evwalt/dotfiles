@@ -6,6 +6,7 @@ return {
 	config = function()
 		require("mini.cursorword").setup({})
 		require("mini.animate").setup({})
+		require("mini.pairs").setup({})
 
 		-- local hipatterns = require("mini.hipatterns")
 		-- hipatterns.setup({
