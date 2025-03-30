@@ -51,6 +51,13 @@ end)
 hs.hotkey.bind(hyper, "G", function()
     hs.application.launchOrFocus("LibreOffice")
 end)
+hs.hotkey.bind(hyper, "H", function()
+    hs.application.launchOrFocus("Discord")
+end)
+hs.hotkey.bind(hyper, "M", function()
+    -- hs.application.launchOrFocus("ColorSync Utility")
+    hs.application.launchOrFocus("Cursor")
+end)
 hs.hotkey.bind(hyper, "F", function()
     hs.application.launchOrFocus("Activity Monitor")
 end)
@@ -132,4 +139,3 @@ hs.hotkey.bind(ca, "s", function() moveAndResize(1 / 3, 1 / 2, 1 / 3, 1 / 2) end
 hs.hotkey.bind(ca, "l", function() moveAndResize(2 / 3, 0, 1 / 3, 1 / 2) end) -- Right upper third
 hs.hotkey.bind(ca, ";", function() moveAndResize(0, 1 / 2, 1 / 3, 1 / 2) end) -- Left lower third
 hs.hotkey.bind(ca, "z", function() moveAndResize(2 / 3, 1 / 2, 1 / 3, 1 / 2) end) -- Right lower third
-
