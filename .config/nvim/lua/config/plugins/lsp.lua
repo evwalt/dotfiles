@@ -64,7 +64,7 @@ return {
 					},
 					completionEnabled = true,
 					dictionary = {
-						["en-US"] = { "js", "TODO" },
+						["en-US"] = { "hw", "js", "TODO" },
 					},
 					checkFrequency = "save",
 				},
