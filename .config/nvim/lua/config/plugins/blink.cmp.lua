@@ -1,7 +1,8 @@
 return {
 	"saghen/blink.cmp",
 	-- optional: provides snippets for the snippet source
-	dependencies = "rafamadriz/friendly-snippets",
+	-- dependencies = { "allaman/emoji.nvim", "rafamadriz/friendly-snippets", "saghen/blink.compat" },
+	dependencies = { "rafamadriz/friendly-snippets" },
 	-- enabled = false,
 
 	-- use a release tag to download pre-built binaries
@@ -33,8 +34,24 @@ return {
 		-- Default list of enabled providers defined so that you can extend it
 		-- elsewhere in your config, without redefining it, due to `opts_extend`
 		sources = {
-			default = { "lsp", "path", "snippets", "buffer" },
+			default = { "buffer", "lsp", "path", "snippets" },
+			-- default = { "buffer", "emoji", "lsp", "path", "snippets" },
 		},
+
+		-- providers = {
+		-- 	emoji = {
+		-- 		name = "emoji",
+		-- 		module = "blink.compat.source",
+		-- 		-- overwrite kind of suggestion
+		-- 		transform_items = function(ctx, items)
+		-- 			local kind = require("blink.cmp.types").CompletionItemKind.Text
+		-- 			for i = 1, #items do
+		-- 				items[i].kind = kind
+		-- 			end
+		-- 			return items
+		-- 		end,
+		-- 	},
+		-- },
 	},
 	opts_extend = { "sources.default" },
 }
