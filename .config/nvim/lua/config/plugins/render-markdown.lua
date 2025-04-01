@@ -9,11 +9,4 @@ return {
 	opts = {
 		strikethrough = true,
 	},
-
-	config = function()
-		vim.api.nvim_set_hl(0, "@markup.strikethrough", { strikethrough = true })
-		vim.api.nvim_set_hl(0, "markdown_inline.Strikethrough", { strikethrough = true })
-		vim.api.nvim_set_hl(0, "markdownStrike", { strikethrough = true })
-		vim.api.nvim_set_hl(0, "markdownStrikeDelimiter", { strikethrough = true })
-	end,
 }
