@@ -51,6 +51,12 @@ return {
 
 		lspconfig.cssls.setup({ capabilities = capabilities })
 
+		lspconfig.eslint.setup({ capabilities = capabilities })
+
+		lspconfig.html.setup({ capabilities = capabilities })
+
+		lspconfig.json.setup({ capabilities = capabilities })
+
 		lspconfig.ltex.setup({
 			settings = {
 				ltex = {
