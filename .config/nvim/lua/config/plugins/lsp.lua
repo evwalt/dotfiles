@@ -49,7 +49,7 @@ return {
 			},
 		})
 
-		lspconfig.lua_ls.setup({ capabilities = capabilities })
+		lspconfig.cssls.setup({ capabilities = capabilities })
 
 		lspconfig.ltex.setup({
 			settings = {
@@ -70,6 +70,8 @@ return {
 				},
 			},
 		})
+
+		lspconfig.lua_ls.setup({ capabilities = capabilities })
 
 		lspconfig.pyright.setup({ capabilities = capabilities })
 
