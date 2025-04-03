@@ -55,6 +55,10 @@ vim.keymap.set("n", "<space>tl", function()
 end)
 vim.keymap.set("t", "<esc>", "<C-\\><C-n>")
 
+-- Miscellaneous
+--
+vim.keymap.set("n", "<space>d", ":lua vim.diagnostic.open_float()<CR>")
+
 -- Edit Specific Files
 --
 local prod_personal_path = "~/Library/CloudStorage/Dropbox/docs/notes/productivity-personal/"

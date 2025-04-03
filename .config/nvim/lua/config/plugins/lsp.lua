@@ -69,11 +69,6 @@ return {
 					checkFrequency = "save",
 				},
 			},
-			on_attach = function(client, bufnr)
-				if client.name == "ltex" then
-					vim.keymap.set("n", "KK", ":lua print(vim.diagnostic.open_float())<CR>")
-				end
-			end,
 		})
 
 		lspconfig.pyright.setup({ capabilities = capabilities })
