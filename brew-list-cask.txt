@@ -1,8 +1,10 @@
 alacritty
 breaktimer
+discord
 font-cascadia-code
 font-hack-nerd-font
 hammerspoon
 qbittorrent
 qutebrowser
+slack
 wezterm
