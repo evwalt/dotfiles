@@ -38,6 +38,10 @@ alias gdc="git diff --color-words"
 alias gl="git log"
 alias glo="git log --oneline"
 
+# Java
+#
+jr="javac Main.java && java Main"
+
 # Misc
 #
 alias cdd="cd ~/Library/CloudStorage/Dropbox/"
