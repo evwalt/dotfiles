@@ -55,6 +55,8 @@ return {
 
 		lspconfig.html.setup({ capabilities = capabilities })
 
+		lspconfig.jdtls.setup({ capabilities = capabilities })
+
 		lspconfig.json.setup({ capabilities = capabilities })
 
 		lspconfig.ltex.setup({
