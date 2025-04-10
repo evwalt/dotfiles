@@ -31,6 +31,7 @@ return {
 				"html",
 				"javascript",
 				"javascriptreact",
+				"json",
 				"less",
 				"sass",
 				"scss",

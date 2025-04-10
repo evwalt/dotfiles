@@ -1,5 +1,5 @@
 local config = {
-	cmd = { "/usr/local/bin/jdtls" },
-	root_dir = vim.fs.dirname(vim.fs.find({ "gradlew", ".git", "mvnw" }, { upward = true })[1]),
+	cmd = { "jdtls" },
+	root_dir = require("jdtls.setup").find_root({ ".git", "mvnw", "gradlew" }),
 }
 require("jdtls").start_or_attach(config)
