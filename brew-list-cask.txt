@@ -7,4 +7,5 @@ hammerspoon
 qbittorrent
 qutebrowser
 slack
+temurin@21
 wezterm

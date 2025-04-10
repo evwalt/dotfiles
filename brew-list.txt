@@ -44,6 +44,7 @@ icu4c@77
 imath
 isl
 jansson
+jdtls
 jpeg-turbo
 jpeg-xl
 krb5
@@ -151,4 +152,5 @@ hammerspoon
 qbittorrent
 qutebrowser
 slack
+temurin@21
 wezterm

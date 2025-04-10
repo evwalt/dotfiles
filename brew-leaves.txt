@@ -12,6 +12,7 @@ gnupg
 go
 grep
 haskell-language-server
+jdtls
 lazygit
 ltex-ls
 lua-language-server
