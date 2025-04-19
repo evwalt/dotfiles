@@ -1,4 +1,6 @@
 -- Tip: run `:h ins-completion` (Insert mode completion)
+local HOME = os.getenv("HOME")
+local ltex_dictionary = dofile(HOME .. "/ltex-dictionary.lua")
 
 return {
 	"neovim/nvim-lspconfig",
@@ -72,7 +74,7 @@ return {
 					},
 					completionEnabled = true,
 					dictionary = {
-						["en-US"] = { "dsa", "hw", "js", "TODO" },
+						["en-US"] = ltex_dictionary,
 					},
 					checkFrequency = "save",
 				},
