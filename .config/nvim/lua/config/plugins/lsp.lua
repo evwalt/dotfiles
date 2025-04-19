@@ -31,7 +31,6 @@ return {
 				"html",
 				"javascript",
 				"javascriptreact",
-				"json",
 				"less",
 				"sass",
 				"scss",
@@ -58,7 +57,7 @@ return {
 
 		lspconfig.jdtls.setup({ capabilities = capabilities })
 
-		lspconfig.json.setup({ capabilities = capabilities })
+		lspconfig.jsonls.setup({ capabilities = capabilities })
 
 		lspconfig.ltex.setup({
 			settings = {
@@ -73,7 +72,7 @@ return {
 					},
 					completionEnabled = true,
 					dictionary = {
-						["en-US"] = { "hw", "js", "TODO" },
+						["en-US"] = { "dsa", "hw", "js", "TODO" },
 					},
 					checkFrequency = "save",
 				},
