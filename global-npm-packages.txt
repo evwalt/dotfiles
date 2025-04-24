@@ -1,6 +1,6 @@
 /Users/evan/.nvm/versions/node/v23.3.0/lib
 ├── @bitwarden/cli@2025.3.0
-├── @tailwindcss/language-server@0.14.15
+├── @tailwindcss/language-server@0.14.16
 ├── corepack@0.32.0
 ├── emmet-ls@0.4.2
 ├── eslint@9.25.1
