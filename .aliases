@@ -40,7 +40,7 @@ alias glo="git log --oneline"
 
 # Java
 #
-alias jr="javac Main.java && java Main"
+alias jr="javac -Xlint:unchecked Main.java && java Main"
 
 # Misc
 #
