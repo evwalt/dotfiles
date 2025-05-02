@@ -3,6 +3,15 @@ return {
 	-- enabled = false,
 	opts = {}, -- for default options, refer to the configuration section for custom setup.
 	cmd = "Trouble",
+	keys = {
+		{
+			"<space>i",
+			"<cmd>Trouble diagnostics toggle<cr>",
+			desc = "Diagnostics (Trouble)",
+		},
+	},
+
+	-- Suggested Keymaps
 	-- keys = {
 	--   {
 	--     "<leader>xx",
