@@ -15,7 +15,6 @@ certifi
 cmake
 coreutils
 curl
-emacs-mac
 expat
 fd
 fontconfig
@@ -42,7 +41,6 @@ highway
 icu4c@77
 imath
 isl
-jansson
 jdtls
 jpeg-turbo
 jpeg-xl
@@ -75,7 +73,6 @@ libxau
 libxcb
 libxdmcp
 libxext
-libxml2
 libxrender
 libyaml
 libzip
@@ -125,7 +122,6 @@ sqlite
 stylua
 svim
 sword
-texinfo
 tidy-html5
 tmux
 tmuxinator

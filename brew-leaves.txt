@@ -1,3 +1,4 @@
+automake
 bash-language-server
 bison
 cmake
@@ -24,7 +25,6 @@ pandoc
 php
 pipx
 pyenv-virtualenv
-railwaycat/emacsmacport/emacs-mac@29
 ripgrep
 shellcheck
 stylua
