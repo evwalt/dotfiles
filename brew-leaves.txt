@@ -18,13 +18,13 @@ lazygit
 ltex-ls
 lua-language-server
 luarocks
-make
 neovim
 ninja
 pandoc
 php
 pipx
 pyenv-virtualenv
+qmk/qmk/qmk
 ripgrep
 shellcheck
 stylua
