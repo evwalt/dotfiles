@@ -36,10 +36,6 @@ hs.hotkey.bind(hyper, "L", function()
     hs.application.launchOrFocus("GitHub Desktop")
 end)
 
-hs.hotkey.bind(hyper, "D", function()
-    hs.application.launchOrFocus("Reminders")
-end)
-
 hs.hotkey.bind(hyper, "I", function()
     hs.application.launchOrFocus("Visual Studio Code")
 end)
