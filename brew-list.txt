@@ -96,7 +96,7 @@ libyaml
 libzip
 little-cms2
 lpeg
-ltex-ls
+ltex-ls-plus
 lua
 lua-language-server
 luajit

@@ -15,7 +15,7 @@ grep
 haskell-language-server
 jdtls
 lazygit
-ltex-ls
+ltex-ls-plus
 lua-language-server
 luarocks
 neovim
