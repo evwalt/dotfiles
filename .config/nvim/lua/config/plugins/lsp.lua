@@ -61,7 +61,7 @@ return {
 
 		lspconfig.jsonls.setup({ capabilities = capabilities })
 
-		lspconfig.ltex.setup({
+		lspconfig.ltex_plus.setup({
 			settings = {
 				ltex = {
 					language = "en-US",
