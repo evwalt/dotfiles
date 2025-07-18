@@ -24,6 +24,8 @@ return {
 		local lspconfig = require("lspconfig")
 		local capabilities = require("blink.cmp").get_lsp_capabilities()
 
+		lspconfig.cssls.setup({ capabilities = capabilities })
+
 		lspconfig.emmet_ls.setup({
 			-- on_attach = on_attach,
 			capabilities = capabilities,
@@ -50,8 +52,6 @@ return {
 				},
 			},
 		})
-
-		lspconfig.cssls.setup({ capabilities = capabilities })
 
 		lspconfig.eslint.setup({ capabilities = capabilities })
 
