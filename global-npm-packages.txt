@@ -3,9 +3,9 @@
 ├── @tailwindcss/language-server@0.14.25
 ├── corepack@0.33.0
 ├── emmet-ls@0.4.2
-├── eslint@9.31.0
+├── eslint@9.32.0
 ├── markdownlint-cli2@0.18.1
-├── npm@11.4.2
+├── npm@11.5.1
 ├── prettier@3.6.2
 ├── ts-node@10.9.2
 ├── typescript-language-server@4.3.4
