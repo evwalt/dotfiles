@@ -1,6 +1,6 @@
 /Users/evan/.nvm/versions/node/v23.3.0/lib
 ├── @bitwarden/cli@2025.6.1
-├── @tailwindcss/language-server@0.14.25
+├── @tailwindcss/language-server@0.14.26
 ├── corepack@0.33.0
 ├── emmet-ls@0.4.2
 ├── eslint@9.32.0
@@ -9,6 +9,6 @@
 ├── prettier@3.6.2
 ├── ts-node@10.9.2
 ├── typescript-language-server@4.3.4
-├── typescript@5.8.3
+├── typescript@5.9.2
 └── vscode-langservers-extracted@4.10.0
 
