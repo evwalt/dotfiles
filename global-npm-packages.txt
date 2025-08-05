@@ -8,7 +8,7 @@
 ├── npm@11.5.2
 ├── prettier@3.6.2
 ├── ts-node@10.9.2
-├── typescript-language-server@4.3.4
+├── typescript-language-server@4.4.0
 ├── typescript@5.9.2
 └── vscode-langservers-extracted@4.10.0
 
