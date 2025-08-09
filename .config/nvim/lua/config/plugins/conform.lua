@@ -15,6 +15,7 @@ return {
 				json = { "prettier" },
 				html = { "prettier" },
 				markdown = { "markdownlint-cli2" },
+				prisma = { "prisma_fmt" },
 				python = { "black" },
 				-- toml = { "taplo" },
 				typescript = { "prettier" },
@@ -38,6 +39,10 @@ return {
 						"$FILENAME",
 					},
 					stdin = true,
+				},
+				prisma_fmt = {
+					command = "prisma",
+					args = { "format", "--schema", "$FILENAME" },
 				},
 				-- ["taplo"] = {
 				-- 	command = "taplo",

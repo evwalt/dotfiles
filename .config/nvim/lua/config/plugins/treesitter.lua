@@ -14,6 +14,7 @@ return {
 				"lua",
 				"markdown",
 				"markdown_inline",
+				"prisma",
 				"query",
 				"vim",
 				"vimdoc",
@@ -60,6 +61,8 @@ return {
 				-- Instead of true it can also be a list of languages
 				additional_vim_regex_highlighting = true,
 			},
+
+			modules = {},
 		})
 	end,
 }
