@@ -41,8 +41,9 @@ return {
 					stdin = true,
 				},
 				prisma_fmt = {
-					command = "prisma",
-					args = { "format", "--schema", "$FILENAME" },
+					command = "npx",
+					args = { "prisma", "format", "--schema", "$FILENAME" },
+					stdin = false,
 				},
 				-- ["taplo"] = {
 				-- 	command = "taplo",
