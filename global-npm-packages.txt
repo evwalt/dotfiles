@@ -1,5 +1,5 @@
 /Users/evan/.nvm/versions/node/v20.19.4/lib
-├── @bitwarden/cli@2025.6.1
+├── @bitwarden/cli@2025.8.0
 ├── @prisma/language-server@6.14.0
 ├── @tailwindcss/language-server@0.14.26
 ├── corepack@0.34.0
