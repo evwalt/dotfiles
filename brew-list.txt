@@ -24,6 +24,7 @@ cmake
 confuse
 coreutils
 curl
+cyrus-sasl
 dfu-programmer
 dfu-util
 expat
