@@ -1,5 +1,5 @@
 {
-  "auto-session": { "branch": "main", "commit": "cb8db2b20ffff8564c0418902d67eb11cea037fe" },
+  "auto-session": { "branch": "main", "commit": "3b5d8947cf16ac582ef00443ede4cdd3dfa23af9" },
   "bible-verse.nvim": { "branch": "main", "commit": "0de082842146e766308cb6eef7a46818d8df7cb3" },
   "blink.cmp": { "branch": "main", "commit": "bae4bae0eedd1fa55f34b685862e94a222d5c6f8" },
   "bufferline.nvim": { "branch": "main", "commit": "655133c3b4c3e5e05ec549b9f8cc2894ac6f51b3" },
@@ -12,7 +12,7 @@
   "lazydev.nvim": { "branch": "main", "commit": "2367a6c0a01eb9edb0464731cc0fb61ed9ab9d2c" },
   "lualine.nvim": { "branch": "master", "commit": "b8c23159c0161f4b89196f74ee3a6d02cdc3a955" },
   "markdown-toc.nvim": { "branch": "main", "commit": "5f51c86a416d7da6c0708d4ea354722fec7bb2b0" },
-  "mini.nvim": { "branch": "main", "commit": "dee23b41ba27bd583f1d19e199738f3bd0236648" },
+  "mini.nvim": { "branch": "main", "commit": "9a92084b3e9595568c0b07b62ad3c43249fa91fb" },
   "noice.nvim": { "branch": "main", "commit": "0427460c2d7f673ad60eb02b35f5e9926cf67c59" },
   "nui.nvim": { "branch": "main", "commit": "de740991c12411b663994b2860f1a4fd0937c130" },
   "nvim-jdtls": { "branch": "master", "commit": "7d1545614235cf6cf68b0839556d87c8f11c5eb5" },
