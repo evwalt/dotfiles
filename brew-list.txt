@@ -159,6 +159,7 @@ unbound
 unibilium
 unixodbc
 utf8proc
+uvwasi
 w3m
 webp
 xorgproto
