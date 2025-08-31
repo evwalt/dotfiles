@@ -5,8 +5,6 @@ font-cascadia-code
 font-hack-nerd-font
 hammerspoon
 keycastr
-qbittorrent
-qutebrowser
 slack
 temurin@21
 wezterm

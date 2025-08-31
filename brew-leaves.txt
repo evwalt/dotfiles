@@ -31,6 +31,7 @@ stylua
 sword
 tmuxinator
 tree
+typst
 utf8proc
 w3m
 yadm
