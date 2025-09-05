@@ -12,7 +12,7 @@
   "lazydev.nvim": { "branch": "main", "commit": "2367a6c0a01eb9edb0464731cc0fb61ed9ab9d2c" },
   "lualine.nvim": { "branch": "master", "commit": "b8c23159c0161f4b89196f74ee3a6d02cdc3a955" },
   "markdown-toc.nvim": { "branch": "main", "commit": "5f51c86a416d7da6c0708d4ea354722fec7bb2b0" },
-  "mini.nvim": { "branch": "main", "commit": "e7538b549361c9ac8416a07b0223ce03c508bfe7" },
+  "mini.nvim": { "branch": "main", "commit": "7bbafa4691147bc8b74a51986b957daca14c1876" },
   "noice.nvim": { "branch": "main", "commit": "0427460c2d7f673ad60eb02b35f5e9926cf67c59" },
   "nui.nvim": { "branch": "main", "commit": "de740991c12411b663994b2860f1a4fd0937c130" },
   "nvim-jdtls": { "branch": "master", "commit": "8dbecd3fc86b4fc4120087767deab4604880d751" },
