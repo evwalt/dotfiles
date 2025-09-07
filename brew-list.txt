@@ -123,6 +123,7 @@ oniguruma
 openexr
 openjdk
 openjpeg
+openjph
 openldap
 openssl@3
 p11-kit
