@@ -29,6 +29,7 @@ ripgrep
 shellcheck
 stylua
 sword
+tinymist
 tmuxinator
 tree
 typst
