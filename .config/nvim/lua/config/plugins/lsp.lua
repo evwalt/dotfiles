@@ -105,6 +105,15 @@ return {
 
 		lspconfig.ts_ls.setup({ capabilities = capabilities })
 
+		lspconfig.tinymist.setup({
+			capabilities = capabilities,
+			settings = {
+				formatterMode = "typstyle",
+				exportPdf = "onType",
+				semanticTokens = "disable",
+			},
+		})
+
 		-- LSP Default Keymaps in Neovim Nightly Build
 		--
 		-- vim.keymap.set('n', 'grn', vim.lsp.buf.rename)
