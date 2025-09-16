@@ -46,10 +46,10 @@ gnu-which
 gnupg
 gnutls
 go
+gobject-introspection
 graphite2
 grep
 harfbuzz
-haskell-language-server
 hid_bootloader_cli
 hidapi
 highway
@@ -98,6 +98,7 @@ libxrender
 libyaml
 libzip
 little-cms2
+llvm
 lpeg
 ltex-ls-plus
 lua
@@ -110,6 +111,7 @@ lzo
 m4
 make
 mdloader
+meson
 mpdecimal
 mpfr
 ncurses
@@ -127,7 +129,6 @@ openjph
 openldap
 openssl@3
 p11-kit
-pandoc
 pcre2
 php
 pillow
@@ -143,6 +144,7 @@ readline
 ripgrep
 rtmpdump
 ruby
+rust
 shellcheck
 simdjson
 sqlite
@@ -168,6 +170,7 @@ webp
 xorgproto
 xz
 yadm
+z3
 zstd
 alacritty
 breaktimer
