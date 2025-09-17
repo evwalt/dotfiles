@@ -1,5 +1,4 @@
 automake
-bash-language-server
 bison
 cmake
 fd

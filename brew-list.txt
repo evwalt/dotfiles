@@ -9,13 +9,11 @@ automake
 avr-binutils
 avr-gcc@8
 avrdude
-bash-language-server
 bdw-gc
 bison
 boost
 bootloadhid
 brotli
-c-ares
 ca-certificates
 cairo
 certifi
@@ -119,7 +117,6 @@ neovim
 net-snmp
 nettle
 ninja
-node
 npth
 oniguruma
 openexr
@@ -146,7 +143,6 @@ rtmpdump
 ruby
 rust
 shellcheck
-simdjson
 sqlite
 stylua
 svim
@@ -164,7 +160,6 @@ unbound
 unibilium
 unixodbc
 utf8proc
-uvwasi
 w3m
 webp
 xorgproto
