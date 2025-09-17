@@ -22,6 +22,6 @@ return {
 		},
 	},
 	keys = {
-		{ "<space>uus", ":SessionSearch<CR>" },
+		{ "<space>uus", ":AutoSession search<CR>" },
 	},
 }
