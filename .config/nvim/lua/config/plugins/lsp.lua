@@ -24,9 +24,10 @@ return {
 		local lspconfig = require("lspconfig")
 		local capabilities = require("blink.cmp").get_lsp_capabilities()
 
-		lspconfig.cssls.setup({ capabilities = capabilities })
+		vim.lsp.config("cssls", { capabilities = capabilities })
+		vim.lsp.enable("cssls")
 
-		lspconfig.emmet_ls.setup({
+		vim.lsp.config("emmet_ls", {
 			-- on_attach = on_attach,
 			capabilities = capabilities,
 			filetypes = {
@@ -52,16 +53,21 @@ return {
 				},
 			},
 		})
+		vim.lsp.enable("emmet_ls")
 
-		lspconfig.eslint.setup({ capabilities = capabilities })
+		vim.lsp.config("eslint", { capabilities = capabilities })
+		vim.lsp.enable("eslint")
 
-		lspconfig.html.setup({ capabilities = capabilities })
+		vim.lsp.config("html", { capabilities = capabilities })
+		vim.lsp.enable("html")
 
-		lspconfig.jdtls.setup({ capabilities = capabilities })
+		vim.lsp.config("jdtls", { capabilities = capabilities })
+		vim.lsp.enable("jdtls")
 
-		lspconfig.jsonls.setup({ capabilities = capabilities })
+		vim.lsp.config("jsonls", { capabilities = capabilities })
+		vim.lsp.enable("jsonls")
 
-		lspconfig.ltex_plus.setup({
+		vim.lsp.config("ltex_plus", {
 			settings = {
 				ltex = {
 					language = "en-US",
@@ -80,14 +86,18 @@ return {
 				},
 			},
 		})
+		vim.lsp.enable("ltex_plus")
 
-		lspconfig.lua_ls.setup({ capabilities = capabilities })
+		vim.lsp.config("lua_ls", { capabilities = capabilities })
+		vim.lsp.enable("lua_ls")
 
-		lspconfig.prismals.setup({ capabilities = capabilities })
+		vim.lsp.config("prismals", { capabilities = capabilities })
+		vim.lsp.enable("prismals")
 
-		lspconfig.pyright.setup({ capabilities = capabilities })
+		vim.lsp.config("pyright", { capabilities = capabilities })
+		vim.lsp.enable("pyright")
 
-		lspconfig.tailwindcss.setup({
+		vim.lsp.config("tailwindcss", {
 			capabilities = capabilities,
 			filetypes = {
 				"css",
@@ -102,10 +112,12 @@ return {
 				"vue",
 			},
 		})
+		vim.lsp.enable("tailwindcss")
 
-		lspconfig.ts_ls.setup({ capabilities = capabilities })
+		vim.lsp.config("ts_ls", { capabilities = capabilities })
+		vim.lsp.enable("ts_ls")
 
-		lspconfig.tinymist.setup({
+		vim.lsp.config("tinymist", {
 			capabilities = capabilities,
 			settings = {
 				formatterMode = "typstyle",
@@ -113,6 +125,7 @@ return {
 				semanticTokens = "disable",
 			},
 		})
+		vim.lsp.enable("tinymist")
 
 		-- LSP Default Keymaps in Neovim Nightly Build
 		--
