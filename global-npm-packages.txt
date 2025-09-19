@@ -4,7 +4,7 @@
 ├── @tailwindcss/language-server@0.14.26
 ├── corepack@0.34.0
 ├── emmet-ls@0.4.2
-├── eslint@9.35.0
+├── eslint@9.36.0
 ├── markdownlint-cli2@0.18.1
 ├── npm@11.6.0
 ├── prettier@3.6.2
