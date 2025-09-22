@@ -4,7 +4,7 @@ manual pages are exposed at /Users/evan/.local/share/man
    package black 25.9.0, installed using Python 3.13.2
     - black
     - blackd
-   package poetry 2.2.0, installed using Python 3.13.2
+   package poetry 2.2.1, installed using Python 3.13.2
     - poetry
    package pyright 1.1.405, installed using Python 3.13.2
     - pyright
