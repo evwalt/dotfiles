@@ -6,7 +6,7 @@
 ├── emmet-ls@0.4.2
 ├── eslint@9.36.0
 ├── markdownlint-cli2@0.18.1
-├── npm@11.6.0
+├── npm@11.6.1
 ├── prettier@3.6.2
 ├── ts-node@10.9.2
 ├── typescript-language-server@5.0.0
