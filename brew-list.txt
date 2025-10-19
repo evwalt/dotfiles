@@ -9,7 +9,6 @@ avr-binutils
 avr-gcc@8
 avrdude
 bdw-gc
-bison
 boost
 bootloadhid
 brotli
