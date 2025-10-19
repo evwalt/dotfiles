@@ -1,4 +1,3 @@
-automake
 bison
 cmake
 fd

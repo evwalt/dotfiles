@@ -5,7 +5,6 @@ argon2
 arm-none-eabi-binutils
 arm-none-eabi-gcc@8
 autoconf
-automake
 avr-binutils
 avr-gcc@8
 avrdude
