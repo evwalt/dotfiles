@@ -3,7 +3,7 @@
 # Just sync lazy.nvim plugins and then run `dua` regularly (every day, week, or two weeks)
 # "daily update"
 # alias du="pxu && ngu && ru && bu"
-alias du="pxu && ngu && ru && mpu"
+alias du="sudo -v && pxu && ngu && ru && mpu"
 # "daily log"
 # alias dl="pxl && ngl && rl && bl"
 alias dl="pxl && ngl && rl && mpl"
@@ -15,7 +15,7 @@ alias uta="u add ~/.config/nvim/lazy-lock.json ~/pipx-packages.txt ~/global-npm-
 alias dua="du && dl && uta"
 
 # MacPorts
-alias mpu="sudo port selfupdate && sudo port clean --all all && sudo port uninstall inactive"
+alias mpu="sudo port selfupdate"
 alias mpl="port installed > ports.txt"
 
 # Homebrew
