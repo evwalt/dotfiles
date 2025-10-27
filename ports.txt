@@ -47,7 +47,7 @@ The following ports are currently installed:
   mpdecimal @4.0.1_0 (active)
   ncurses @6.5_0 (active)
   netpbm @11.10.05_0+x11 (active)
-  openjpeg @2.5.3_0 (active)
+  openjpeg @2.5.4_0 (active)
   openssl @3_27 (active)
   openssl3 @3.5.4_0 (active)
   pandoc @3.8_0 (active)
