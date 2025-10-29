@@ -27,7 +27,7 @@ The following ports are currently installed:
   lerc @4.0.0_1 (active)
   leveldb @1.23_1+memenv+rtti (active)
   libdeflate @1.22_0 (active)
-  libedit @20250104-3.1_0 (active)
+  libedit @20251016-3.1_0 (active)
   libelf @0.8.13_4 (active)
   libffi @3.4.8_0 (active)
   libiconv @1.17_0 (active)
