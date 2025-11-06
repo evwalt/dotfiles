@@ -81,7 +81,7 @@ The following ports are currently installed:
   qt5-qtxmlpatterns @5.15.18_0 (active)
   readline @8.2.013_0 (active)
   snappy @1.2.2_2 (active)
-  sqlite3 @3.50.4_0 (active)
+  sqlite3 @3.51.0_1 (active)
   tiff @4.7.1_0 (active)
   uchardet @0.0.8_0 (active)
   urw-fonts @1.0.7pre44_0 (active)
