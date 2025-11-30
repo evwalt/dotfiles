@@ -1,11 +1,19 @@
 return {
-	"echasnovski/mini.nvim",
+	"nvim-mini/mini.nvim",
 	-- enabled = false,
 	version = false,
 
 	config = function()
-		require("mini.cursorword").setup({})
-		require("mini.animate").setup({})
+		local cursorword = require("mini.cursorword")
+		local animate = require("mini.animate")
+
+		cursorword.setup({})
+
+		animate.setup({
+			scroll = {
+				timing = animate.gen_timing.linear({ duration = 50, unit = "total" }),
+			},
+		})
 		require("mini.pairs").setup({})
 
 		-- local hipatterns = require("mini.hipatterns")
