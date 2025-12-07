@@ -44,10 +44,12 @@ The following ports are currently installed:
   lcms2 @2.17_0 (active)
   lerc @4.0.0_1 (active)
   leveldb @1.23_1+memenv+rtti (active)
-  libarchive @3.8.3_0 (active)
+  libarchive @3.8.3_0
+  libarchive @3.8.4_0 (active)
   libb2 @0.98.1_1 (active)
   libcxx @5.0.1_5 (active)
-  libdeflate @1.22_0 (active)
+  libdeflate @1.22_0
+  libdeflate @1.25_0 (active)
   libedit @20251016-3.1_0 (active)
   libelf @0.8.13_4 (active)
   libevent @2.1.12_2 (active)
@@ -82,7 +84,8 @@ The following ports are currently installed:
   ncurses @6.5_0 (active)
   netpbm @11.10.05_0+x11 (active)
   nghttp2 @1.68.0_0 (active)
-  ninja @1.13.1_0 (active)
+  ninja @1.13.1_0
+  ninja @1.13.2_0 (active)
   nodejs22 @22.21.1_0 (active)
   openjpeg @2.5.4_0 (active)
   openssl @3_27 (active)
@@ -103,7 +106,8 @@ The following ports are currently installed:
   python3_select-312 @0.1_1 (active)
   python3_select-313 @0.1_1 (active)
   python312 @3.12.12_0+lto+optimizations (active)
-  python313 @3.13.9_0+lto+optimizations (active)
+  python313 @3.13.9_0+lto+optimizations
+  python313 @3.13.11_0+lto+optimizations (active)
   python_select @0.3_10 (active)
   python_select-312 @0.3_1 (active)
   python_select-313 @0.3_1 (active)
@@ -125,7 +129,8 @@ The following ports are currently installed:
   readline @8.2.013_0 (active)
   rust @1.91.1_0 (active)
   snappy @1.2.2_2 (active)
-  sqlite3 @3.51.0_1 (active)
+  sqlite3 @3.51.0_1
+  sqlite3 @3.51.1_0 (active)
   tiff @4.7.1_0 (active)
   uchardet @0.0.8_0 (active)
   urw-fonts @1.0.7pre44_0 (active)
