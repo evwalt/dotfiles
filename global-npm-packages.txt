@@ -1,10 +1,9 @@
-/Users/evan/.nvm/versions/node/v20.19.4/lib
-├── @bitwarden/cli@2025.11.0
+/Users/evan/.nvm/versions/node/v24.12.0/lib
+├── @bitwarden/cli@2025.12.0
 ├── @prisma/language-server@31.1.0
-├── @tailwindcss/language-server@0.14.29
 ├── corepack@0.34.5
 ├── emmet-ls@0.4.2
-├── eslint@9.39.1
+├── eslint@9.39.2
 ├── markdownlint-cli2@0.20.0
 ├── npm@11.7.0
 ├── prettier@3.7.4
