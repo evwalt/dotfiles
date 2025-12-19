@@ -70,7 +70,11 @@ return {
 		vim.lsp.config("ltex_plus", {
 			settings = {
 				ltex = {
-					language = "en-US",
+					checkFrequency = "save",
+					completionEnabled = true,
+					dictionary = {
+						["en-US"] = ltex_dictionary,
+					},
 					disabledRules = {
 						-- For options, see the following:
 						-- <https://community.languagetool.org/rule/list>
@@ -78,11 +82,7 @@ return {
 						-- <https://www.reddit.com/r/neovim/comments/1hsmyod/comment/m5z2i66/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button>
 						["en-US"] = { "EN_SPECIFIC_CASE", "I_LOWERCASE", "UPPERCASE_SENTENCE_START" },
 					},
-					completionEnabled = true,
-					dictionary = {
-						["en-US"] = ltex_dictionary,
-					},
-					checkFrequency = "save",
+					language = "en-US",
 				},
 			},
 		})
