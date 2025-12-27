@@ -5,7 +5,11 @@ return {
 
 	config = function()
 		local bufferline = require("bufferline")
-		bufferline.setup({})
+		bufferline.setup({
+			options = {
+				numbers = "ordinal",
+			},
+		})
 
 		vim.keymap.set("n", "<space>j", ":BufferLineCyclePrev<CR>")
 		vim.keymap.set("n", "<space>k", ":BufferLineCycleNext<CR>")
