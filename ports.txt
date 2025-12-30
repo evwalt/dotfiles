@@ -135,7 +135,8 @@ The following ports are currently installed:
   qt5-qtxmlpatterns @5.15.18_0 (active)
   readline @8.2.013_0 (active)
   rust @1.91.1_0
-  rust @1.92.0_0 (active)
+  rust @1.92.0_0
+  rust @1.92.0_1 (active)
   snappy @1.2.2_2 (active)
   sqlite3 @3.51.0_1
   sqlite3 @3.51.1_0 (active)
