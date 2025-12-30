@@ -39,9 +39,9 @@ return {
 		vim.keymap.set("n", "<space>pp", ":BufferLineGoToBuffer 4<CR>")
 		vim.keymap.set("n", "<space>yy", ":BufferLineGoToBuffer 5<CR>") -- Refrain from using <space>ff to avoid conflict with with find files.
 		vim.keymap.set("n", "<space>yff", ":BufferLineGoToBuffer 6<CR>")
-		vim.keymap.set("n", "<space>gg", ":BufferLineGoToBuffer 6<CR>")
-		vim.keymap.set("n", "<space>cc", ":BufferLineGoToBuffer 7<CR>")
-		vim.keymap.set("n", "<space>rr", ":BufferLineGoToBuffer 8<CR>")
+		vim.keymap.set("n", "<space>gg", ":BufferLineGoToBuffer 7<CR>")
+		vim.keymap.set("n", "<space>cc", ":BufferLineGoToBuffer 8<CR>")
+		vim.keymap.set("n", "<space>rr", ":BufferLineGoToBuffer 9<CR>")
 		vim.keymap.set("n", "<space>ll", ":BufferLineGoToBuffer -1<CR>")
 	end,
 }
