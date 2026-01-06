@@ -21,10 +21,10 @@ print(os.getenv("HOME") .. "/.hammerspoon/")
 local hyper = { "ctrl", "alt", "cmd", "shift" }
 -- crl tns wvz fdb
 hs.hotkey.bind(hyper, "F", function()
-	hs.application.launchOrFocus("Activity Monitor")
+	hs.application.launchOrFocus("Notion")
 end)
 hs.hotkey.bind(hyper, "G", function()
-	-- hs.application.launchOrFocus("Discord")
+	hs.application.launchOrFocus("Activity Monitor")
 end)
 hs.hotkey.bind(hyper, "C", function()
 	hs.application.launchOrFocus("Finder")
