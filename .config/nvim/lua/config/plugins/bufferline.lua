@@ -33,15 +33,15 @@ return {
 		-- vim.keymap.set("n", "<space><space>m$", function()
 		-- 	bufferline.move_to(-1)
 		-- end)
-		vim.keymap.set("n", "<space>''", ":BufferLineGoToBuffer 1<CR>")
-		vim.keymap.set("n", "<space>,,", ":BufferLineGoToBuffer 2<CR>")
-		vim.keymap.set("n", "<space>..", ":BufferLineGoToBuffer 3<CR>")
-		vim.keymap.set("n", "<space>pp", ":BufferLineGoToBuffer 4<CR>")
-		vim.keymap.set("n", "<space>yy", ":BufferLineGoToBuffer 5<CR>") -- Refrain from using <space>ff to avoid conflict with with find files.
-		vim.keymap.set("n", "<space>yff", ":BufferLineGoToBuffer 6<CR>")
-		vim.keymap.set("n", "<space>gg", ":BufferLineGoToBuffer 7<CR>")
-		vim.keymap.set("n", "<space>cc", ":BufferLineGoToBuffer 8<CR>")
-		vim.keymap.set("n", "<space>rr", ":BufferLineGoToBuffer 9<CR>")
-		vim.keymap.set("n", "<space>ll", ":BufferLineGoToBuffer -1<CR>")
+		vim.keymap.set("n", "<space>''", ":lua require'bufferline'.go_to(1, true)<CR>")
+		vim.keymap.set("n", "<space>,,", ":lua require'bufferline'.go_to(2, true)<CR>")
+		vim.keymap.set("n", "<space>..", ":lua require'bufferline'.go_to(3, true)<CR>")
+		vim.keymap.set("n", "<space>pp", ":lua require'bufferline'.go_to(4, true)<CR>")
+		vim.keymap.set("n", "<space>yy", ":lua require'bufferline'.go_to(5, true)<CR>") -- Refrain from using <space>ff to avoid conflict with with find files.
+		vim.keymap.set("n", "<space>yff", ":lua require'bufferline'.go_to(6, true)<CR>")
+		vim.keymap.set("n", "<space>gg", ":lua require'bufferline'.go_to(7, true)<CR>")
+		vim.keymap.set("n", "<space>cc", ":lua require'bufferline'.go_to(8, true)<CR>")
+		vim.keymap.set("n", "<space>rr", ":lua require'bufferline'.go_to(9, true)<CR>")
+		vim.keymap.set("n", "<space>ll", ":lua require'bufferline'.go_to(-1, true)<CR>")
 	end,
 }
