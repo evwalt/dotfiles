@@ -18,6 +18,7 @@ return {
 				prisma = { "prisma_fmt" },
 				python = { "black" },
 				-- toml = { "taplo" },
+				sql = { "sqlfluff" },
 				typescript = { "prettier" },
 				typescriptreact = { "prettier" },
 			},
