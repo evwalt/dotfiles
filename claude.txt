@@ -1,0 +1,2 @@
+/Users/evan/.local/bin/claude
+2.1.9 (Claude Code)
