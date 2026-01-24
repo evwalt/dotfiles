@@ -46,6 +46,7 @@ alias gdw="git diff --word-diff"
 alias gdc="git diff --color-words"
 alias gl="git log"
 alias glo="git log --oneline"
+alias gre="git restore"
 
 # Java
 #
