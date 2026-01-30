@@ -21,6 +21,15 @@ return {
 		-- See the full "keymap" documentation for information on defining your own keymap.
 		keymap = { preset = "default" },
 
+		completion = {
+			menu = {
+				auto_show = true,
+			},
+			trigger = {
+				show_on_keyword = true,
+			},
+		},
+
 		appearance = {
 			-- Sets the fallback highlight groups to nvim-cmp's highlight groups
 			-- Useful for when your theme doesn't support blink.cmp
@@ -35,6 +44,7 @@ return {
 		-- elsewhere in your config, without redefining it, due to `opts_extend`
 		sources = {
 			default = { "buffer", "lsp", "path", "snippets" },
+			min_keyword_length = 2,
 			-- default = { "buffer", "emoji", "lsp", "path", "snippets" },
 		},
 
