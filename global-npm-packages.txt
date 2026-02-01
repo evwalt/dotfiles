@@ -1,16 +1,16 @@
 /Users/evan/.nvm/versions/node/v24.12.0/lib
 ├── @bitwarden/cli@2025.12.1
-├── @google/gemini-cli@0.25.2
-├── @openai/codex@0.89.0
+├── @google/gemini-cli@0.26.0
+├── @openai/codex@0.93.0
 ├── @prisma/language-server@31.4.0
 ├── @tailwindcss/language-server@0.14.29
 ├── corepack@0.34.6
 ├── emmet-ls@0.4.2
 ├── eslint@9.39.2
 ├── markdownlint-cli2@0.20.0
-├── npm-check-updates@19.3.1
+├── npm-check-updates@19.3.2
 ├── npm@11.8.0
-├── opencode-ai@1.1.45
+├── opencode-ai@1.1.48
 ├── prettier@3.8.1
 ├── ts-node@10.9.2
 ├── typescript-language-server@5.1.3
