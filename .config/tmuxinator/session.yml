@@ -44,13 +44,22 @@ root: ~/
 # Controls whether the tmux session should be attached to automatically. Defaults to true.
 # attach: false
 
-
 windows:
   - "7":
-      root: ~
+      root: ~/dev/dsai
   - "8":
       root: ~/dev
   - "9":
       root: ~/Library/CloudStorage/Dropbox/docs/notes
   - "6":
-      root: ~/.config/nvim
+      root: ~
+
+# windows:
+#   - "7":
+#       root: ~
+#   - "8":
+#       root: ~/dev
+#   - "9":
+#       root: ~/Library/CloudStorage/Dropbox/docs/notes
+#   - "6":
+#       root: ~/.config/nvim
