@@ -60,6 +60,7 @@ alias ngl="npm -g list > global-npm-packages.txt"
 alias ngdl="less ~/global-npm-packages.txt"
 alias nrd="npm run dev"
 alias nrb="npm run build"
+alias nt="npm test"
 
 # --- pipx ---
 alias pxu="pipx upgrade-all"
