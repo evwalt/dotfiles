@@ -36,6 +36,7 @@ return {
 					args = {
 						-- "--config",
 						-- HOME .. "/.config/prettier/.prettierrc.yaml",
+						-- HOME .. "/.config/prettier/.prettierrc.toml",
 						"--stdin-filepath",
 						"$FILENAME",
 					},

@@ -1,0 +1,9 @@
+arrowParens = "always"
+bracketSpacing = true
+jsxSingleQuote = false
+plugins = ["prettier-plugin-tailwindcss"]
+printWidth = 100
+semi = true
+singleQuote = true
+tabWidth = 2
+trailingComma = "all"
