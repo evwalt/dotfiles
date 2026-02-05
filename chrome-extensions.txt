@@ -1,14 +1,14 @@
 All Extensions
 
 Adblock for Youtube™
-7.0.6
+7.0.7
 Removes ads from Youtube™.
 ID: cmedhionkhpnakcndndgjdbohmhepckk
 Inspect views
 service worker
 
 Bitwarden Password Manager
-2025.11.1
+2025.12.1
 At home, at work, or on the go, Bitwarden easily secures all your passwords, passkeys, and sensitive information
 ID: nngceckbapebfimnlniiiahkandclblb
 Inspect views
@@ -19,7 +19,7 @@ Consent-O-Matic
 Automatic handling of GDPR consent forms
 ID: mdjildafknihdffpkfmmpnpoiajfjnjd
 Inspect views
-service worker (Inactive)
+service worker
 
 Privacy Badger
 2025.12.9
@@ -40,19 +40,17 @@ React Developer Tools
 Adds React debugging tools to the Chrome Developer Tools. Created from revision 3cde211b0c on 10/20/2025.
 ID: fmkadmapgofadopljbjfkapdkoienihi
 Inspect views
-service worker (Inactive),
- 1 more…
+service worker
 
 Redux DevTools
 3.2.10
 Redux DevTools for debugging application's state changes.
 ID: lmhkpmbekcpmknklioeibfkpmmfibljd
 Inspect views
-service worker,
- 1 more…
+service worker (Inactive)
 
 Simplify Copilot - Autofill job applications, job tracker & AI resumes
-2.2.12
+2.2.24
 The better way to job search. Quick apply and autofill job applications in one click. Track jobs, companies, resumes & more!
 ID: pbanhockgagggenencehbnadejlgchfc
 
@@ -61,18 +59,26 @@ Surfingkeys
 Rich shortcuts to click links/switch tabs/scroll, capture pages, use your browser like vim for productivity.
 ID: gfbliohnnapiefjpjlpjnehglfpaknnc
 Inspect views
-service worker (Inactive),
- 10 more…
+service worker,
+ 5 more…
+
+Tampermonkey
+5.4.1
+Change the web at will with userscripts
+ID: dhdgffkkebhmkfjojejmpbldmpobfkfo
+Inspect views
+service worker,
+ 2 more…
 
 uBlock Origin Lite
-2025.1207.2142
+2026.201.1924
 An efficient content blocker. Blocks ads, trackers, miners, and more immediately upon installation.
 ID: ddkjiahejlhfcafbddmgiahcphecmpfh
 Inspect views
-service worker (Inactive)
+service worker
 
 Wappalyzer - Technology profiler
-6.10.88
+6.10.89
 Identify web technologies
 ID: gppongmhjkpfnbhagpmjfkannfbllamg
 Inspect views
