@@ -1,8 +1,6 @@
--- Keymaps
---
+--- Keymaps ---
 
--- Write, Quit, Wrap, Set Cursor Column, & Source
---
+--- Write, Quit, Wrap, Set Cursor Column, & Source ---
 vim.keymap.set("n", "<space>w", ":w<CR>")
 -- vim.keymap.set('n', '<space>v', function() vim.lsp.buf.format() end)
 -- vim.keymap.set('n', '<space>m', function()
@@ -15,8 +13,7 @@ vim.keymap.set("n", "<space>hc", ":set cursorcolumn!<CR>")
 vim.keymap.set("n", "<space>u.", ":set cursorcolumn!<CR>")
 vim.keymap.set("n", "<space>so", ":source %<CR>")
 
--- Netrw
---
+--- Netrw ---
 -- vim.keymap.set('n', '<space>e', function()
 --     if vim.bo.filetype == 'netrw' then
 --         vim.cmd(':e #')
@@ -25,20 +22,17 @@ vim.keymap.set("n", "<space>so", ":source %<CR>")
 --     end
 -- end)
 
--- Buffers
---
+--- Buffers ---
 vim.keymap.set("n", "<space>q", ":bd<CR>")
 vim.keymap.set("n", "<space>x", ":bd<CR>")
 vim.keymap.set("n", "<space><space>xf", ":bd!<CR>")
 vim.keymap.set("n", "<space><space>qf", ":bd!<CR>")
 
--- Windows
---
+--- Windows ---
 vim.keymap.set("n", "<space>u", "<C-w>")
 vim.keymap.set("n", "<space>h", "<C-w>")
 
--- Terminal
---
+--- Terminal ---
 vim.keymap.set("n", "<space>tj", function()
 	vim.cmd.vnew()
 	vim.cmd.term()
@@ -55,12 +49,10 @@ vim.keymap.set("n", "<space>tl", function()
 end)
 vim.keymap.set("t", "<esc>", "<C-\\><C-n>")
 
--- Miscellaneous
---
+--- Miscellaneous ---
 vim.keymap.set("n", "<space>d", ":lua vim.diagnostic.open_float()<CR>")
 
--- Edit Specific Files
---
+--- Edit Specific Files ---
 local prod_personal_path = "~/Library/CloudStorage/Dropbox/docs/notes/productivity-personal/"
 vim.keymap.set("n", "<space><space>d", function()
 	vim.cmd("e " .. prod_personal_path .. "daily-planning.md")
@@ -91,15 +83,13 @@ vim.keymap.set("n", "<space><space>'", function()
 	vim.cmd("e " .. prod_personal_path .. "jots.md")
 end)
 
--- Comments
---
+--- Comments ---
 vim.api.nvim_set_keymap("n", "<space>gc", "gcc", { noremap = false, silent = true })
 vim.api.nvim_set_keymap("n", "<space>p.", "gcc", { noremap = false, silent = true })
 vim.api.nvim_set_keymap("v", "<space>gc", "gc", { noremap = false, silent = true })
 vim.api.nvim_set_keymap("v", "<space>p.", "gc", { noremap = false, silent = true })
 
--- Markdown
---
+--- Markdown ---
 local function insert_to_do()
 	if vim.bo.filetype == "markdown" then
 		vim.api.nvim_command("normal! o")
@@ -116,8 +106,7 @@ vim.keymap.set("n", "<space>ht", function()
 	insert_to_do()
 end, { desc = "Insert to-do item" })
 
--- Language-specific Settings
---
+--- Language-specific Settings ---
 vim.api.nvim_create_autocmd("FileType", {
 	pattern = { "javascript", "typescript", "javascriptreact", "typescriptreact" },
 	callback = function()

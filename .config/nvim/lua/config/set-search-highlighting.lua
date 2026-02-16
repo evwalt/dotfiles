@@ -1,5 +1,4 @@
--- Search Highlighting
---
+--- Search Highlighting ---
 
 local group = vim.api.nvim_create_augroup("vimrc_incsearch_highlight", { clear = true })
 

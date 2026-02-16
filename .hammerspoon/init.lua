@@ -1,5 +1,4 @@
--- Automatic Config Reload
---
+--- Automatic Config Reload ---
 function reloadConfig(files)
 	doReload = false
 	for _, file in pairs(files) do
@@ -16,8 +15,7 @@ myWatcher = hs.pathwatcher.new(os.getenv("HOME") .. "/.hammerspoon/", reloadConf
 hs.alert.show("Config loaded")
 print(os.getenv("HOME") .. "/.hammerspoon/")
 
--- Application Focus
---
+--- Application Focus ---
 local hyper = { "ctrl", "alt", "cmd", "shift" }
 -- crl tns wvz fdb
 hs.hotkey.bind(hyper, "F", function()
@@ -60,8 +58,7 @@ hs.hotkey.bind(hyper, "J", function()
 	hs.application.launchOrFocus("zoom.us")
 end)
 
--- Window Management
---
+--- Window Management ---
 -- lmr
 -- halves: left half: o; middle half: e/t; right half: n
 -- thirds: left third: j; middle third: k/m; right third: w
@@ -89,8 +86,7 @@ hs.hotkey.bind({ "ctrl", "alt", "shift" }, "return", function()
 	moveAndResize(0.05, 0.05, 0.9, 0.9)
 end) -- Almost maximized
 
--- Vertical Halves
---
+--- Vertical Halves ---
 hs.hotkey.bind(ca, "o", function()
 	moveAndResize(0, 0, 0.5, 1)
 end) -- Left half
@@ -104,8 +100,7 @@ hs.hotkey.bind(ca, "n", function()
 	moveAndResize(0.5, 0, 0.5, 1)
 end) -- Right half
 
--- Horisontal Halves
---
+--- Horisontal Halves ---
 hs.hotkey.bind(ca, "y", function()
 	moveAndResize(0, 0, 1, 0.5)
 end) -- Top half
@@ -113,8 +108,7 @@ hs.hotkey.bind(ca, "f", function()
 	moveAndResize(0.5, 0.5, 1, 0.5)
 end) -- Bottom half
 
--- Fourths - Corners
---
+--- Fourths - Corners ---
 hs.hotkey.bind(ca, ",", function()
 	moveAndResize(0, 0, 0.5, 0.5)
 end) -- Top left
@@ -128,8 +122,7 @@ hs.hotkey.bind(ca, "q", function()
 	moveAndResize(0, 0.5, 0.5, 0.5)
 end) -- Bottom left
 
--- Fourths - Centered
---
+--- Fourths - Centered ---
 hs.hotkey.bind(ca, ".", function()
 	moveAndResize(0.25, 0, 0.5, 0.5)
 end) -- Top middle fourth
@@ -143,8 +136,7 @@ hs.hotkey.bind(ca, "g", function()
 	moveAndResize(0.25, 0.25, 0.5, 0.5)
 end) -- Center fourth (same as "p")
 
--- Vertical Thirds
---
+--- Vertical Thirds ---
 hs.hotkey.bind(ca, "j", function()
 	moveAndResize(0, 0, 1 / 3, 1)
 end) -- Left third
@@ -158,8 +150,7 @@ hs.hotkey.bind(ca, "w", function()
 	moveAndResize(2 / 3, 0, 1 / 3, 1)
 end) -- Right third
 
--- Vertical Two-thirds
---
+--- Vertical Two-thirds ---
 hs.hotkey.bind(ca, "x", function()
 	moveAndResize(0, 0, 2 / 3, 1)
 end) -- Left two-thirds
@@ -173,8 +164,7 @@ hs.hotkey.bind(ca, "b", function()
 	moveAndResize(1 / 3, 0, 2 / 3, 1)
 end) -- Right two-thirds
 
--- Vertical Thirds with Horizontal Halves
---
+--- Vertical Thirds with Horizontal Halves ---
 hs.hotkey.bind(ca, "'", function()
 	moveAndResize(0, 0, 1 / 3, 1 / 2)
 end) -- Left upper third

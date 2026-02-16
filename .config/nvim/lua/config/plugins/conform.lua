@@ -54,8 +54,7 @@ return {
 			},
 		})
 
-		-- Helper Fuctions
-		--
+		--- Helper Fuctions ---
 		local function shell_escape(path)
 			return path:gsub(" ", "\\ "):gsub("%(", "\\("):gsub("%)", "\\)")
 		end
@@ -74,8 +73,7 @@ return {
 			vim.fn.winrestview(view)
 		end
 
-		-- Keymaps
-		--
+		--- Keymaps ---
 		vim.keymap.set("n", "<space>v", function()
 			-- conform.format({
 			-- 	lsp_fallback = true,
