@@ -40,7 +40,7 @@ parse_time() {
 
 # Require at least one arg
 if (( ${#time_args} == 0 )); then
-  echo "Usage: ct | $0 <time> [-m message] [-e end_message]"
+  echo "Usage: ct <time> [-m message] [-e end_message]"
   echo "Examples:"
   echo "  ct 30m -m \"DSA\""
   echo "  ct 50m -e \"Laundry\""
