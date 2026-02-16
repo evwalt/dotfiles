@@ -106,6 +106,24 @@ vim.keymap.set("n", "<space>ht", function()
 	insert_to_do()
 end, { desc = "Insert to-do item" })
 
+--- Markdown Date ---
+vim.keymap.set("n", "<space><space>pd", function()
+	--@type string
+	local date = os.date("%Y-%m-%d")
+	vim.api.nvim_put({ date }, "c", true, true)
+end, { desc = "Insert current date" })
+vim.keymap.set("n", "<space><space>mpd", function()
+	local success = pcall(vim.cmd, "normal! f]l")
+	if success then
+		--@type string
+		local date = os.date("%Y-%m-%d")
+		vim.api.nvim_put({ "(" .. date .. ") " }, "c", true, true)
+		vim.cmd("normal! 0j")
+	else
+		print("Closing bracket ']' not found")
+	end
+end, { desc = "Insert current date in a Markdown to-do item" })
+
 --- Language-specific Settings ---
 vim.api.nvim_create_autocmd("FileType", {
 	pattern = { "javascript", "typescript", "javascriptreact", "typescriptreact" },
