@@ -52,7 +52,7 @@ vim.keymap.set("t", "<esc>", "<C-\\><C-n>")
 --- Diagnostics Float ---
 vim.keymap.set("n", "<space>d", ":lua vim.diagnostic.open_float()<CR>")
 
---- Diagnostics In-line ---
+--- Diagnostics Inline ---
 vim.keymap.set("n", "<space><space>td", function()
 	local enabled = vim.diagnostic.is_enabled()
 	vim.diagnostic.enable(not enabled)
