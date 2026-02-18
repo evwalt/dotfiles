@@ -49,8 +49,22 @@ vim.keymap.set("n", "<space>tl", function()
 end)
 vim.keymap.set("t", "<esc>", "<C-\\><C-n>")
 
---- Miscellaneous ---
+--- Diagnostics Float ---
 vim.keymap.set("n", "<space>d", ":lua vim.diagnostic.open_float()<CR>")
+
+--- Diagnostics In-line ---
+vim.keymap.set("n", "<space><space>td", function()
+	local enabled = vim.diagnostic.is_enabled()
+	vim.diagnostic.enable(not enabled)
+	vim.notify("Diagnostics: globally " .. (enabled and "OFF" or "ON"))
+end, { desc = "Toggle diagnostics globally" })
+
+vim.keymap.set("n", "<space><space>btd", function()
+	local filter = { bufnr = 0 }
+	local enabled = vim.diagnostic.is_enabled(filter)
+	vim.diagnostic.enable(not enabled, filter)
+	vim.notify("Diagnostics: " .. (enabled and "OFF" or "ON") .. " for this buffer")
+end, { desc = "Toggle diagnostics for current buffer" })
 
 --- Edit Specific Files ---
 local prod_personal_path = "~/Library/CloudStorage/Dropbox/docs/notes/productivity-personal/"
