@@ -1,33 +1,26 @@
--- Set
---
+--- Set ---
 
--- EditorConfig
---
--- vim.g.editorconfig = true
+--- EditorConfig ---
+--- vim.g.editorconfig = true ---
 
--- Line Numbers
---
+--- Line Numbers ---
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.cursorline = true
 
--- Tabs
---
+--- Tabs ---
 vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
 vim.opt.smartindent = true
 
--- Text Width (Print Width)
---
+--- Text Width (Print Width) ---
 vim.opt.textwidth = 2000
 
--- Cases
---
+--- Cases ---
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
 
--- Yank Highlighting
--- Try it with `yap` in normal mode
+--- Yank Highlighting ---
 -- See `:help vim.highlight.on_yank()`
 vim.api.nvim_create_autocmd("TextYankPost", {
 	desc = "Highlight when yanking (copying) text",
@@ -37,35 +30,28 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 	end,
 })
 
--- Search Highlighting
---
+--- Search Highlighting ---
 require("config.set-search-highlighting")
 
--- Terminal GUI Colors
---
+--- Terminal GUI Colors ---
 vim.opt.termguicolors = true
 
--- Clipboard
---
+--- Clipboard ---
 vim.opt.clipboard = "unnamedplus"
 
--- Spell
---
+--- Spell ---
 vim.opt.spell = false
 vim.opt.spelllang = "en_us"
 
--- Sessions
---
+--- Sessions ---
 vim.o.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions,globals" -- from `:checkhealth` warning and auto-session docs
 
--- netrw
---
+--- netrw ---
 -- Disable netrw per nvim-tree docs
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
--- Language-specific Settings
---
+--- Language-specific Settings ---
 vim.api.nvim_create_autocmd("FileType", {
 	pattern = { "javascript", "typescript", "javascriptreact", "typescriptreact" },
 	callback = function()
@@ -76,8 +62,7 @@ vim.api.nvim_create_autocmd("FileType", {
 	end,
 })
 
--- Scroll Position
---
+--- Scroll Position ---
 -- Save scroll position when leaving a buffer
 vim.api.nvim_create_autocmd("BufLeave", {
 	pattern = "*",
@@ -95,8 +80,7 @@ vim.api.nvim_create_autocmd("BufEnter", {
 	end,
 })
 
--- Virtual Text
---
+--- Virtual Text ---
 vim.diagnostic.config({
 	virtual_text = true,
 	signs = true,
