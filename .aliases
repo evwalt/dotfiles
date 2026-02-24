@@ -5,7 +5,7 @@
 alias du="sudo -v && pxu && ngu && ru && mps"
 # "daily log"
 # alias dl="pxl && ngl && rl && bl"
-alias dl="pxl && ngl && rl && mpl"
+alias dl="pxl && ngl && rl && mpl && fhd"
 # "yadm track all"
 # alias uta="u add ~/.config/nvim/lazy-lock.json ~/pipx-packages.txt ~/global-npm-packages.txt ~/rust-version.txt ~/brew-leaves.txt ~/brew-list.txt ~/brew-list-cask.txt && ucm 'chore: update deps' && ups"
 alias uta="u add ~/.config/nvim/lazy-lock.json ~/pipx-packages.txt ~/global-npm-packages.txt ~/rust-version.txt ~/ports.txt && ucm 'chore: update deps' && ups"
@@ -43,6 +43,9 @@ alias gdc="git diff --color-words"
 alias gl="git log"
 alias glo="git log --oneline"
 alias gre="git restore"
+
+# --- Firefox History ---
+alias fhd="~/scripts/firefox-history-dump.zsh"
 
 # --- Java ---
 alias jr="javac -Xlint:unchecked Main.java && java Main"
