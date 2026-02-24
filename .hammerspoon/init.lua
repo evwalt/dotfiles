@@ -58,6 +58,38 @@ hs.hotkey.bind(hyper, "J", function()
 	hs.application.launchOrFocus("zoom.us")
 end)
 
+--- Firefox Quit, Raindrop Save Tabs Warning ---
+local function frontmostAppName()
+	local app = hs.application.frontmostApplication()
+	return app and app:name() or ""
+end
+local confirmModal = hs.hotkey.modal.new()
+confirmModal:bind({}, "y", function()
+	confirmModal:exit()
+	local fx = hs.application.get("Firefox")
+	if fx then
+		fx:selectMenuItem({ "Firefox", "Quit Firefox" })
+	end
+end)
+confirmModal:bind({}, "n", function()
+	confirmModal:exit()
+end)
+confirmModal:bind({}, "escape", function()
+	confirmModal:exit()
+end)
+hs.hotkey.bind({ "cmd" }, "q", function()
+	if frontmostAppName() ~= "Firefox" then
+		hs.application.frontmostApplication():selectMenuItem({ "App", "Quit" })
+		return
+	end
+	hs.alert.show(
+		"Have you saved wanted open tabs to Raindrop?\n"
+			.. "If yes, press Y to quit Firefox. If no, press N or Esc to cancel.",
+		3
+	)
+	confirmModal:enter()
+end)
+
 --- Window Management ---
 -- lmr
 -- halves: left half: o; middle half: e/t; right half: n
