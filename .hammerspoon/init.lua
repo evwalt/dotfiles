@@ -77,18 +77,26 @@ end)
 confirmModal:bind({}, "escape", function()
 	confirmModal:exit()
 end)
-hs.hotkey.bind({ "cmd" }, "q", function()
+local cmdQTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(e)
+	local flags = e:getFlags()
+	local key = hs.keycodes.map[e:getKeyCode()]
+	local isCmdQ = flags.cmd and not flags.alt and not flags.ctrl and not flags.shift and key == "q"
+	if not isCmdQ then
+		return false
+	end
 	if frontmostAppName() ~= "Firefox" then
-		hs.application.frontmostApplication():selectMenuItem({ "App", "Quit" })
-		return
+		return false
 	end
 	hs.alert.show(
 		"Have you saved wanted open tabs to Raindrop?\n"
-			.. "If yes, press Y to quit Firefox. If no, press N or Esc to cancel.",
+			.. "If yes, press Y to quit Firefox.\n"
+			.. "If no, press N or Esc to cancel.",
 		3
 	)
 	confirmModal:enter()
+	return true
 end)
+cmdQTap:start()
 
 --- Window Management ---
 -- lmr
