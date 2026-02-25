@@ -11,7 +11,7 @@ manual pages are exposed at /Users/evan/.local/share/man
     - pyright-langserver
     - pyright-python
     - pyright-python-langserver
-   package ruff 0.15.0, installed using Python 3.13.2
+   package ruff 0.15.2, installed using Python 3.13.2
     - ruff
-   package sqlfluff 4.0.3, installed using Python 3.13.7
+   package sqlfluff 4.0.4, installed using Python 3.13.7
     - sqlfluff
