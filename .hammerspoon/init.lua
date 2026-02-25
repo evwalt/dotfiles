@@ -59,11 +59,11 @@ hs.hotkey.bind(hyper, "J", function()
 end)
 
 --- Firefox Quit, Raindrop Save Tabs Warning ---
-local function frontmostAppName()
+function frontmostAppName()
 	local app = hs.application.frontmostApplication()
 	return app and app:name() or ""
 end
-local confirmModal = hs.hotkey.modal.new()
+confirmModal = hs.hotkey.modal.new()
 confirmModal:bind({}, "y", function()
 	confirmModal:exit()
 	local fx = hs.application.get("Firefox")
@@ -77,11 +77,11 @@ end)
 confirmModal:bind({}, "escape", function()
 	confirmModal:exit()
 end)
-local cmdQTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(e)
+cmdQTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(e)
 	local flags = e:getFlags()
-	local key = hs.keycodes.map[e:getKeyCode()]
-	local isCmdQ = flags.cmd and not flags.alt and not flags.ctrl and not flags.shift and key == "q"
-	if not isCmdQ then
+	local isCmdOnly = flags.cmd and not flags.alt and not flags.ctrl and not flags.shift
+	local isQ = (e:getKeyCode() == hs.keycodes.map["q"])
+	if not (isCmdOnly and isQ) then
 		return false
 	end
 	if frontmostAppName() ~= "Firefox" then
