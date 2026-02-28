@@ -75,9 +75,9 @@ alias pxdl="less ~/pipx-packages.txt"
 # --- Rustup ---
 alias ru="rustup update"
 # "rustc log"
-alias rl="rustc --version > ~/rust-version.txt"
+alias rl="rustup toolchain list > ~/rust-toolchains.txt && cargo install --list > ~/cargo-packages.txt"
 # "rustc display logs"
-alias rdl="less ~/rust-version.txt"
+alias rdl="less ~/rust-toolchains.txt && less ~/cargo-packages.txt"
 
 # --- tmuxinator ---
 alias tx="tmuxinator"
