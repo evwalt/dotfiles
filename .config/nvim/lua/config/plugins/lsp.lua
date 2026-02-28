@@ -24,6 +24,36 @@ return {
 		local lspconfig = require("lspconfig")
 		local capabilities = require("blink.cmp").get_lsp_capabilities()
 
+		vim.lsp.config("codebook-lsp", {
+			cmd = { "codebook-lsp", "serve" },
+			filetypes = {
+				"c",
+				"css",
+				-- "gitcommit",
+				"go",
+				"haskell",
+				-- "html",
+				"java",
+				"javascript",
+				"javascriptreact",
+				"lua",
+				-- "markdown",
+				"php",
+				"python",
+				"ruby",
+				"rust",
+				"swift",
+				"toml",
+				-- "text",
+				"typescript",
+				"typescriptreact",
+				"typst",
+				"zig",
+			},
+			root_markers = { ".git", "codebook.toml", ".codebook.toml" },
+		})
+		vim.lsp.enable("codebook-lsp")
+
 		vim.lsp.config("cssls", { capabilities = capabilities })
 		vim.lsp.enable("cssls")
 
@@ -68,6 +98,27 @@ return {
 		vim.lsp.enable("jsonls")
 
 		vim.lsp.config("ltex_plus", {
+			-- capabilities = capabilities,
+			filetypes = {
+				"bib",
+				"context",
+				"gitcommit",
+				"html",
+				"markdown",
+				"org",
+				"pandoc",
+				"plaintex",
+				"quarto",
+				"mail",
+				"mdx",
+				"rmd",
+				"rnoweb",
+				"rst",
+				"tex",
+				"text",
+				-- "typst",
+				"xhtml",
+			},
 			settings = {
 				ltex = {
 					checkFrequency = "save",
@@ -81,6 +132,27 @@ return {
 						-- <https://www.reddit.com/r/neovim/comments/1hsmyod/disable_some_diagnostics_within_ltexls/?utm_source=chatgpt.com>
 						-- <https://www.reddit.com/r/neovim/comments/1hsmyod/comment/m5z2i66/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button>
 						["en-US"] = { "EN_SPECIFIC_CASE", "I_LOWERCASE", "UPPERCASE_SENTENCE_START" },
+					},
+					enabled = {
+						"bib",
+						"context",
+						"gitcommit",
+						"html",
+						"markdown",
+						"org",
+						"pandoc",
+						"plaintex",
+						"quarto",
+						"mail",
+						"mdx",
+						"rmd",
+						"rnoweb",
+						"rst",
+						"tex",
+						"latex",
+						"text",
+						-- "typst",
+						"xhtml",
 					},
 					language = "en-US",
 				},
@@ -126,6 +198,27 @@ return {
 			},
 		})
 		vim.lsp.enable("tinymist")
+
+		-- vim.lsp.enable("typos_lsp")
+		-- vim.lsp.config("typos_lsp", {
+		-- 	-- capabilities = capabilities,
+		-- 	-- typos-lsp must be on your PATH, or otherwise change this to an absolute path to typos-lsp
+		-- 	-- defaults to typos-lsp if unspecified
+		-- 	cmd = { "typos-lsp" },
+		-- 	-- Logging level of the language server. Logs appear in :LspLog. Defaults to error.
+		-- 	cmd_env = { RUST_LOG = "error" },
+		-- 	init_options = {
+		-- 		-- Custom config. Used together with a config file found in the workspace or its parents,
+		-- 		-- taking precedence for settings declared in both.
+		-- 		-- Equivalent to the typos `--config` cli argument.
+		-- 		config = "~/code/typos-lsp/crates/typos-lsp/tests/typos.toml",
+		-- 		-- How typos are rendered in the editor, can be one of an Error, Warning, Info or Hint.
+		-- 		-- Defaults to Info.
+		-- 		diagnosticSeverity = "Info",
+		-- 	},
+		-- })
+		-- Enable debug logs for the LSP client. Recommended for debugging only.
+		-- vim.lsp.set_log_level("debug")
 
 		--- LSP Default Keymaps in Neovim Nightly Build ---
 		-- vim.keymap.set('n', 'grn', vim.lsp.buf.rename)
