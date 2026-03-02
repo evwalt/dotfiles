@@ -44,7 +44,8 @@ return {
 				lualine_c = {
 					{ "filename", path = 3 },
 				},
-				lualine_x = { "encoding", "fileformat", "filetype" },
+				-- lualine_x = { "encoding", "fileformat", "filetype" },
+				lualine_x = { "encoding", "filetype" },
 				-- lualine_x = {
 				-- 	{
 				-- 		require("noice").api.statusline.mode.get,
