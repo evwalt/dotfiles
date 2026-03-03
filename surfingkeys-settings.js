@@ -13,8 +13,10 @@ api.map('gH', 'H');
 api.unmap('H');
 api.map('H', 'S');
 api.map('L', 'D');
-api.map('K', 'R');
-api.map('J', 'E');
+// api.map('K', 'R');
+api.map('J', 'R');
+// api.map('J', 'E');
+api.map('K', 'E');
 api.map('ot', 'on');
 
 /**
