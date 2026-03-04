@@ -73,6 +73,10 @@ ZSH_THEME="agnoster"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(git)
 
+if [ -f "$HOME/.zprofile" ]; then
+	source "$HOME/.zprofile"
+fi
+
 source $ZSH/oh-my-zsh.sh
 
 # User configuration
@@ -108,9 +112,6 @@ done
 # export EDITOR="/Applications/Visual\ Studio\ Code\ -\ Insiders.app/Contents/MacOS/Electron"
 # export PATH="/opt/homebrew/opt/node@18/bin:$PATH"
 # export PATH="$PATH:/opt/homebrew/opt/node@18/bin"
-# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
-export PATH="$PATH:$HOME/.rvm/bin"
-
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
@@ -119,25 +120,12 @@ echo -ne "\e[2 q"
 
 trap 'echo -ne "\e[2 q"' EXIT
 
-# sbin fix per `brew doctor`
-#
-export PATH="/usr/local/sbin:$PATH"
-
 # ghcup
 #
 source ${HOME}/.ghcup/env
 
-# w3m
-#
-export PATH="/usr/local/bin/w3m:$PATH"
-
-# Created by `pipx` on 2025-03-01 04:08:58
-export PATH="$PATH:/Users/evan/.local/bin"
-
 # pyenv
 #
-export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init --path)"
 
 # pyenv-virtualenv
