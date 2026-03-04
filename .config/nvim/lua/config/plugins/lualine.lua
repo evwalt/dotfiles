@@ -45,7 +45,22 @@ return {
 					{ "filename", path = 3 },
 				},
 				-- lualine_x = { "encoding", "fileformat", "filetype" },
-				lualine_x = { "encoding", "filetype" },
+				lualine_x = {
+					{
+						function()
+							local reg = vim.fn.reg_recording()
+							-- If a macro is being recorded, show "Recording @<register>"
+							if reg ~= "" then
+								return "Recording @" .. reg
+							else
+								return ""
+							end
+						end,
+						color = { fg = "#ff9e64" },
+					},
+					"encoding",
+					"filetype",
+				},
 				-- lualine_x = {
 				-- 	{
 				-- 		require("noice").api.statusline.mode.get,
