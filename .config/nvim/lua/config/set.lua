@@ -1,7 +1,7 @@
 --- Set ---
 
 --- EditorConfig ---
---- vim.g.editorconfig = true ---
+-- vim.g.editorconfig = true
 
 --- Line Numbers ---
 vim.opt.number = true
@@ -52,15 +52,15 @@ vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
 --- Language-specific Settings ---
-vim.api.nvim_create_autocmd("FileType", {
-	pattern = { "javascript", "typescript", "javascriptreact", "typescriptreact" },
-	callback = function()
-		vim.notify("Detected JS/TS/React file")
-		vim.opt_local.tabstop = 2
-		vim.opt_local.shiftwidth = 2
-		vim.opt_local.expandtab = true
-	end,
-})
+-- vim.api.nvim_create_autocmd("FileType", {
+--         pattern = { "javascript", "typescript", "javascriptreact", "typescriptreact" },
+--         callback = function()
+--                 vim.notify("Detected JS/TS/React file")
+--                 vim.opt_local.tabstop = 2
+--                 vim.opt_local.shiftwidth = 2
+--                 vim.opt_local.expandtab = true
+--         end,
+-- })
 
 --- Scroll Position ---
 -- Save scroll position when leaving a buffer
