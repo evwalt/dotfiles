@@ -3,6 +3,9 @@
 typeset -U path PATH
 export ZPROFILE_LOADED=1
 
+# bob-managed Neovim
+export PATH="$HOME/.local/share/bob/nvim-bin:$PATH"
+
 # Keep rustup-managed toolchains first
 export PATH="$HOME/.cargo/bin:$PATH"
 
