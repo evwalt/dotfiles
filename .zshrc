@@ -73,7 +73,7 @@ ZSH_THEME="agnoster"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(git)
 
-if [ -f "$HOME/.zprofile" ]; then
+if [ -z "$ZPROFILE_LOADED" ] && [ -f "$HOME/.zprofile" ]; then
 	source "$HOME/.zprofile"
 fi
 

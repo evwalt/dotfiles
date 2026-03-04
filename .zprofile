@@ -1,4 +1,8 @@
 # --- PATH setup ---
+# Prevent duplicate PATH entries if sourced multiple times
+typeset -U path PATH
+export ZPROFILE_LOADED=1
+
 # Keep rustup-managed toolchains first
 export PATH="$HOME/.cargo/bin:$PATH"
 
