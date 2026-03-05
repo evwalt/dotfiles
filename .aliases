@@ -54,7 +54,6 @@ alias jr="javac -Xlint:unchecked Main.java && java Main"
 
 # --- Misc ---
 alias cdd="cd ~/Library/CloudStorage/Dropbox/"
-alias tn="ts-node"
 
 # --- NPM ---
 alias ngo="npm -g outdated"

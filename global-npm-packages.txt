@@ -11,9 +11,9 @@
 ├── markdownlint-cli2@0.21.0
 ├── npm-check-updates@19.6.3
 ├── npm@11.11.0
-├── opencode-ai@1.2.15
+├── opencode-ai@1.2.17
 ├── prettier@3.8.1
-├── ts-node@10.9.2
+├── tsx@4.21.0
 ├── typescript-language-server@5.1.3
 ├── typescript@5.9.3
 └── vscode-langservers-extracted@4.10.0
