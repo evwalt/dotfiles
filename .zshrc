@@ -2,13 +2,13 @@
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
-export ZSH="$HOME/.oh-my-zsh"
+# export ZSH="$HOME/.oh-my-zsh"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="agnoster"
+# ZSH_THEME="agnoster"
 # ZSH_THEME="robbyrussellcust"
 
 # Set list of themes to pick from when loading at random
@@ -71,13 +71,13 @@ ZSH_THEME="agnoster"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git)
+# plugins=(git)
 
 if [ -z "$ZPROFILE_LOADED" ] && [ -f "$HOME/.zprofile" ]; then
 	source "$HOME/.zprofile"
 fi
 
-source $ZSH/oh-my-zsh.sh
+# source $ZSH/oh-my-zsh.sh
 
 # User configuration
 
@@ -104,7 +104,7 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-#### aliases
+# aliases
 for file in ~/.aliases; do
 	[ -r "$file" ] && [ -f "$file" ] && source "$file"
 done
@@ -121,18 +121,26 @@ echo -ne "\e[2 q"
 trap 'echo -ne "\e[2 q"' EXIT
 
 # ghcup
-#
 source ${HOME}/.ghcup/env
 
 # pyenv
-#
 eval "$(pyenv init --path)"
 
 # pyenv-virtualenv
-#
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
 
 # codex
-#
 eval "$(codex completion zsh)"
+
+# --- post-omz ---
+autoload -U colors && colors
+setopt prompt_subst
+
+git_branch() {
+  local b
+  b=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+  [[ -n "$b" ]] && echo "%F{magenta} $b%f"
+}
+
+PROMPT='%F{green}%n@%m%f %F{blue}%~%f $(git_branch) %# '
