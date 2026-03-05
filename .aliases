@@ -1,4 +1,4 @@
-# --- Daily Combos ---
+# --- daily combos ---
 # Just sync lazy.nvim plugins and then run `dua` regularly (every day, week, or two weeks)
 # "daily update"
 # alias du="pxu && ngu && ru && bu"
@@ -15,12 +15,12 @@ alias uta="u add ~/.config/nvim/lazy-lock.json ~/pipx-packages.txt ~/global-npm-
 # alias dua="du && dl && uta && bd"
 alias dua="du && dl && uta"
 
-# --- MacPorts ---
+# --- macports ---
 alias mps="sudo port selfupdate"
 alias mpu="sudo port upgrade outdated && sudo port uninstall inactive"
 alias mpl="port installed > ports.txt"
 
-# --- Homebrew ---
+# --- homebrew ---
 # "brew update"
 alias bu="brew update --verbose && brew upgrade --verbose && brew cleanup --verbose --prune=all"
 alias bd="brew doctor"
@@ -29,7 +29,7 @@ alias bl="brew leaves > ~/brew-leaves.txt && brew list > ~/brew-list.txt && brew
 # "brew display logs"
 alias bdl="less ~/brew-leaves.txt && less ~/brew-list.txt && less ~/brew-list-cask.txt"
 
-# --- Git ---
+# --- git ---
 # git develop and main, or git deploy
 alias gdp="git checkout main && git merge dev && git push && git checkout dev"
 alias gs="git status"
@@ -46,16 +46,16 @@ alias gl="git log"
 alias glo="git log --oneline"
 alias gre="git restore"
 
-# --- Firefox History ---
+# --- firefox history ---
 alias fhd="~/scripts/firefox-history-dump.zsh"
 
-# --- Java ---
+# --- java ---
 alias jr="javac -Xlint:unchecked Main.java && java Main"
 
-# --- Misc ---
+# --- misc ---
 alias cdd="cd ~/Library/CloudStorage/Dropbox/"
 
-# --- NPM ---
+# --- npm ---
 alias ngo="npm -g outdated"
 alias ngu="npm -g update"
 # "npm -g log"
@@ -73,7 +73,7 @@ alias pxl="pipx list > ~/pipx-packages.txt"
 # "pipx display logs"
 alias pxdl="less ~/pipx-packages.txt"
 
-# --- Rustup ---
+# --- rustup ---
 alias ru="rustup update"
 # "rustc log"
 alias rl="rustup toolchain list > ~/rust-toolchains.txt && cargo install --list > ~/cargo-packages.txt"
