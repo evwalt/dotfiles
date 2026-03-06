@@ -17,6 +17,7 @@ return {
 
 			-- defaults = require("telescope.themes").get_ivy({}),
 			defaults = {
+				file_ignore_patterns = { "^.git/" },
 				layout_strategy = "vertical",
 				layout_config = {
 					vertical = {
@@ -25,6 +26,13 @@ return {
 					},
 				},
 				sorting_strategy = "ascending",
+			},
+			pickers = {
+				find_files = {
+					hidden = true,
+					no_ignore = true,
+					follow = true,
+				},
 			},
 		})
 
