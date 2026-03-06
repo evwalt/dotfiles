@@ -107,7 +107,7 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 [ -r ~/.aliases ] && source ~/.aliases
-[ -r ~/dev/resume-cov/.aliases-resume-cov ] && source ~/dev/resume-cov/.aliases-resume-cov
+[ -r ~/dev/resume-cov/resume-cov.zsh ] && source ~/dev/resume-cov/resume-cov.zsh
 
 # export EDITOR="/Applications/Visual\ Studio\ Code\ -\ Insiders.app/Contents/MacOS/Electron"
 # export PATH="/opt/homebrew/opt/node@18/bin:$PATH"
