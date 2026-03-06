@@ -17,7 +17,7 @@ return {
 
 			-- defaults = require("telescope.themes").get_ivy({}),
 			defaults = {
-				file_ignore_patterns = { "^.git/" },
+				file_ignore_patterns = { "^.git/", "%.DS_Store$" },
 				layout_strategy = "vertical",
 				layout_config = {
 					vertical = {
