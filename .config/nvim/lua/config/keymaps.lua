@@ -68,33 +68,49 @@ end, { desc = "Toggle diagnostics for current buffer" })
 
 --- Edit Specific Files ---
 local prod_personal_path = "~/Library/CloudStorage/Dropbox/docs/notes/productivity-personal/"
+local function in_dropbox_dir()
+	local cwd = vim.loop and vim.loop.cwd() or vim.fn.getcwd()
+	local dropbox_root = vim.fn.expand("~/Library/CloudStorage/Dropbox/")
+	if dropbox_root:sub(-1) ~= "/" then
+		dropbox_root = dropbox_root .. "/"
+	end
+	return cwd ~= nil and vim.startswith(cwd, dropbox_root)
+end
+
+local function open_prod_personal(file)
+	if not in_dropbox_dir() then
+		vim.notify("prod_personal_path shortcuts only work inside Dropbox", vim.log.levels.WARN)
+		return
+	end
+	vim.cmd("e " .. prod_personal_path .. file)
+end
 vim.keymap.set("n", "<space><space>d", function()
-	vim.cmd("e " .. prod_personal_path .. "daily-planning.md")
+	open_prod_personal("daily-planning.md")
 end)
 vim.keymap.set("n", "<space><space>c", function()
 	-- vim.cmd("e " .. prod_personal_path .. "../notes-generic.md")
-	vim.cmd("e " .. prod_personal_path .. "notes-devlaunch.md")
+	open_prod_personal("notes-devlaunch.md")
 end)
 vim.keymap.set("n", "<space><space>r", function()
-	vim.cmd("e " .. prod_personal_path .. "plan-overview-to-do-items.md")
+	open_prod_personal("plan-overview-to-do-items.md")
 end)
 vim.keymap.set("n", "<space><space>l", function()
-	vim.cmd("e " .. prod_personal_path .. "jots.md")
+	open_prod_personal("jots.md")
 end)
 vim.keymap.set("n", "<space><space>s", function()
-	vim.cmd("e " .. prod_personal_path .. "archive/complete-todo-items.md")
+	open_prod_personal("archive/complete-todo-items.md")
 end)
 vim.keymap.set("n", "<space><space>i", function()
-	vim.cmd("e " .. prod_personal_path .. "daily-planning.md")
+	open_prod_personal("daily-planning.md")
 end)
 vim.keymap.set("n", "<space><space>.", function()
-	vim.cmd("e " .. prod_personal_path .. "../notes-generic.md")
+	open_prod_personal("../notes-generic.md")
 end)
 vim.keymap.set("n", "<space><space>,", function()
-	vim.cmd("e " .. prod_personal_path .. "plan-overview-to-do-items.md")
+	open_prod_personal("plan-overview-to-do-items.md")
 end)
 vim.keymap.set("n", "<space><space>'", function()
-	vim.cmd("e " .. prod_personal_path .. "jots.md")
+	open_prod_personal("jots.md")
 end)
 
 --- Comments ---
