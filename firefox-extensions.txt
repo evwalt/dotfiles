@@ -1,3 +1,5 @@
+In Firefox, go to `about:support`, find Add-ons, and copy-paste the extension entries of the table.
+
 Add-ons
 Name 	Type 	Version 	Enabled 	Location 	ID
 AdBlocker for YouTube™	extension	0.5.3	true	app-profile	jid1-q4sG8pYhq8KGHs@jetpack
