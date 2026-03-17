@@ -9,12 +9,17 @@ Consent-O-Matic	extension	1.1.5	true	app-profile	gdpr@cavi.au.dk
 Data Leak Blocker	extension	144.0.0	true	app-builtin-addons	data-leak-blocker@mozilla.com
 Form Autofill	extension	1.0.1	true	app-builtin-addons	formautofill@mozilla.org
 IPP Activator	extension	0.1	true	app-builtin-addons	ipp-activator@mozilla.com
-New Tab	extension	149.2.20260220.204414	true	app-profile	newtab@mozilla.org
+New Tab	extension	150.1.20260304.231049	true	app-profile	newtab@mozilla.org
 Picture-In-Picture	extension	1.0.0	true	app-builtin-addons	pictureinpicture@mozilla.org
 Raindrop.io	extension	6.6.91	true	app-profile	jid0-adyhmvsP91nUO8pRv0Mn2VKeB84@jetpack
 React Developer Tools	extension	6.1.1	true	app-profile	@react-devtools
 Surfingkeys	extension	1.17.11	true	app-profile	{a8332c60-5b6d-41ee-bfc8-e9bb331d34ad}
-Violentmonkey	extension	2.34.0	true	app-profile	{aecec67f-0d10-4fa7-b7c7-609a2db280cf}
+uBlock Origin	extension	1.70.0	true	app-profile	uBlock0@raymondhill.net
+Violentmonkey	extension	2.35.0	true	app-profile	{aecec67f-0d10-4fa7-b7c7-609a2db280cf}
 Wappalyzer - Technology profiler	extension	6.10.89	true	app-profile	wappalyzer@crunchlabz.com
 Web Compatibility Interventions	extension	149.7.20260211.154938	true	app-system-addons	webcompat@mozilla.org
 Youtube Playback Speed Control	extension	1.1.4	true	app-profile	{63eebab4-6bd0-44a0-8d79-7fefb998ebc1}
+System theme — auto	theme	1.4.2	true	app-builtin	default-theme@mozilla.org
+Dark	theme	1.3.4	false	app-builtin	firefox-compact-dark@mozilla.org
+Firefox Alpenglow	theme	1.5.1	false	app-builtin	firefox-alpenglow@mozilla.org
+Light	theme	1.3.4	false	app-builtin	firefox-compact-light@mozilla.org
