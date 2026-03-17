@@ -52,13 +52,14 @@ hs.hotkey.bind(hyper, "V", function()
 end)
 hs.hotkey.bind(hyper, "Z", function()
 	-- hs.application.launchOrFocus("System Settings")
-	hs.application.launchOrFocus("Skim")
+	-- hs.application.launchOrFocus("Skim")
+	hs.application.launchOrFocus("/Applications/Adobe Digital Editions 4.5.app")
 end)
 hs.hotkey.bind(hyper, "J", function()
 	hs.application.launchOrFocus("zoom.us")
 end)
 
---- Per-Window Dimming (Adobe Digital Editions) ---
+--- Window Dimming (Adobe Digital Editions) ---
 local adeName = "Adobe Digital Editions"
 local wf = hs.window.filter.new(adeName)
 local overlay = nil
