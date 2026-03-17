@@ -58,6 +58,126 @@ hs.hotkey.bind(hyper, "J", function()
 	hs.application.launchOrFocus("zoom.us")
 end)
 
+--- Per-Window Dimming (Adobe Digital Editions) ---
+local adeName = "Adobe Digital Editions"
+local wf = hs.window.filter.new(adeName)
+local overlay = nil
+local currentWin = nil
+local occlusionPoller = nil
+local function rectsOverlap(a, b)
+	return not (a.x + a.w <= b.x or b.x + b.w <= a.x or a.y + a.h <= b.y or b.y + b.h <= a.y)
+end
+local function ensureOverlay(win)
+	local f = win:frame()
+	if not overlay then
+		overlay = hs.canvas.new(f)
+		overlay:level(hs.canvas.windowLevels.floating)
+		overlay:behavior({})
+		overlay:clickActivating(false)
+		overlay:appendElements({
+			type = "rectangle",
+			action = "fill",
+			fillColor = { black = 0, alpha = 0.6 },
+			frame = { x = 0, y = 0, w = "100%", h = "100%" },
+		})
+	else
+		overlay:frame(f)
+	end
+end
+local function adeIsOccluded(win)
+	if not win or not win:isVisible() then
+		return true
+	end
+	local adeFrame = win:frame()
+	local adeID = win:id()
+	local windows = hs.window.orderedWindows()
+	for _, other in ipairs(windows) do
+		local otherID = other:id()
+		if otherID == adeID then
+			-- We reached ADE in z-order.
+			-- Anything after this is behind it and cannot cover it.
+			return false
+		end
+		if other:isVisible() then
+			local otherFrame = other:frame()
+			if rectsOverlap(adeFrame, otherFrame) then
+				return true
+			end
+		end
+	end
+	return false
+end
+local function updateOverlay(win)
+	if not win then
+		if overlay then
+			overlay:hide()
+		end
+		return
+	end
+	currentWin = win
+	ensureOverlay(win)
+	if adeIsOccluded(win) then
+		overlay:hide()
+	else
+		overlay:show()
+	end
+end
+local function startPoller()
+	if occlusionPoller then
+		return
+	end
+	occlusionPoller = hs.timer.doEvery(0.2, function()
+		if currentWin then
+			updateOverlay(currentWin)
+		end
+	end)
+end
+local function stopPoller()
+	if occlusionPoller then
+		occlusionPoller:stop()
+		occlusionPoller = nil
+	end
+end
+wf:subscribe(hs.window.filter.windowFocused, function(win)
+	currentWin = win
+	updateOverlay(win)
+	startPoller()
+end)
+wf:subscribe(hs.window.filter.windowUnfocused, function(win)
+	currentWin = win
+	updateOverlay(win)
+	startPoller()
+end)
+wf:subscribe(hs.window.filter.windowMoved, function(win)
+	if currentWin and win:id() == currentWin:id() then
+		updateOverlay(win)
+	end
+end)
+wf:subscribe(hs.window.filter.windowVisible, function(win)
+	currentWin = win
+	updateOverlay(win)
+	startPoller()
+end)
+wf:subscribe(hs.window.filter.windowNotVisible, function(_)
+	if overlay then
+		overlay:hide()
+	end
+	stopPoller()
+end)
+wf:subscribe(hs.window.filter.windowHidden, function(_)
+	if overlay then
+		overlay:hide()
+	end
+	stopPoller()
+end)
+wf:subscribe(hs.window.filter.windowDestroyed, function(_)
+	if overlay then
+		overlay:hide()
+	end
+	currentWin = nil
+	stopPoller()
+end)
+
 --- Firefox Quit, Raindrop Save Tabs Warning ---
 function frontmostAppName()
 	local app = hs.application.frontmostApplication()
