@@ -3,7 +3,7 @@
 # "daily update"
 # alias du="pxu && ngu && ru && bu"
 # alias du="sudo -v && pxu && ngu && ru && mps"
-alias du="sudo -v && pxu && ngu && ru && bob update"
+alias du="pxu && ngu && ru && bob update"
 # "daily log"
 # alias dl="pxl && ngl && rl && bl"
 # alias dl="pxl && ngl && rl && mpl && fhd"
