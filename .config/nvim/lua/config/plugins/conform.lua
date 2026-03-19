@@ -17,7 +17,7 @@ return {
 				markdown = { "markdownlint-cli2" },
 				prisma = { "prisma_fmt" },
 				python = { "black" },
-				-- toml = { "taplo" },
+				toml = { "taplo" },
 				sql = { "sqlfluff" },
 				typescript = { "prettier" },
 				typescriptreact = { "prettier" },
