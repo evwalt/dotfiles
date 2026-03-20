@@ -48,6 +48,7 @@ return {
 		vim.keymap.set("n", "<space><space>", find_files)
 		vim.keymap.set("n", "<space><space><space>", find_files)
 		vim.keymap.set("n", "<space>fh", help_tags)
+		vim.keymap.set("n", "<space>fb", ":Telescope buffers<CR>")
 
 		require("config.telescope.multigrep").setup()
 	end,
