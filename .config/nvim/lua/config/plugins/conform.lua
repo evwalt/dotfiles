@@ -6,6 +6,7 @@ return {
 
 	config = function()
 		local conform = require("conform")
+		local util = require("conform.util")
 		conform.setup({
 			formatters_by_ft = {
 				css = { "prettier" },
@@ -45,6 +46,11 @@ return {
 				prisma_fmt = {
 					command = "npx",
 					args = { "prisma", "format", "--schema", "$FILENAME" },
+					stdin = false,
+				},
+				sqlfluff = {
+					command = "sqlfluff",
+					args = { "fix", "$FILENAME" },
 					stdin = false,
 				},
 				-- ["taplo"] = {
