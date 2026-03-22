@@ -81,8 +81,8 @@ fi
 source $ZSH/oh-my-zsh.sh
 
 # Enable Vim mode in shell
-bindkey -v
-KEYTIMEOUT=1
+# bindkey -v
+# KEYTIMEOUT=1
 
 # User configuration
 
@@ -120,16 +120,19 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
+echo -ne "\e[2 q"
+trap 'echo -ne "\e[2 q"' EXIT
+
 # Mode-aware cursor (insert vs normal)
-function zle-keymap-select {
-  if [[ $KEYMAP == vicmd ]]; then
-    echo -ne '\e[2 q'  # steady block
-  else
-    echo -ne '\e[6 q'  # steady beam
-  fi
-}
-zle -N zle-keymap-select
-echo -ne '\e[6 q'
+# function zle-keymap-select {
+#   if [[ $KEYMAP == vicmd ]]; then
+#     echo -ne '\e[2 q'  # steady block
+#   else
+#     echo -ne '\e[6 q'  # steady beam
+#   fi
+# }
+# zle -N zle-keymap-select
+# echo -ne '\e[6 q'
 
 # ghcup
 source ${HOME}/.ghcup/env
