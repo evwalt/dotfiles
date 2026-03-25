@@ -22,8 +22,6 @@ taplo-cli v0.10.0:
     taplo
 tinymist-cli v0.14.10 (https://github.com/Myriad-Dreamin/tinymist#017c40dd):
     tinymist
-typos-cli v1.44.0:
-    typos
 typos-lsp v0.1.48 (https://github.com/tekumara/typos-lsp#da683c82):
     typos-lsp
 typst-cli v0.14.2:
