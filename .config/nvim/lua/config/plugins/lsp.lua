@@ -169,6 +169,18 @@ return {
 		vim.lsp.config("pyright", { capabilities = capabilities })
 		vim.lsp.enable("pyright")
 
+		vim.lsp.config("sqls", {
+			capabilities = capabilities,
+			filetypes = { "sql" },
+			root_markers = { ".git" },
+			on_attach = function(client, bufnr)
+				-- Disable formatting to avoid conflicts
+				client.server_capabilities.documentFormattingProvider = false
+				client.server_capabilities.documentRangeFormattingProvider = false
+			end,
+		})
+		vim.lsp.enable("sqls")
+
 		vim.lsp.config("tailwindcss", {
 			capabilities = capabilities,
 			filetypes = {

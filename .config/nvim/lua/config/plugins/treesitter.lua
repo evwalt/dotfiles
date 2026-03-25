@@ -15,6 +15,7 @@ return {
 				"markdown",
 				"markdown_inline",
 				"prisma",
+				"sql",
 				"query",
 				"vim",
 				"vimdoc",

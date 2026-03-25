@@ -50,7 +50,7 @@ return {
 				},
 				sqlfluff = {
 					command = "sqlfluff",
-					args = { "fix", "$FILENAME" },
+					args = { "fix", "--dialect", "ansi", "$FILENAME" },
 					stdin = false,
 				},
 				-- ["taplo"] = {
