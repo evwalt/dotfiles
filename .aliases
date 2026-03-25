@@ -52,6 +52,12 @@ alias fhd="~/scripts/firefox-history-dump.zsh"
 # --- java ---
 alias jr="javac -Xlint:unchecked Main.java && java Main"
 
+# --- go ---
+# run these inside a Go module
+alias goo="go list -m -u all"
+alias gou="go get -u ./... && go mod tidy"
+alias gol="go list -m all > ~/go-packages.txt"
+
 # --- misc ---
 alias cdd="cd ~/Library/CloudStorage/Dropbox/"
 
