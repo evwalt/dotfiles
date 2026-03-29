@@ -143,6 +143,3 @@ eval "$(pyenv init --path)"
 # pyenv-virtualenv
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
-
-# codex
-eval "$(codex completion zsh)"
