@@ -4,16 +4,16 @@
 ├── @mermaid-js/mermaid-cli@11.12.0
 ├── @prisma/language-server@31.9.0
 ├── @tailwindcss/language-server@0.14.29
-├── corepack@0.34.6
+├── corepack@0.34.7
 ├── emmet-ls@0.4.2
-├── eslint@10.2.0
+├── eslint@10.2.1
 ├── markdownlint-cli2@0.22.0
-├── npm-check-updates@20.0.2
+├── npm-check-updates@21.0.3
 ├── npm@11.12.1
-├── opencode-ai@1.4.3
-├── prettier@3.8.2
+├── opencode-ai@1.14.20
+├── prettier@3.8.3
 ├── tsx@4.21.0
 ├── typescript-language-server@5.1.3
-├── typescript@6.0.2
+├── typescript@6.0.3
 └── vscode-langservers-extracted@4.10.0
 
