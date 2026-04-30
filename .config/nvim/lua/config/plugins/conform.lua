@@ -22,6 +22,7 @@ return {
 				sql = { "sqlfluff" },
 				typescript = { "prettier" },
 				typescriptreact = { "prettier" },
+				vhdl = { "vsg" },
 			},
 			formatters = {
 				black = {
@@ -57,6 +58,11 @@ return {
 				-- 	command = "taplo",
 				-- 	prepend_args = { "fmt", "--option", "align_entries=true", "$FILENAME" },
 				-- },
+				vsg = {
+					command = "vsg",
+					args = { "-f", "$FILENAME", "--fix" },
+					stdin = false,
+				},
 			},
 		})
 

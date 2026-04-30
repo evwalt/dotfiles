@@ -15,3 +15,5 @@ manual pages are exposed at /Users/evan/.local/share/man
     - ruff
    package sqlfluff 4.1.0, installed using Python 3.13.7
     - sqlfluff
+   package vsg 3.35.0, installed using Python 3.13.7
+    - vsg

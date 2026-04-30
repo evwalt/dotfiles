@@ -211,6 +211,17 @@ return {
 		})
 		vim.lsp.enable("tinymist")
 
+		vim.lsp.config("vhdl_ls", {
+			on_attach = on_attach,
+			capabilities = capabilities,
+		})
+		vim.lsp.enable("vhdl_ls")
+
+		-- lspconfig.vhdl_ls.setup({
+		-- 	on_attach = on_attach,
+		-- 	capabilities = capabilities,
+		-- })
+
 		-- vim.lsp.enable("typos_lsp")
 		-- vim.lsp.config("typos_lsp", {
 		-- 	-- capabilities = capabilities,

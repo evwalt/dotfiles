@@ -26,3 +26,5 @@ typos-lsp v0.1.48 (https://github.com/tekumara/typos-lsp#da683c82):
     typos-lsp
 typst-cli v0.14.2:
     typst
+vhdl_ls v0.86.0:
+    vhdl_ls
