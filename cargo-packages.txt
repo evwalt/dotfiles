@@ -18,6 +18,8 @@ ripgrep v15.1.0:
     rg
 stylua v2.3.1:
     stylua
+surfer v0.7.0 (https://gitlab.com/surfer-project/surfer.git#63910fbe):
+    surfer
 taplo-cli v0.10.0:
     taplo
 tinymist-cli v0.14.10 (https://github.com/Myriad-Dreamin/tinymist#017c40dd):
