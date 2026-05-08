@@ -116,9 +116,40 @@ source $ZSH/oh-my-zsh.sh
 # export EDITOR="/Applications/Visual\ Studio\ Code\ -\ Insiders.app/Contents/MacOS/Electron"
 # export PATH="/opt/homebrew/opt/node@18/bin:$PATH"
 # export PATH="$PATH:/opt/homebrew/opt/node@18/bin"
+
+# NVM
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# Load nvm
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+# Load bash_completion if present
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
+# Automatically use project .nvmrc if present,
+# otherwise fall back to default Node version.
+autoload -U add-zsh-hook
+
+load-nvmrc() {
+  local nvmrc_path
+  nvmrc_path="$(nvm_find_nvmrc)"
+
+  if [ -n "$nvmrc_path" ]; then
+    local nvmrc_node_version
+    nvmrc_node_version="$(cat "$nvmrc_path")"
+
+    if [ "$(nvm version)" != "$(nvm version "$nvmrc_node_version")" ]; then
+      nvm use --silent
+    fi
+  else
+    if [ "$(nvm current)" != "$(nvm version default)" ]; then
+      nvm use default --silent
+    fi
+  fi
+}
+
+add-zsh-hook chpwd load-nvmrc
+load-nvmrc
 
 echo -ne "\e[2 q"
 trap 'echo -ne "\e[2 q"' EXIT
