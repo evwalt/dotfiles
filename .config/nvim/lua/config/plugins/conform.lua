@@ -10,15 +10,18 @@ return {
 		conform.setup({
 			formatters_by_ft = {
 				css = { "prettier" },
+				liquid = { "prettier" },
 				lua = { "stylua" },
 				javascript = { "prettier" },
 				javascriptreact = { "prettier" },
 				json = { "prettier" },
+				jsonc = { "prettier" },
 				html = { "prettier" },
 				markdown = { "markdownlint-cli2" },
 				prisma = { "prisma_fmt" },
 				python = { "black" },
 				toml = { "taplo" },
+				scss = { "prettier" },
 				sql = { "sqlfluff" },
 				typescript = { "prettier" },
 				typescriptreact = { "prettier" },

@@ -36,6 +36,7 @@ return {
 				"java",
 				"javascript",
 				"javascriptreact",
+				-- "liquid",
 				"lua",
 				-- "markdown",
 				"php",
@@ -168,6 +169,9 @@ return {
 
 		vim.lsp.config("pyright", { capabilities = capabilities })
 		vim.lsp.enable("pyright")
+
+		vim.lsp.config("shopify_theme_ls", { capabilities = capabilities })
+		vim.lsp.enable("shopify_theme_ls")
 
 		vim.lsp.config("sqls", {
 			capabilities = capabilities,
