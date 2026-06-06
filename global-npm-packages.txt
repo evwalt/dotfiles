@@ -9,7 +9,7 @@
 ├── emmet-ls@0.4.2
 ├── eslint@10.4.1
 ├── markdownlint-cli2@0.22.1
-├── npm-check-updates@22.2.2
+├── npm-check-updates@22.2.3
 ├── npm@11.16.0
 ├── opencode-ai@1.16.2
 ├── prettier@3.8.3
