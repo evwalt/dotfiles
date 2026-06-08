@@ -85,7 +85,9 @@ local function open_prod_personal(file)
 	vim.cmd("e " .. prod_personal_path .. file)
 end
 vim.keymap.set("n", "<space><space>d", function()
-	open_prod_personal("daily-planning.md")
+	-- open_prod_personal("daily-planning.md")
+    -- jots currently being used as daily planning
+	open_prod_personal("jots.md")
 end)
 vim.keymap.set("n", "<space><space>c", function()
 	-- vim.cmd("e " .. prod_personal_path .. "../notes-generic.md")
