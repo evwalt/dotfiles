@@ -38,7 +38,31 @@ return {
 
 		telescope.load_extension("fzf")
 
+		local actions = require("telescope.actions")
+		local action_state = require("telescope.actions.state")
 		local builtin = require("telescope.builtin")
+
+		local find_dirs = function()
+			builtin.find_files({
+				prompt_title = "Find Directories",
+				-- use the following to show ignored directories in search
+				-- find_command = { "fd", "--type", "directory", "--hidden", "--no-ignore", "--exclude", ".git" },
+				find_command = { "fd", "--type", "directory", "--hidden", "--exclude", ".git" },
+				attach_mappings = function(_, map)
+					local open_in_oil = function(prompt_bufnr)
+						local entry = action_state.get_selected_entry()
+						local path = entry.path or entry[1] or entry.value
+						actions.close(prompt_bufnr)
+						require("oil").open(path)
+					end
+
+					map("i", "<CR>", open_in_oil)
+					map("n", "<CR>", open_in_oil)
+					return true
+				end,
+			})
+		end
+
 		-- local find_files = function()
 		-- 	builtin.find_files({ search_dirs = { vim.fn.fnamemodify(vim.fn.getcwd(), ":h") } })
 		-- end
@@ -49,6 +73,7 @@ return {
 		vim.keymap.set("n", "<space><space><space>", find_files)
 		vim.keymap.set("n", "<space>fh", help_tags)
 		vim.keymap.set("n", "<space>fb", ":Telescope buffers<CR>")
+		vim.keymap.set("n", "<space>fd", find_dirs)
 
 		require("config.telescope.multigrep").setup()
 	end,
