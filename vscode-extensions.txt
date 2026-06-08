@@ -11,6 +11,7 @@ gruntfuggly.todo-tree
 kamikillerto.vscode-colorize
 mdickin.markdown-shortcuts
 oderwat.indent-rainbow
+oracle.oracle-java
 streetsidesoftware.code-spell-checker
 takumii.markdowntable
 tamasfe.even-better-toml
