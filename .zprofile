@@ -13,6 +13,9 @@ export PATH="$HOME/go/bin:$PATH"
 # Keep rustup-managed toolchains first
 export PATH="$HOME/.cargo/bin:$PATH"
 
+# ffmpeg
+export PATH="$HOME/tools:$PATH"
+
 # pipx
 export PATH="$PATH:$HOME/.local/bin"
 
