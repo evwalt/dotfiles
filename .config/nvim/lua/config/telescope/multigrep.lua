@@ -34,6 +34,7 @@ local live_multigrep = function(opts)
 					"--hidden",
 					"--glob",
 					"!**/.git/*",
+					"--no-mmap",
 					"--color=never",
 					"--no-heading",
 					"--with-filename",
