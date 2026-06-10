@@ -5,13 +5,14 @@
 ├── @prisma/language-server@31.11.0
 ├── @shopify/cli@4.1.0
 ├── @tailwindcss/language-server@0.14.29
+├── bobshell@1.0.4
 ├── corepack@0.35.0
 ├── emmet-ls@0.4.2
 ├── eslint@10.4.1
 ├── markdownlint-cli2@0.22.1
 ├── npm-check-updates@22.2.3
 ├── npm@11.16.0
-├── opencode-ai@1.16.2
+├── opencode-ai@1.17.3
 ├── prettier@3.8.3
 ├── tsx@4.22.4
 ├── typescript-language-server@5.3.0
