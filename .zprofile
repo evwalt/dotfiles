@@ -6,6 +6,10 @@ export ZPROFILE_LOADED=1
 # bob-managed Neovim
 export PATH="$HOME/.local/share/bob/nvim-bin:$PATH"
 
+# go
+export PATH="/usr/local/go/bin:$PATH"
+export PATH="$HOME/go/bin:$PATH"
+
 # Keep rustup-managed toolchains first
 export PATH="$HOME/.cargo/bin:$PATH"
 
