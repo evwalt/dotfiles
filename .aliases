@@ -16,6 +16,9 @@ alias uta="u add ~/.config/nvim/lazy-lock.json ~/pipx-packages.txt ~/global-npm-
 # alias dua="du && dl && uta && bd"
 alias dua="du && dl && uta"
 
+# --- bob nvim --
+alias bob-nvim="$HOME/.local/bin/bob"
+
 # --- macports ---
 alias mps="sudo port selfupdate"
 alias mpu="sudo port upgrade outdated && sudo port uninstall inactive"
