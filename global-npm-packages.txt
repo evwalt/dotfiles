@@ -12,7 +12,7 @@
 ├── markdownlint-cli2@0.22.1
 ├── npm-check-updates@22.2.3
 ├── npm@11.16.0
-├── opencode-ai@1.17.3
+├── opencode-ai@1.17.7
 ├── prettier@3.8.3
 ├── tsx@4.22.4
 ├── typescript-language-server@5.3.0
