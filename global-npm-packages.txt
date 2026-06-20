@@ -5,7 +5,6 @@
 ├── @prisma/language-server@31.11.0
 ├── @shopify/cli@4.1.0
 ├── @tailwindcss/language-server@0.14.29
-├── bobshell@1.0.4
 ├── corepack@0.35.0
 ├── emmet-ls@0.4.2
 ├── eslint@10.4.1
