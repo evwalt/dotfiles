@@ -8,6 +8,12 @@ return {
 
 	config = function()
 		require("oil").setup({
+			columns = {
+				"permissions",
+				"size",
+				{ "mtime", format = "%Y-%m-%d %H:%M" },
+				"icon",
+			},
 			view_options = {
 				show_hidden = true,
 				is_always_hidden = function(name, _)
