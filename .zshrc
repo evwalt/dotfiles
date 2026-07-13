@@ -292,6 +292,15 @@ PROMPT='%{%f%b%k%}$(build_prompt) '
 ## ============================================================
 export NVM_DIR="$HOME/.nvm"
 
+# Eagerly expose the default node version's bin/ on PATH (cheap glob, no nvm.sh sourcing)
+# so external tools (e.g. nvim's markdownlint-cli2 subprocess) can find node/npm-installed
+# binaries even in a shell that never explicitly ran a node/npm/nvm command.
+if [[ -r "$NVM_DIR/alias/default" ]]; then
+  _nvm_default_dirs=("$NVM_DIR"/versions/node/v"$(<"$NVM_DIR/alias/default")"*(N/n))
+  [[ -n "$_nvm_default_dirs[-1]" ]] && export PATH="$_nvm_default_dirs[-1]/bin:$PATH"
+  unset _nvm_default_dirs
+fi
+
 _nvm_lazy_load() {
   unset -f nvm node npm npx yarn pnpm corepack 2>/dev/null
   [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
