@@ -5,6 +5,7 @@ local ltex_dictionary = dofile(HOME .. "/ltex-dictionary.lua")
 return {
 	"neovim/nvim-lspconfig",
 	-- enabled = false,
+	event = { "BufReadPre", "BufNewFile" },
 	dependencies = {
 		"saghen/blink.cmp",
 		{

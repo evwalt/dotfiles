@@ -1,6 +1,7 @@
 return {
 	"tidalcycles/vim-tidal",
 	-- enabled = false,
+	ft = "tidal",
 
 	config = function()
 		-- vim.keymap.set("n", "<space>te", ":TidalSend")

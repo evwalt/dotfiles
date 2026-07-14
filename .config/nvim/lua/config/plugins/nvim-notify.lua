@@ -9,6 +9,7 @@
 return {
 	"rcarriga/nvim-notify",
 	-- enabled = false,
+	event = "VeryLazy",
 	opts = {
 		top_down = false,
 		max_width = 50,

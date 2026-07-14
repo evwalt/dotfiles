@@ -4,6 +4,7 @@ return {
 	-- dependencies = { "allaman/emoji.nvim", "rafamadriz/friendly-snippets", "saghen/blink.compat" },
 	dependencies = { "rafamadriz/friendly-snippets" },
 	-- enabled = false,
+	event = "InsertEnter",
 
 	-- use a release tag to download pre-built binaries
 	version = "*",

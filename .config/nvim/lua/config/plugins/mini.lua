@@ -2,6 +2,7 @@ return {
 	"nvim-mini/mini.nvim",
 	-- enabled = false,
 	version = false,
+	event = "VeryLazy",
 
 	config = function()
 		local cursorword = require("mini.cursorword")

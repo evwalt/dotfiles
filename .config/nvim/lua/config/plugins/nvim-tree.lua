@@ -1,5 +1,7 @@
 return {
 	"nvim-tree/nvim-tree.lua",
+	cmd = { "NvimTreeToggle", "NvimTreeOpen", "NvimTreeFocus", "NvimTreeFindFile" },
+	keys = { "<space>ne" },
 	opts = {},
 
 	config = function()

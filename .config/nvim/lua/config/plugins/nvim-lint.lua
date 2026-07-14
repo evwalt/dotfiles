@@ -2,6 +2,7 @@ local HOME = os.getenv("HOME")
 return {
 	"mfussenegger/nvim-lint",
 	-- enabled = false,
+	event = { "BufReadPre", "BufWritePost" },
 	opts = {},
 
 	config = function()
