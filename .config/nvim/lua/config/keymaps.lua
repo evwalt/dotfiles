@@ -27,6 +27,8 @@ vim.keymap.set("n", "<space>q", ":bd<CR>")
 vim.keymap.set("n", "<space>x", ":bd<CR>")
 vim.keymap.set("n", "<space><space>xf", ":bd!<CR>")
 vim.keymap.set("n", "<space><space>qf", ":bd!<CR>")
+-- vim.keymap.set("n", "<space>cp", ":let @+ = expand('%:p')<CR>")
+vim.keymap.set("n", "<space>cp", ":let @+ = substitute(expand('%:p'), expand('$HOME'), '~', '')<CR>")
 
 --- Windows ---
 vim.keymap.set("n", "<space>u", "<C-w>")
@@ -86,7 +88,7 @@ local function open_prod_personal(file)
 end
 vim.keymap.set("n", "<space><space>d", function()
 	-- open_prod_personal("daily-planning.md")
-    -- jots currently being used as daily planning
+	-- jots currently being used as daily planning
 	open_prod_personal("jots.md")
 end)
 vim.keymap.set("n", "<space><space>c", function()
