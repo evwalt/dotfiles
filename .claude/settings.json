@@ -1,0 +1,14 @@
+{
+  "extraKnownMarketplaces": {
+    "claude-plugins-official": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-plugins-official"
+      }
+    }
+  },
+  "theme": "auto",
+  "enabledPlugins": {
+    "vercel@claude-plugins-official": true
+  }
+}
