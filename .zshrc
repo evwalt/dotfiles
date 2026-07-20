@@ -55,6 +55,11 @@ alias la='ls -lAh'
 # NOTE: `l` is intentionally left unset here — ~/.aliases defines
 # `alias l="ls -laF"` and sources later, exactly as it did before.
 
+# ls colors (from OMZ lib/theme-and-appearance.zsh): bold teal/cyan dirs,
+# default (white) regular files, on BSD ls.
+export CLICOLOR=1
+export LSCOLORS="Gxfxcxdxbxegedabagacad"
+
 ## ============================================================
 ## Misc shell options (from OMZ lib/misc.zsh)
 ## ============================================================
