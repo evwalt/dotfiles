@@ -126,9 +126,11 @@ vim.api.nvim_set_keymap("v", "<space>p.", "gc", { noremap = false, silent = true
 --- Markdown ---
 local function insert_to_do()
 	if vim.bo.filetype == "markdown" then
-		vim.api.nvim_command("normal! o")
-		vim.api.nvim_put({ "- [ ] " }, "c", true, true)
-		vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("a", true, false, true), "n", true)
+		local row = vim.api.nvim_win_get_cursor(0)[1]
+
+		vim.api.nvim_buf_set_lines(0, row, row, false, { "- [ ] " })
+		vim.api.nvim_win_set_cursor(0, { row + 1, 0 })
+		vim.cmd("startinsert!")
 	else
 		print("Not a markdown file")
 	end
