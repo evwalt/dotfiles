@@ -63,6 +63,7 @@ alias gol="go list -m all > ~/go-packages.txt"
 
 # --- misc ---
 alias cdd="cd ~/Library/CloudStorage/Dropbox/"
+alias cdb="cd ~/Library/CloudStorage/Dropbox/bk/"
 
 # --- npm ---
 alias ngo="npm -g outdated"
