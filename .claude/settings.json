@@ -1,4 +1,7 @@
 {
+  "enabledPlugins": {
+    "vercel@claude-plugins-official": true
+  },
   "extraKnownMarketplaces": {
     "claude-plugins-official": {
       "source": {
@@ -8,7 +11,8 @@
     }
   },
   "theme": "auto",
-  "enabledPlugins": {
-    "vercel@claude-plugins-official": true
-  }
+  "preferredNotifChannel": "terminal_bell",
+  "inputNeededNotifEnabled": true,
+  "agentPushNotifEnabled": true,
+  "remoteControlAtStartup": true
 }
