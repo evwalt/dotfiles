@@ -46,7 +46,7 @@ root: ~/
 
 windows:
   - "7":
-      root: ~/dev/dsai
+      root: ~/dev/founder-os
   - "8":
       root: ~/dev
   - "9":
