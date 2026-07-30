@@ -1,11 +1,7 @@
-/**
- * Useful Links
- */
+// --- Useful Links ---
 // https://github.com/brookhong/Surfingkeys/wiki
 
-/**
- * Modified Keybindings
- */
+// --- Modified Keybindings ---
 api.unmap(';dh');
 api.unmap(';t');
 api.unmap('r');
@@ -19,9 +15,7 @@ api.map('J', 'R');
 api.map('K', 'E');
 api.map('ot', 'on');
 
-/**
- * Examples
- */
+// --- Examples ---
 // an example to create a new mapping `ctrl-y`
 api.mapkey('<Ctrl-y>', 'Show me the money', function () {
   Front.showPopup(
@@ -33,14 +27,10 @@ api.mapkey('<Ctrl-y>', 'Show me the money', function () {
 // an example to remove mapkey `Ctrl-i`
 // api.unmap('<Ctrl-i>');
 
-/**
- * Hint Align
- */
+// --- Hint Align ---
 settings.hintAlign = 'left';
 
-/**
- * Theme
- */
+// --- Theme ---
 settings.theme = `
 .sk_theme {
     font-family: Input Sans Condensed, Charcoal, sans-serif;
