@@ -30,6 +30,13 @@ api.mapkey('<Ctrl-y>', 'Show me the money', function () {
 // --- Hint Align ---
 settings.hintAlign = 'left';
 
+// --- Hints Theme ---
+api.Hints.style('border:1px solid #3e4452; color:#e5e9f0; background:#24272e;');
+api.Hints.style(
+  'border:1px solid #3e4452 !important; color:#e5e9f0 !important; background:#24272e !important;',
+  'text',
+);
+
 // --- Theme ---
 settings.theme = `
 .sk_theme {
