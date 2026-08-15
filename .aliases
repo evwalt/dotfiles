@@ -1,9 +1,9 @@
 # --- daily combos ---
 # Just sync lazy.nvim plugins and then run `dua` regularly (every day, week, or two weeks)
 # "daily update"
-# alias du="pxu && ngu && ru && bu"
-# alias du="sudo -v && pxu && ngu && ru && mps"
-alias du="pxu && ngu && ru && bob update"
+# alias dup="pxu && ngu && ru && bu"
+# alias dup="sudo -v && pxu && ngu && ru && mps"
+alias dup="pxu && ngu && ru && bob update"
 # "daily log"
 # alias dl="pxl && ngl && rl && bl"
 # alias dl="pxl && ngl && rl && mpl && fhd"
@@ -13,8 +13,8 @@ alias dl="pxl && ngl && rl"
 # alias uta="u add ~/.config/nvim/lazy-lock.json ~/pipx-packages.txt ~/global-npm-packages.txt ~/rust-version.txt ~/brew-leaves.txt ~/brew-list.txt ~/brew-list-cask.txt && ucm 'chore: update deps' && ups"
 alias uta="u add ~/.config/nvim/lazy-lock.json ~/pipx-packages.txt ~/global-npm-packages.txt ~/rust-version.txt ~/cargo-packages.txt ~/ports.txt && ucm 'chore(env): update deps' && ups"
 # "daily update, log, and yadm track all"
-# alias dua="du && dl && uta && bd"
-alias dua="du && dl && uta"
+# alias dua="dup && dl && uta && bd"
+alias dua="dup && dl && uta"
 
 # --- macports ---
 alias mps="sudo port selfupdate"
