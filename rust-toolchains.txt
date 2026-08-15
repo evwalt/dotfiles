@@ -1,2 +1,0 @@
-stable-x86_64-apple-darwin (active, default)
-nightly-x86_64-apple-darwin
