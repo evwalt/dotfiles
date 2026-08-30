@@ -368,3 +368,7 @@ pyenv() {
   eval "$(command pyenv virtualenv-init -)"
   pyenv "$@"
 }
+
+# .NET SDK (user-local install, no admin/brew required)
+export DOTNET_ROOT="$HOME/.dotnet"
+export PATH="$HOME/.dotnet:$HOME/.dotnet/tools:$PATH"
