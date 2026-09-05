@@ -17,13 +17,37 @@ print(os.getenv("HOME") .. "/.hammerspoon/")
 
 --- Application Focus ---
 local hyper = { "ctrl", "alt", "cmd", "shift" }
+--- Multi-app picker for a single hotkey ---
+-- Usage: hs.hotkey.bind(hyper, "G", appPicker({ s = "Skim", p = "Spotify" }))
+-- Press the hyper combo, then one of the listed sub-keys. Esc cancels.
+local function appPicker(choices)
+	local m = hs.hotkey.modal.new()
+	local hint = {}
+	for key, app in pairs(choices) do
+		table.insert(hint, key .. " → " .. app)
+		m:bind({}, key, function()
+			m:exit()
+			hs.application.launchOrFocus(app)
+		end)
+	end
+	m:bind({}, "escape", function()
+		m:exit()
+	end)
+	local hintText = table.concat(hint, "\n")
+	function m:entered()
+		hs.alert.closeAll()
+		hs.alert.show(hintText, 2)
+	end
+	return function()
+		m:enter()
+	end
+end
+
 -- crl tns wvz fdb
 hs.hotkey.bind(hyper, "F", function()
 	hs.application.launchOrFocus("Reminders")
 end)
-hs.hotkey.bind(hyper, "G", function()
-	hs.application.launchOrFocus("Skim")
-end)
+hs.hotkey.bind(hyper, "G", appPicker({ k = "Skim", o = "Spotify" }))
 hs.hotkey.bind(hyper, "C", function()
 	hs.application.launchOrFocus("Finder")
 end)
