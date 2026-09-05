@@ -80,6 +80,11 @@
       }
     }
   },
+  "modelSettings": {
+    "claude-sonnet-5": {
+      "effortLevel": "medium"
+    }
+  },
   "theme": "auto",
   "preferredNotifChannel": "terminal_bell",
   "remoteControlAtStartup": true,
