@@ -1,0 +1,12 @@
+#!/bin/sh
+
+SOCKET="sidecar"
+SESSION="sidecar"
+
+# Create the persistent LLM session once if it doesn't exist.
+if ! tmux -L "$SOCKET" has-session -t "$SESSION" 2>/dev/null; then
+    TMUX= tmux -L "$SOCKET" new-session -d -s "$SESSION"
+fi
+
+# Attach this pane as another view of that same session.
+exec env TMUX= tmux -L "$SOCKET" attach-session -t "$SESSION"
