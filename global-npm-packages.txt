@@ -1,17 +1,18 @@
 /Users/evan/.nvm/versions/node/v24.15.0/lib
 ├── @bitwarden/cli@2026.6.0
-├── @marp-team/marp-cli@4.5.0
-├── @mermaid-js/mermaid-cli@11.16.0
-├── @prisma/language-server@31.12.0
+├── @marp-team/marp-cli@4.5.1
+├── @mermaid-js/mermaid-cli@11.17.0
+├── @prisma/language-server@31.12.8
 ├── @tailwindcss/language-server@0.16.0
 ├── corepack@0.36.0
 ├── emmet-ls@0.4.2
-├── eslint@10.9.1
+├── eslint@10.10.0
 ├── markdownlint-cli2@0.23.2
 ├── npm@12.0.2
-├── opencode-ai@1.18.25
+├── opencode-ai@1.18.29
 ├── prettier@3.9.6
-├── tsx@4.23.12
+├── tsx@4.23.13
 ├── typescript-language-server@6.0.0
-└── typescript@7.0.2
+├── typescript@7.0.2
+└── vscode-langservers-extracted@4.10.0
 
