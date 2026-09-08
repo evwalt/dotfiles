@@ -1,4 +1,4 @@
-# ~/.zshrc.no-omz — minimal, framework-free replacement for Oh My Zsh
+# ~/.zshrc — minimal, framework-free replacement for Oh My Zsh
 #
 # Goal: same look/behavior as the current agnoster-themed OMZ setup,
 # but without the Oh My Zsh framework overhead. Ported piece-by-piece
