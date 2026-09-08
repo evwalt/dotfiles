@@ -47,7 +47,7 @@ end
 hs.hotkey.bind(hyper, "F", function()
 	hs.application.launchOrFocus("Reminders")
 end)
-hs.hotkey.bind(hyper, "G", appPicker({ k = "Skim", o = "Spotify" }))
+hs.hotkey.bind(hyper, "G", appPicker({ k = "Skim", o = "Spotify", a = "Activity Monitor" }))
 hs.hotkey.bind(hyper, "C", function()
 	hs.application.launchOrFocus("Finder")
 end)
