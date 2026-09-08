@@ -2,8 +2,12 @@
 
 ## Overview
 
-This repository leverages [yadm](https://yadm.io) to manage dotfiles, settings, and text files in my macOS home directory. `yadm` simplifies tracking and synchronizing these files across systems. The local `yadm` repository is stored at `.local/share/yadm/repo.git`.
+My macOS dotfiles and development environment configuration, managed with [yadm](https://yadm.io).
+
+yadm keeps configuration files in their normal locations under `$HOME` while providing Git-based version control and synchronization.
 
 ## Regular Maintenance
 
-To update and track dependencies, sync lazy.nvim plugins and then run `dua` regularly, ideally every week. See [aliases](./.aliases) for details.
+To update and track dependencies, sync lazy.nvim plugins and run `dua` regularly, typically weekly.
+
+See [`.aliases`](./.aliases) for the associated commands and aliases.
