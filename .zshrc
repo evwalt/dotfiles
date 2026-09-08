@@ -269,6 +269,71 @@ _prompt_git() {
   fi
 }
 
+_prompt_yadm_segment() {
+  local label=$1
+  local branch=$2
+  local dirty=$3
+
+  if [[ -n "$dirty" ]]; then
+    _prompt_segment yellow black
+  else
+    _prompt_segment green black
+  fi
+
+  print -n "$label $_PL_BRANCH_CHAR $branch"
+}
+
+_prompt_yadm_private() {
+  local branch dirty
+  branch="$(yadm-private branch --show-current 2>/dev/null)" || return
+  dirty="$(yadm-private status --porcelain --untracked-files=no 2>/dev/null)"
+  _prompt_yadm_segment r "$branch" "$dirty"
+}
+
+_prompt_yadm_public() {
+  local branch dirty
+  branch="$(yadm-public branch --show-current 2>/dev/null)" || return
+  dirty="$(yadm-public status --porcelain --untracked-files=no 2>/dev/null)"
+  _prompt_yadm_segment u "$branch" "$dirty"
+}
+
+YADM_PROMPT_PUBLIC=false
+YADM_PROMPT_PRIVATE=false
+
+yadm-prompt-toggle() {
+  case "$1" in
+    public)
+      if [[ "$YADM_PROMPT_PUBLIC" == true ]]; then
+        YADM_PROMPT_PUBLIC=false
+      else
+        YADM_PROMPT_PUBLIC=true
+      fi
+      ;;
+    private)
+      if [[ "$YADM_PROMPT_PRIVATE" == true ]]; then
+        YADM_PROMPT_PRIVATE=false
+      else
+        YADM_PROMPT_PRIVATE=true
+      fi
+      ;;
+    both|"")
+      if [[ "$YADM_PROMPT_PUBLIC" == true || "$YADM_PROMPT_PRIVATE" == true ]]; then
+        YADM_PROMPT_PUBLIC=false
+        YADM_PROMPT_PRIVATE=false
+      else
+        YADM_PROMPT_PUBLIC=true
+        YADM_PROMPT_PRIVATE=true
+      fi
+      ;;
+    *)
+      echo "usage: yadm-prompt-toggle [public|private|both]"
+      return 1
+      ;;
+  esac
+
+  zle reset-prompt 2>/dev/null || true
+}
+
 build_prompt() {
   RETVAL=$?
   _CURRENT_BG='NONE'
@@ -278,6 +343,8 @@ build_prompt() {
   _prompt_context
   _prompt_dir
   _prompt_git
+  [[ "$YADM_PROMPT_PRIVATE" == true ]] && _prompt_yadm_private
+  [[ "$YADM_PROMPT_PUBLIC" == true ]] && _prompt_yadm_public
   _prompt_end
 }
 
@@ -287,7 +354,7 @@ PROMPT='%{%f%b%k%}$(build_prompt) '
 ## User configuration
 ## ============================================================
 yadm-public() {
-	command yadm "$@"
+  command yadm "$@"
 }
 
 yadm-private() {
