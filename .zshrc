@@ -284,8 +284,19 @@ build_prompt() {
 PROMPT='%{%f%b%k%}$(build_prompt) '
 
 ## ============================================================
-## User configuration (unchanged)
+## User configuration
 ## ============================================================
+yadm-public() {
+	command yadm "$@"
+}
+
+yadm-private() {
+  command yadm \
+    --yadm-dir "$HOME/.config/yadm-private" \
+    --yadm-data "$HOME/.local/share/yadm-private" \
+    "$@"
+}
+
 [ -r ~/.aliases ] && source ~/.aliases
 [ -r ~/dev/resume-cov/tool-resume-cov.zsh ] && source ~/dev/resume-cov/tool-resume-cov.zsh
 
