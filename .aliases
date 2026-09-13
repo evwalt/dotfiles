@@ -11,19 +11,18 @@ alias yuta="yadm-public add ~/.config/nvim/lazy-lock.json ~/pipx-packages.txt ~/
 # alias dua="dup && dl && yuta && bd"
 alias dua="dup && dl && yuta"
 
-# --- macports ---
-alias mps="sudo port selfupdate"
-alias mpu="sudo port upgrade outdated && sudo port uninstall inactive"
-alias mpl="port installed > ports.txt"
+# --- claude ---
+alias chs="yadm-private add ~/.claude/projects ~/.claude/history.jsonl"
 
-# --- homebrew ---
-# "brew update"
-alias bu="brew update --verbose && brew upgrade --verbose && brew cleanup --verbose --prune=all"
-alias bd="brew doctor"
-# "brew log"
-alias bl="brew leaves > ~/brew-leaves.txt && brew list > ~/brew-list.txt && brew list --cask > ~/brew-list-cask.txt"
-# "brew display logs"
-alias bdl="less ~/brew-leaves.txt && less ~/brew-list.txt && less ~/brew-list-cask.txt"
+# --- codex ---
+alias cxs="yadm-private add ~/.codex/sessions ~/.codex/history.jsonl"
+
+# --- dropbox ---
+alias cdd="cd ~/Library/CloudStorage/Dropbox/"
+alias cdb="cd ~/Library/CloudStorage/Dropbox/bk/"
+
+# --- firefox history ---
+alias fhd="~/scripts/firefox-history-dump.zsh"
 
 # --- git ---
 # git develop and main, or git deploy
@@ -44,21 +43,28 @@ alias gl="git log"
 alias glo="git log --oneline"
 alias gre="git restore"
 
-# --- firefox history ---
-alias fhd="~/scripts/firefox-history-dump.zsh"
-
-# --- java ---
-alias jr="javac -Xlint:unchecked Main.java && java Main"
-
 # --- go ---
 # run these inside a Go module
 alias goo="go list -m -u all"
 alias gou="go get -u ./... && go mod tidy"
 alias gol="go list -m all > ~/go-packages.txt"
 
-# --- misc ---
-alias cdd="cd ~/Library/CloudStorage/Dropbox/"
-alias cdb="cd ~/Library/CloudStorage/Dropbox/bk/"
+# --- homebrew ---
+# "brew update"
+alias bu="brew update --verbose && brew upgrade --verbose && brew cleanup --verbose --prune=all"
+alias bd="brew doctor"
+# "brew log"
+alias bl="brew leaves > ~/brew-leaves.txt && brew list > ~/brew-list.txt && brew list --cask > ~/brew-list-cask.txt"
+# "brew display logs"
+alias bdl="less ~/brew-leaves.txt && less ~/brew-list.txt && less ~/brew-list-cask.txt"
+
+# --- java ---
+alias jr="javac -Xlint:unchecked Main.java && java Main"
+
+# --- macports ---
+alias mps="sudo port selfupdate"
+alias mpu="sudo port upgrade outdated && sudo port uninstall inactive"
+alias mpl="port installed > ports.txt"
 
 # --- npm ---
 alias ngo="npm -g outdated"
@@ -70,6 +76,9 @@ alias ngdl="less ~/global-npm-packages.txt"
 alias nrd="npm run dev"
 alias nrb="npm run build"
 alias nt="npm test"
+
+# --- opencode ---
+alias ohs="opencode-history-sync"
 
 # --- pipx ---
 alias pxu="pipx upgrade-all"

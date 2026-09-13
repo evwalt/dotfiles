@@ -364,6 +364,18 @@ yadm-private() {
     "$@"
 }
 
+opencode-history-sync() {
+  mkdir -p "$HOME/opencode-history"
+
+  opencode session list |
+    awk '/^ses_/ {print $1}' |
+    while read -r id; do
+      opencode export "$id" > "$HOME/opencode-history/$id.json"
+    done
+
+  yadm-private add "$HOME/opencode-history"
+}
+
 [ -r ~/.aliases ] && source ~/.aliases
 [ -r ~/dev/resume-cov/tool-resume-cov.zsh ] && source ~/dev/resume-cov/tool-resume-cov.zsh
 
