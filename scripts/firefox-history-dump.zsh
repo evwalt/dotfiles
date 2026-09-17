@@ -1,10 +1,22 @@
 #!/usr/bin/env zsh
 set -euo pipefail
 
-[[ -f "$HOME/scripts/.env.local" ]] && source "$HOME/scripts/.env.local"
+FIREFOX_DIR="$HOME/Library/Application Support/Firefox"
 
-DB="${FIREFOX_PLACES_DB:?Set FIREFOX_PLACES_DB in ~/.env.local}"
-OUT_DIR="${FIREFOX_HISTORY_OUT_DIR:?Set FIREFOX_HISTORY_OUT_DIR in ~/.env.local}"
+PROFILE_PATH="$(
+  awk -F= '
+    /^\[Install/ { in_install=1; next }
+    /^\[/        { in_install=0 }
+    in_install && /^Default=/ {
+      sub(/^Default=/, "")
+      print
+      exit
+    }
+  ' "$FIREFOX_DIR/profiles.ini"
+)"
+
+DB="$FIREFOX_DIR/$PROFILE_PATH/places.sqlite"
+OUT_DIR="$PWD"
 
 TIMESTAMP="$(date +%Y-%m-%d_%H-%M-%S)"
 OUT="$OUT_DIR/firefox-history-$TIMESTAMP.txt"
