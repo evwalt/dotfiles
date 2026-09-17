@@ -1,15 +1,15 @@
-# --- daily combos ---
-# Just sync lazy.nvim plugins and then run `dua` regularly (every day, week, or two weeks)
-# "daily update"
-alias dup="pxu && ngu && ru && bob update"
-# "daily log"
-alias dl="pxl && ngl && rl"
+# --- weekly combos ---
+# Just sync lazy.nvim plugins and then run `wua` regularly (every day, week, or two weeks)
+# "weekly update"
+alias wup="pipx upgrade-all && npm -g update && rustup update && bob update"
+# "weekly log"
+alias wl="pxl && ngl && rl"
 # "yadm-public track all"
 # alias yuta="yadm-public add ~/.config/nvim/lazy-lock.json ~/pipx-packages.txt ~/global-npm-packages.txt ~/rust-version.txt ~/brew-leaves.txt ~/brew-list.txt ~/brew-list-cask.txt && yadm-public commit -m 'chore: update deps' && yadm-public push"
-alias yuta="yadm-public add ~/.config/nvim/lazy-lock.json ~/pipx-packages.txt ~/global-npm-packages.txt ~/rust-version.txt ~/cargo-packages.txt ~/ports.txt && yadm-public commit -m 'chore(env): update deps' && yadm-public push"
+alias wuta="yadm-public add ~/.config/nvim/lazy-lock.json ~/pipx-packages.txt ~/global-npm-packages.txt ~/rust-version.txt ~/cargo-packages.txt ~/ports.txt && yadm-public commit -m 'chore(env): update deps' && yadm-public push"
 # "daily update, log, and yadm track all"
 # alias dua="dup && dl && yuta && bd"
-alias dua="dup && dl && yuta"
+alias wua="wup && wl && yuta"
 
 # --- claude ---
 alias chs="yadm-private add ~/.claude/projects ~/.claude/history.jsonl"
