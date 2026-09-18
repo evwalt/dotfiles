@@ -1,6 +1,6 @@
 --- Automatic Config Reload ---
-function reloadConfig(files)
-	doReload = false
+local function reloadConfig(files)
+	local doReload = false
 	for _, file in pairs(files) do
 		if file:sub(-4) == ".lua" then
 			doReload = true
@@ -11,6 +11,7 @@ function reloadConfig(files)
 	end
 end
 
+---@diagnostic disable-next-line: lowercase-global
 myWatcher = hs.pathwatcher.new(os.getenv("HOME") .. "/.hammerspoon/", reloadConfig):start()
 hs.alert.show("Config loaded")
 print(os.getenv("HOME") .. "/.hammerspoon/")
@@ -26,6 +27,7 @@ local function appPicker(choices)
 	for key, app in pairs(choices) do
 		table.insert(hint, key .. " → " .. app)
 		m:bind({}, key, function()
+			hs.alert.closeAll()
 			m:exit()
 			hs.application.launchOrFocus(app)
 		end)
@@ -80,11 +82,11 @@ hs.hotkey.bind(hyper, "J", function()
 end)
 
 --- Firefox Quit, Raindrop Save Tabs Warning ---
-function frontmostAppName()
+local function frontmostAppName()
 	local app = hs.application.frontmostApplication()
 	return app and app:name() or ""
 end
-confirmModal = hs.hotkey.modal.new()
+local confirmModal = hs.hotkey.modal.new()
 confirmModal:bind({}, "y", function()
 	confirmModal:exit()
 	local fx = hs.application.get("Firefox")
@@ -98,6 +100,7 @@ end)
 confirmModal:bind({}, "escape", function()
 	confirmModal:exit()
 end)
+---@diagnostic disable-next-line: lowercase-global
 cmdQTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(e)
 	local flags = e:getFlags()
 	local isCmdOnly = flags.cmd and not flags.alt and not flags.ctrl and not flags.shift
@@ -161,7 +164,7 @@ hs.hotkey.bind(ca, "n", function()
 	moveAndResize(0.5, 0, 0.5, 1)
 end) -- Right half
 
---- Horisontal Halves ---
+--- Horizontal Halves ---
 hs.hotkey.bind(ca, "y", function()
 	moveAndResize(0, 0, 1, 0.5)
 end) -- Top half
