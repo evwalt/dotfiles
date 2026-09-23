@@ -134,6 +134,7 @@ return {
 						-- <https://www.reddit.com/r/neovim/comments/1hsmyod/disable_some_diagnostics_within_ltexls/?utm_source=chatgpt.com>
 						-- <https://www.reddit.com/r/neovim/comments/1hsmyod/comment/m5z2i66/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button>
 						["en-US"] = {
+							"AI",
 							"EN_SPECIFIC_CASE",
 							"I_LOWERCASE",
 							"LINKEDIN",
