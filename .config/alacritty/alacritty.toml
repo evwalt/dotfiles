@@ -45,4 +45,8 @@ white   = "#ffffff"
 bindings = [
   # { key = "Q", mods = "Command", action = "None" }, # This setting is not working. Remapped "Command + Q" to "Hide alacritty" in macOS System Settings instead.
   { key = "W", mods = "Command", action = "None" },
+
+  # macOS-style dashes
+  { key = "Minus", mods = "Alt", chars = "–" },
+  { key = "Minus", mods = "Alt|Shift", chars = "—" },
 ]
