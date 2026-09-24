@@ -88,6 +88,7 @@ local function frontmostAppName()
 end
 local confirmModal = hs.hotkey.modal.new()
 confirmModal:bind({}, "y", function()
+	hs.alert.closeAll()
 	confirmModal:exit()
 	local fx = hs.application.get("Firefox")
 	if fx then
@@ -95,9 +96,11 @@ confirmModal:bind({}, "y", function()
 	end
 end)
 confirmModal:bind({}, "n", function()
+	hs.alert.closeAll()
 	confirmModal:exit()
 end)
 confirmModal:bind({}, "escape", function()
+	hs.alert.closeAll()
 	confirmModal:exit()
 end)
 ---@diagnostic disable-next-line: lowercase-global
