@@ -16,11 +16,14 @@
 # Options:
 #   -m "message"               # countdown label
 #   -e "message"               # completion message
+#   --military-time            # display end time in 24-hour format (default)
+#   --standard-time            # display end time in 12-hour AM/PM format
 #
 # Examples with options:
 #   ct 30m -m "DSA"
 #   ct -t 1100 -m "DSA"
 #   ct -t 1100 -e "Time to stop"
+#   ct 30m --standard-time
 #
 # -t uses 24-hour HHMM or HHMMSS. If seconds are omitted, they default
 # to 00. If the time has already passed today, it counts down to
@@ -31,14 +34,17 @@ label="Countdown"
 end_msg="Countdown complete!"
 time_args=()
 target_time=""
+time_format="+%H:%M:%S"
 
 # Parse Arguments
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    -m|--message) label="$2"; shift 2 ;;
-    -e|--end)     end_msg="$2"; shift 2 ;;
-    -t|--time)    target_time="$2"; shift 2 ;;
-    *)            time_args+=("$1"); shift ;;
+    -m|--message)      label="$2"; shift 2 ;;
+    -e|--end)          end_msg="$2"; shift 2 ;;
+    -t|--time)         target_time="$2"; shift 2 ;;
+    --military-time)   time_format="+%H:%M:%S"; shift ;;
+    --standard-time)   time_format="+%I:%M:%S %p"; shift ;;
+    *)                 time_args+=("$1"); shift ;;
   esac
 done
 
@@ -139,7 +145,7 @@ mins=$(( (seconds % 3600) / 60 ))
 secs=$(( seconds % 60 ))
 
 printf "Timer: %02d:%02d:%02d → %s\n" \
-  "$hours" "$mins" "$secs" "$(date -r $end_epoch '+%I:%M:%S %p')"
+  "$hours" "$mins" "$secs" "$(date -r $end_epoch "$time_format")"
 
 # Countdown Loop
 while (( seconds > 0 )); do
