@@ -16,7 +16,8 @@ PROFILE_PATH="$(
 )"
 
 DB="$FIREFOX_DIR/$PROFILE_PATH/places.sqlite"
-OUT_DIR="$PWD"
+# OUT_DIR="$PWD"
+OUT_DIR="$HOME/Library/CloudStorage/Dropbox/bk"
 
 TIMESTAMP="$(date +%Y-%m-%d_%H-%M-%S)"
 OUT="$OUT_DIR/firefox-history-$TIMESTAMP.txt"
