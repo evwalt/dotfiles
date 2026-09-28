@@ -18,18 +18,23 @@ print(os.getenv("HOME") .. "/.hammerspoon/")
 
 --- Application Focus ---
 local hyper = { "ctrl", "alt", "cmd", "shift" }
---- Multi-app picker for a single hotkey ---
--- Usage: hs.hotkey.bind(hyper, "G", appPicker({ s = "Skim", p = "Spotify" }))
+--- Multi-action picker for a single hotkey ---
+-- Usage: hs.hotkey.bind(hyper, "G", actionPicker({ s = "Skim", p = "Spotify" }))
 -- Press the hyper combo, then one of the listed sub-keys. Esc cancels.
-local function appPicker(choices)
+local function actionPicker(choices)
 	local m = hs.hotkey.modal.new()
 	local hint = {}
-	for key, app in pairs(choices) do
-		table.insert(hint, key .. " → " .. app)
+	for key, choice in pairs(choices) do
+		local label = type(choice) == "table" and choice.label or choice
+		table.insert(hint, key .. " → " .. label)
 		m:bind({}, key, function()
 			hs.alert.closeAll()
 			m:exit()
-			hs.application.launchOrFocus(app)
+			if type(choice) == "table" then
+				choice.action()
+			else
+				hs.application.launchOrFocus(choice)
+			end
 		end)
 	end
 	m:bind({}, "escape", function()
@@ -49,7 +54,21 @@ end
 hs.hotkey.bind(hyper, "F", function()
 	hs.application.launchOrFocus("Reminders")
 end)
-hs.hotkey.bind(hyper, "G", appPicker({ k = "Skim", o = "Spotify", a = "Activity Monitor" }))
+hs.hotkey.bind(
+	hyper,
+	"G",
+	actionPicker({
+		k = "Skim",
+		o = "Spotify",
+		a = "Activity Monitor",
+		t = {
+			label = "Toggle Grayscale",
+			action = function()
+				hs.screen.setForceToGray(not hs.screen.getForceToGray())
+			end,
+		},
+	})
+)
 hs.hotkey.bind(hyper, "C", function()
 	hs.application.launchOrFocus("Finder")
 end)
