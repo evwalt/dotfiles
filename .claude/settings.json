@@ -117,5 +117,6 @@
       "**Org-specific CLIs**: None configured",
       "routine under evwalt/resume-cov prefix: local file edits (resume.typ, cov.typ), running resume-cov.zsh, and git operations against the origin remote are routine for this project"
     ]
-  }
+  },
+  "model": "sonnet"
 }
