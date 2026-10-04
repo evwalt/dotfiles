@@ -1,7 +1,7 @@
 # --- weekly combos ---
 # Just sync lazy.nvim plugins and then run `wua` regularly (every day, week, or two weeks)
 # "weekly update"
-alias wup="pipx upgrade-all && npm -g update && nvm install --lts --reinstall-packages-from=node && rustup update && bob update"
+alias wup="pipx upgrade-all && npm -g update && rustup update && bob update"
 # "weekly log"
 alias wl="pxl && ngl && rl"
 # "yadm-public track all"
