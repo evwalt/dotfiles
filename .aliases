@@ -66,8 +66,11 @@ alias mps="sudo port selfupdate"
 alias mpu="sudo port upgrade outdated && sudo port uninstall inactive"
 alias mpl="port installed > ports.txt"
 
-# --- node via nvm ---
-alias nvu="nvm install --lts --reinstall-packages-from=node"
+# --- nvm node ---
+# nvm update current
+alias nvc="nvm install --lts --reinstall-packages-from=current && nvm alias default 'lts/*' && nvm use default && node -v && nvm version default"
+# nvm update lts
+alias nvl="nvm install --lts --reinstall-packages-from=node && nvm alias default 'lts/*' && nvm use default && node -v && nvm version default"
 
 # --- npm ---
 alias ngo="npm -g outdated"
