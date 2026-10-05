@@ -380,53 +380,10 @@ opencode-history-sync() {
 [ -r ~/dev/resume-cov/tool-resume-cov.zsh ] && source ~/dev/resume-cov/tool-resume-cov.zsh
 
 ## ============================================================
-## Node via nvm — LAZY LOADED (real nvm.sh costs ~800ms to source)
-## First call to nvm/node/npm/npx/yarn/pnpm/corepack pays the cost once;
-## everything else about the workflow (including auto .nvmrc switching
-## when a project actually has one) is preserved.
+## Node via nvm
 ## ============================================================
 export NVM_DIR="$HOME/.nvm"
-
-# Eagerly expose the default node version's bin/ on PATH (cheap glob, no nvm.sh sourcing)
-# so external tools (e.g. nvim's markdownlint-cli2 subprocess) can find node/npm-installed
-# binaries even in a shell that never explicitly ran a node/npm/nvm command.
-if [[ -r "$NVM_DIR/alias/default" ]]; then
-  _nvm_default_dirs=("$NVM_DIR"/versions/node/v"$(<"$NVM_DIR/alias/default")"*(N/n))
-  [[ -n "$_nvm_default_dirs[-1]" ]] && export PATH="$_nvm_default_dirs[-1]/bin:$PATH"
-  unset _nvm_default_dirs
-fi
-
-_nvm_lazy_load() {
-  unset -f nvm node npm npx yarn pnpm corepack 2>/dev/null
-  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-  [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-}
-for _cmd in nvm node npm npx yarn pnpm corepack; do
-  eval "${_cmd}() { _nvm_lazy_load; ${_cmd} \"\$@\" }"
-done
-unset _cmd
-
-_find_up() {
-  local dir="$PWD"
-  while [[ "$dir" != "/" ]]; do
-    [[ -f "$dir/$1" ]] && { print -r -- "$dir/$1"; return 0; }
-    dir="${dir:h}"
-  done
-  return 1
-}
-
-load-nvmrc() {
-  local nvmrc_path
-  nvmrc_path="$(_find_up .nvmrc)" || return
-  _nvm_lazy_load
-  local nvmrc_node_version
-  nvmrc_node_version="$(cat "$nvmrc_path")"
-  if [ "$(nvm version)" != "$(nvm version "$nvmrc_node_version")" ]; then
-    nvm use --silent
-  fi
-}
-add-zsh-hook chpwd load-nvmrc
-load-nvmrc
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
 ## ============================================================
 ## Terminal cursor shape
