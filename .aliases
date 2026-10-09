@@ -42,6 +42,7 @@ alias gdc="git diff --color-words"
 alias gl="git log"
 alias glo="git log --oneline"
 alias gre="git restore"
+alias gba="git branch -a"
 
 # --- go ---
 # run these inside a Go module
