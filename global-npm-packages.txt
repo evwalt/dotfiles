@@ -2,17 +2,17 @@
 ├── @bitwarden/cli@2026.9.1
 ├── @marp-team/marp-cli@4.5.1
 ├── @mermaid-js/mermaid-cli@12.0.0
-├── @prisma/language-server@31.12.10
+├── @prisma/language-server@31.12.15
 ├── @tailwindcss/language-server@0.16.0
 ├── corepack@0.36.0
 ├── emmet-ls@0.4.2
 ├── eslint@10.12.0
 ├── markdownlint-cli2@0.23.3
 ├── npm@12.2.0
-├── opencode-ai@1.18.34
-├── prettier@3.9.9
+├── opencode-ai@1.18.35
+├── prettier@3.9.10
 ├── tsx@4.23.15
-├── typescript-language-server@6.0.1
+├── typescript-language-server@6.0.2
 ├── typescript@7.0.2
 └── vscode-langservers-extracted@4.10.0
 
