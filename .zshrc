@@ -1,8 +1,8 @@
-# ~/.zshrc — minimal, framework-free replacement for Oh My Zsh
-#
-# Goal: same look/behavior as the current agnoster-themed OMZ setup,
-# but without the Oh My Zsh framework overhead. Ported piece-by-piece
-# from ~/.oh-my-zsh/lib/{history,directories,misc,completion,key-bindings}.zsh
+# ~/.zshrc
+# Minimal replacement for Oh My Zsh (omz)
+# Goal: same look/behavior as agnoster-themed omz setup
+# Ported piece-by-piece from
+# ~/.oh-my-zsh/lib/{history,directories,misc,completion,key-bindings}.zsh
 # and ~/.oh-my-zsh/themes/agnoster.zsh-theme.
 #
 # To test without touching your real setup:
@@ -10,23 +10,22 @@
 # or simply:
 #   zsh -c 'source ~/.zshrc.no-omz; zsh'
 
+# Dedupe
+typeset -U path PATH
+
 # --- .zprofile guard (same pattern as before, for non-login interactive shells) ---
 if [ -z "$ZPROFILE_LOADED" ] && [ -f "$HOME/.zprofile" ]; then
   source "$HOME/.zprofile"
 fi
 
-## ============================================================
-## History (from OMZ lib/history.zsh)
-## ============================================================
+# --- History (from omz lib/history.zsh) ---
 HISTFILE="$HOME/.zsh_history"
 HISTSIZE=50000
 SAVEHIST=10000
 setopt extended_history hist_expire_dups_first hist_ignore_dups \
        hist_ignore_space hist_verify share_history
 
-## ============================================================
-## Directory navigation (from OMZ lib/directories.zsh)
-## ============================================================
+# --- Directory navigation (from omz lib/directories.zsh) ---
 setopt auto_cd auto_pushd pushd_ignore_dups pushdminus
 
 alias -g ...='../..'
@@ -55,14 +54,12 @@ alias la='ls -lAh'
 # NOTE: `l` is intentionally left unset here — ~/.aliases defines
 # `alias l="ls -laF"` and sources later, exactly as it did before.
 
-# ls colors (from OMZ lib/theme-and-appearance.zsh): bold teal/cyan dirs,
+# ls colors (from omz lib/theme-and-appearance.zsh): bold teal/cyan dirs,
 # default (white) regular files, on BSD ls.
 export CLICOLOR=1
 export LSCOLORS="Gxfxcxdxbxegedabagacad"
 
-## ============================================================
-## Misc shell options (from OMZ lib/misc.zsh)
-## ============================================================
+# --- Misc shell options (from omz lib/misc.zsh) ---
 setopt multios long_list_jobs interactivecomments
 (( $+commands[less] )) && { export PAGER=less; export LESS='-R'; }
 alias _='sudo '
@@ -72,9 +69,7 @@ elif (( $+commands[ack] )); then
   alias afind='ack -il'
 fi
 
-## ============================================================
-## Completion system (from OMZ lib/completion.zsh + oh-my-zsh.sh compinit)
-## ============================================================
+# --- Completion system (from omz lib/completion.zsh + oh-my-zsh.sh compinit) ---
 zmodload -i zsh/complist
 WORDCHARS=''
 unsetopt menu_complete flowcontrol
@@ -103,9 +98,7 @@ zstyle ':completion:*' cache-path "${ZDOTDIR:-$HOME}/.zcompcache"
 
 autoload -Uz bashcompinit && bashcompinit
 
-## ============================================================
-## Key bindings (from OMZ lib/key-bindings.zsh)
-## ============================================================
+# --- Key bindings (from omz lib/key-bindings.zsh) ---
 if (( ${+terminfo[smkx]} )) && (( ${+terminfo[rmkx]} )); then
   zle-line-init() { echoti smkx }
   zle-line-finish() { echoti rmkx }
@@ -152,9 +145,7 @@ zle -N edit-command-line
 bindkey '\C-x\C-e' edit-command-line
 bindkey '^[m' copy-prev-shell-word
 
-## ============================================================
-## Terminal title (from OMZ lib/termsupport.zsh) — cheap, tmux/iTerm aware
-## ============================================================
+# --- Terminal title (from omz lib/termsupport.zsh) — cheap, tmux/iTerm aware ---
 _title() {
   setopt localoptions nopromptsubst
   case "$TERM" in
@@ -167,10 +158,8 @@ _omz_like_precmd() { _title "%15<..<%~%<<" "%n@%m:%~" }
 autoload -Uz add-zsh-hook
 add-zsh-hook precmd _omz_like_precmd
 
-## ============================================================
-## Prompt: agnoster-style, recreated without the OMZ theme engine
-## Same segments/colors/separators as your current ZSH_THEME="agnoster"
-## ============================================================
+# --- Prompt: agnoster-style, recreated without the omz theme engine ---
+# --- Same segments/colors/separators as your current ZSH_THEME="agnoster" ---
 setopt promptsubst
 autoload -Uz vcs_info
 zstyle ':vcs_info:*' enable git
@@ -350,9 +339,7 @@ build_prompt() {
 
 PROMPT='%{%f%b%k%}$(build_prompt) '
 
-## ============================================================
-## User configuration
-## ============================================================
+# --- User configuration ---
 yadm-public() {
   command yadm "$@"
 }
@@ -379,43 +366,17 @@ opencode-history-sync() {
 [ -r ~/.aliases ] && source ~/.aliases
 [ -r ~/dev/resume-cov/tool-resume-cov.zsh ] && source ~/dev/resume-cov/tool-resume-cov.zsh
 
-## ============================================================
-## Node via nvm
-## ============================================================
+# --- Node via nvm ---
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+nvm()  { unset -f nvm node npm npx; . "$NVM_DIR/nvm.sh"; nvm "$@"; }
+node() { unset -f nvm node npm npx; . "$NVM_DIR/nvm.sh"; node "$@"; }
+npm()  { unset -f nvm node npm npx; . "$NVM_DIR/nvm.sh"; npm "$@"; }
+npx()  { unset -f nvm node npm npx; . "$NVM_DIR/nvm.sh"; npx "$@"; }
 
-## ============================================================
-## Terminal cursor shape
-## ============================================================
+
+# --- Terminal cursor shape ---
 echo -ne "\e[2 q"
 trap 'echo -ne "\e[2 q"' EXIT
 
-## ============================================================
-## ghcup
-## ============================================================
+# --- ghcup ---
 [ -f "${HOME}/.ghcup/env" ] && source "${HOME}/.ghcup/env"
-
-## ============================================================
-## pyenv — LAZY LOADED (the 3 `eval $(pyenv init ...)` calls cost ~580ms)
-## Shims (already on PATH via ~/.zprofile + the line below) resolve the
-## right python/pip per .python-version with zero shell startup cost.
-## `pyenv` itself (and pyenv-virtualenv's auto-activate-on-cd behavior,
-## which affects the venv prompt segment above) initializes on first use.
-##
-## If you rely on the venv segment appearing immediately in every new
-## shell (not just after first `pyenv`/`python` use), replace this whole
-## block with the eager 3-line version from the old .zshrc instead.
-## ============================================================
-export PATH="$PYENV_ROOT/shims:$PATH"
-
-pyenv() {
-  unset -f pyenv
-  eval "$(command pyenv init -)"
-  eval "$(command pyenv virtualenv-init -)"
-  pyenv "$@"
-}
-
-# .NET SDK (user-local install, no admin/brew required)
-export DOTNET_ROOT="$HOME/.dotnet"
-export PATH="$HOME/.dotnet:$HOME/.dotnet/tools:$PATH"
