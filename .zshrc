@@ -372,6 +372,7 @@ nvm()  { unset -f nvm node npm npx; . "$NVM_DIR/nvm.sh"; nvm "$@"; }
 node() { unset -f nvm node npm npx; . "$NVM_DIR/nvm.sh"; node "$@"; }
 npm()  { unset -f nvm node npm npx; . "$NVM_DIR/nvm.sh"; npm "$@"; }
 npx()  { unset -f nvm node npm npx; . "$NVM_DIR/nvm.sh"; npx "$@"; }
+markdownlint-cli2() { unset -f nvm node npm npx markdownlint-cli2 2>/dev/null; . "$NVM_DIR/nvm.sh"; markdownlint-cli2 "$@"; }
 
 
 # --- Terminal cursor shape ---
