@@ -101,6 +101,8 @@ return {
 
 		vim.lsp.config("ltex_plus", {
 			-- capabilities = capabilities,
+			-- Cap the JVM heap so ltex can't balloon
+			cmd_env = { JAVA_OPTS = "-Xmx1g" },
 			filetypes = {
 				"bib",
 				"context",

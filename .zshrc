@@ -383,3 +383,6 @@ trap 'echo -ne "\e[2 q"' EXIT
 
 # --- ghcup ---
 [ -f "${HOME}/.ghcup/env" ] && source "${HOME}/.ghcup/env"
+
+# Kill orphaned ltex-ls-plus (LanguageTool) Java processes
+alias ltexkill='pkill -f LtexLanguageServerLauncher'
