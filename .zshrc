@@ -368,6 +368,8 @@ opencode-history-sync() {
 
 # --- Node via nvm ---
 export NVM_DIR="$HOME/.nvm"
+# Default Node on PATH up front so non-interactive children (Claude Code hooks via /bin/sh, editors, scripts) find node and global bins.
+export PATH="$NVM_DIR/versions/node/v24.21.0/bin:$PATH"
 nvm()  { unset -f nvm node npm npx; . "$NVM_DIR/nvm.sh"; nvm "$@"; }
 node() { unset -f nvm node npm npx; . "$NVM_DIR/nvm.sh"; node "$@"; }
 npm()  { unset -f nvm node npm npx; . "$NVM_DIR/nvm.sh"; npm "$@"; }
