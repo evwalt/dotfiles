@@ -53,7 +53,7 @@ parse_time() {
   local total=0 num
   for arg in "$@"; do
     if [[ $arg =~ ^([0-9]+)h$ ]]; then
-      num=${match}
+      num=${match[1]}
       (( total += num * 3600 ))
     elif [[ $arg =~ ^([0-9]+)m$ ]]; then
       num=${match[1]}
@@ -147,22 +147,22 @@ secs=$(( seconds % 60 ))
 printf "Timer: %02d:%02d:%02d → %s\n" \
   "$hours" "$mins" "$secs" "$(date -r $end_epoch "$time_format")"
 
+# Redraw the status line in place. Truncate to the terminal width: a wrapped
+# line makes \r only return to the last row, so every tick prints a new line.
+show() {
+  local cols=$(tput cols 2>/dev/null || echo 80)
+  local line="$1"
+  (( ${#line} >= cols )) && line="${line[1,cols-1]}"
+  printf "\r\033[K%s" "$line"
+}
+
 # Countdown Loop
 while (( seconds > 0 )); do
   mins=$(( seconds / 60 ))
   secs=$(( seconds % 60 ))
-  printf "\r%s %02d:%02d remaining..." "$label" "$mins" "$secs"
+  show "$(printf "%s %02d:%02d remaining..." "$label" "$mins" "$secs")"
   sleep 1
   ((seconds--))
 done
-printf "\r%s 00:00 remaining... %s" "$label" "$end_msg"
-
-# Finish sound (macOS) - plays for 30 minutes or until Ctrl+C
-# 1800 seconds = 30 minutes
-alert_duration=1800
-alert_end=$(( $(date +%s) + alert_duration ))
-
-while (( $(date +%s) < alert_end )); do
-  afplay /System/Library/Sounds/Hero.aiff
-  sleep 1
-done
+show "$label 00:00 remaining... $end_msg"
+printf "\n"
