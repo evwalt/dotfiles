@@ -1,28 +1,322 @@
-#!/bin/sh
-# Keep a single sidecar pane in the current window, moving it there from
-# wherever it lives. Idempotent. Called from tmux hooks; see .tmux.conf.
+#!/usr/bin/env python3
+"""Sidecar: a group of tmux panes (tagged @sidecar) that follows you between windows.
 
-# Serialize: rapid window switching fires overlapping hooks.
-lock="${TMPDIR:-/tmp}/tmux-sidecar.lock"
-i=0
-until mkdir "$lock" 2>/dev/null; do
-    i=$((i + 1))
-    [ "$i" -gt 50 ] && exit 0
-    sleep 0.02
-done
-trap 'rmdir "$lock"' EXIT
+Called from tmux hooks (see tmux.conf) with the window that just became
+current. Before moving the group out of the window it was last in, the
+script records the group's geometry: which edge it hugs, its size and its
+internal split tree. It then rebuilds that exact arrangement in the new
+window, so the sidecar looks the way you left it.
 
-# Resolve the window after taking the lock so the last switch wins.
-win=$(tmux display-message -p '#{window_id}')
-pane=$(tmux list-panes -a -F '#{pane_id} #{@sidecar}' | awk '$2 == 1 { print $1; exit }')
+State lives in tmux itself:
+  pane option   @sidecar       "1" on every pane in the group
+  global option @sidecar_snap  JSON snapshot of the last arrangement
+  global option @sidecar_win   window currently holding the group (fast-path guard)
+  window option @sidecar_zoom  group pane that was zoomed when you left that window
+"""
+import json
+import os
+import subprocess
+import sys
+import time
+from collections import Counter
 
-if [ -z "$pane" ]; then
-    pane=$(tmux split-window -d -h -l 30% -t "$win" -P -F '#{pane_id}')
-    tmux set-option -p -t "$pane" @sidecar 1
-    exit 0
-fi
+LOCK = os.path.join(os.environ.get("TMPDIR", "/tmp"), "tmux-sidecar.lock")
+DEFAULT_SIZE = 0.30
+FMT = "\t".join([
+    "#{pane_id}", "#{window_id}", "#{@sidecar}", "#{pane_left}", "#{pane_top}",
+    "#{pane_width}", "#{pane_height}", "#{window_width}", "#{window_height}",
+])
 
-# Already here: nothing to move.
-tmux list-panes -t "$win" -F '#{pane_id}' | grep -qx "$pane" && exit 0
 
-tmux join-pane -d -h -l 30% -s "$pane" -t "$win"
+def tmux(*args, check=True):
+    r = subprocess.run(["tmux", *args], capture_output=True, text=True)
+    if check and r.returncode:
+        raise RuntimeError("tmux %s: %s" % (" ".join(args), r.stderr.strip()))
+    return r.stdout.rstrip("\n")
+
+
+def acquire():
+    for _ in range(150):
+        try:
+            os.mkdir(LOCK)
+            return True
+        except FileExistsError:
+            try:  # stale lock from a crashed run
+                if time.time() - os.stat(LOCK).st_mtime > 5:
+                    os.rmdir(LOCK)
+            except OSError:
+                pass
+            time.sleep(0.02)
+    return False
+
+
+def list_panes(window=None):
+    args = ["list-panes", "-F", FMT] + (["-t", window] if window else ["-a"])
+    out = []
+    for line in tmux(*args).splitlines():
+        f = line.split("\t")
+        out.append({
+            "id": f[0], "win": f[1], "tag": f[2] == "1",
+            "x": int(f[3]), "y": int(f[4]), "w": int(f[5]), "h": int(f[6]),
+            "ww": int(f[7]), "wh": int(f[8]),
+        })
+    return out
+
+
+def fmt(target, f):
+    return tmux("display-message", "-p", "-t", target, f, check=False)
+
+
+def zoomed_pane(win):
+    """Active pane if the window is zoomed, else None."""
+    if fmt(win, "#{window_zoomed_flag}") == "1":
+        return fmt(win, "#{pane_id}")
+    return None
+
+
+def unzoom(win):
+    p = zoomed_pane(win)
+    if p:
+        tmux("resize-pane", "-Z", "-t", p)
+    return p
+
+
+def rezoom(pane):
+    if pane and fmt(pane, "#{pane_id}") == pane:
+        tmux("resize-pane", "-Z", "-t", pane, check=False)
+
+
+# --- split tree -----------------------------------------------------------
+
+def bbox(rects):
+    x0 = min(r["x"] for r in rects)
+    y0 = min(r["y"] for r in rects)
+    x1 = max(r["x"] + r["w"] for r in rects)
+    y1 = max(r["y"] + r["h"] for r in rects)
+    return x0, y0, x1, y1
+
+
+def build_tree(rects):
+    """Guillotine tree from pane rectangles; raises ValueError if not one."""
+    if len(rects) == 1:
+        r = rects[0]
+        return {"id": r["id"], "w": r["w"], "h": r["h"]}
+    x0, y0, x1, y1 = bbox(rects)
+    for d, lo, size in (("h", "x", "w"), ("v", "y", "h")):
+        for cut in sorted({r[lo] + r[size] for r in rects}):
+            a = [r for r in rects if r[lo] + r[size] <= cut]
+            b = [r for r in rects if r[lo] >= cut + 1]
+            if a and b and len(a) + len(b) == len(rects):
+                if max(r[lo] + r[size] for r in a) == cut and min(r[lo] for r in b) == cut + 1:
+                    return {"d": d, "a": build_tree(a), "b": build_tree(b),
+                            "w": x1 - x0, "h": y1 - y0}
+    raise ValueError("not a guillotine layout")
+
+
+def leaves(node):
+    if "id" in node:
+        return [node["id"]]
+    return leaves(node["a"]) + leaves(node["b"])
+
+
+def prune(node, alive):
+    if "id" in node:
+        return node if node["id"] in alive else None
+    a, b = prune(node["a"], alive), prune(node["b"], alive)
+    if a and b:
+        return dict(node, a=a, b=b)
+    return a or b
+
+
+def stack(ids, d):
+    """Equal-weight chain of splits for panes with no recorded arrangement."""
+    node = {"id": ids[-1], "w": 1, "h": 1}
+    for pid in reversed(ids[:-1]):
+        n = len(leaves(node)) + 1
+        node = {"d": d, "a": {"id": pid, "w": 1, "h": 1}, "b": node, "w": n, "h": n}
+    return node
+
+
+def place(node, anchor):
+    """Split the region `anchor` currently fills into the node's arrangement."""
+    if "id" in node:
+        return
+    w, h = map(int, fmt(anchor, "#{pane_width} #{pane_height}").split())
+    first_b = leaves(node["b"])[0]
+    if node["d"] == "h":
+        total, ra, rb, flag = w, node["a"]["w"], node["b"]["w"], "-h"
+    else:
+        total, ra, rb, flag = h, node["a"]["h"], node["b"]["h"], "-v"
+    if total < 3:
+        raise RuntimeError("region too small")
+    size = min(max(round(rb * (total - 1) / max(ra + rb, 1)), 1), total - 2)
+    tmux("join-pane", "-d", flag, "-l", str(size), "-s", first_b, "-t", anchor)
+    place(node["a"], anchor)
+    place(node["b"], first_b)
+
+
+# --- snapshot / restore ---------------------------------------------------
+
+def take_snapshot(win, group_ids):
+    """Record how the group sits in `win` (must be unzoomed). None if unusable."""
+    ps = list_panes(win)
+    g = [p for p in ps if p["id"] in group_ids]
+    if not g or len(g) == len(ps):
+        return None  # sidecar alone in its window: nothing to learn
+    ax0, ay0, ax1, ay1 = bbox(ps)
+    gx0, gy0, gx1, gy1 = bbox(g)
+    left, right = gx0 == ax0, gx1 == ax1
+    top, bottom = gy0 == ay0, gy1 == ay1
+    if left and right and not (top and bottom):
+        edge = "bottom" if bottom else "top"
+    elif top and bottom and not (left and right):
+        edge = "right" if right else "left"
+    elif right and not left:
+        edge = "right"
+    elif left and not right:
+        edge = "left"
+    elif bottom and not top:
+        edge = "bottom"
+    elif top and not bottom:
+        edge = "top"
+    else:
+        return None
+    try:
+        tree = build_tree(g)
+    except ValueError:
+        return None
+    horiz = edge in ("left", "right")
+    return {"edge": edge, "size": (gx1 - gx0) if horiz else (gy1 - gy0),
+            "dim": g[0]["ww"] if horiz else g[0]["wh"], "tree": tree}
+
+
+def load_option(name):
+    try:
+        return json.loads(tmux("show-options", "-gqv", name) or "null")
+    except ValueError:
+        return None
+
+
+def restore(win, ids, snap):
+    """Move panes `ids` into `win` using the snapshot (or defaults)."""
+    edge = (snap or {}).get("edge", "right")
+    horiz = edge in ("left", "right")
+    tree = (snap or {}).get("tree")
+    if tree:
+        tree = prune(tree, set(ids))
+    if tree:
+        missing = [i for i in ids if i not in leaves(tree)]
+        if missing:  # panes tagged since the snapshot: stack them on the end
+            ex = stack(missing, "v" if horiz else "h")
+            n, m = len(leaves(tree)), len(missing)
+            tree = {"d": "v" if horiz else "h", "a": tree, "b": ex,
+                    "w": n + m, "h": n + m}
+    else:
+        tree = stack(ids, "v" if horiz else "h")
+    wdim = int(fmt(win, "#{window_width}" if horiz else "#{window_height}"))
+    if snap and snap.get("size"):
+        size = round(snap["size"] * wdim / max(snap["dim"], 1))
+    else:
+        size = round(wdim * DEFAULT_SIZE)
+    size = min(max(size, 1), max(wdim - 3, 1))
+    flags = {"right": ["-h"], "left": ["-h", "-b"],
+             "bottom": ["-v"], "top": ["-v", "-b"]}[edge]
+    root = leaves(tree)[0]
+    tmux("join-pane", "-d", "-f", *flags, "-l", str(size), "-s", root, "-t", win)
+    # A border-status row at the top edge is taken out of the pane itself.
+    have = int(fmt(root, "#{pane_width}" if horiz else "#{pane_height}"))
+    if have != size:
+        tmux("resize-pane", "-t", root, "-x" if horiz else "-y", str(size), check=False)
+    place(tree, root)
+
+
+def fallback(win, ids):
+    """Last resort: every pane into one stack at the default spot."""
+    ps = {p["id"]: p for p in list_panes()}
+    here = [i for i in ids if ps.get(i) and ps[i]["win"] == win]
+    rest = [i for i in ids if i not in here]
+    if not here and rest:
+        tmux("join-pane", "-d", "-f", "-h", "-l", "30%", "-s", rest.pop(0), "-t", win,
+             check=False)
+        here = [ps_id for ps_id in ids if fmt(ps_id, "#{window_id}") == win]
+    for i in rest:
+        if here:
+            tmux("join-pane", "-d", "-v", "-s", i, "-t", here[0], check=False)
+
+
+# --- main -----------------------------------------------------------------
+
+def create(win):
+    tz = unzoom(win)
+    pid = tmux("split-window", "-d", "-f", "-h", "-l", "30%", "-t", win,
+               "-P", "-F", "#{pane_id}")
+    tmux("set-option", "-p", "-t", pid, "@sidecar", "1")
+    tmux("set-option", "-g", "@sidecar_win", win)
+    rezoom(tz)
+
+
+def sync(win):
+    if fmt(win, "#{window_active}") != "1":
+        return  # a later switch superseded this one
+    panes = list_panes()
+    group = [p for p in panes if p["tag"]]
+    if not group:
+        return create(win)
+    outside = [p["id"] for p in group if p["win"] != win]
+    if not outside:
+        tmux("set-option", "-g", "@sidecar_win", win)
+        return
+    src = Counter(p["win"] for p in group if p["win"] != win).most_common(1)[0][0]
+    all_ids = [p["id"] for p in group]
+
+    # Departure: unzoom the source window so geometry is real, then record it.
+    zp = unzoom(src)
+    snap = take_snapshot(src, {p["id"] for p in group if p["win"] == src})
+    if snap and snap == load_option("@sidecar_built"):
+        snap = None  # exactly what we built last time: keep the original snapshot
+    if snap:
+        tmux("set-option", "-g", "@sidecar_snap", json.dumps(snap))
+    else:
+        snap = load_option("@sidecar_snap")
+    sidecar_zoomed = zp if zp in all_ids else ""
+    tmux("set-option", "-w", "-t", src, "@sidecar_zoom", sidecar_zoomed, check=False)
+
+    # Arrival.
+    tz = unzoom(win)
+    try:
+        if any(p["win"] == win for p in group):
+            raise RuntimeError("partially present")
+        restore(win, outside, snap)
+    except Exception:
+        fallback(win, outside)
+    tmux("set-option", "-g", "@sidecar_win", win)
+    built = take_snapshot(win, set(all_ids))
+    tmux("set-option", "-g", "@sidecar_built", json.dumps(built))
+
+    if zp and zp not in all_ids:
+        rezoom(zp)  # source window had a normal pane zoomed
+    want = fmt(win, "#{@sidecar_zoom}")
+    rezoom(want if want in all_ids else tz)
+
+
+def main():
+    # Usage: sidecar [WINDOW_ID]   (default: the current window)
+    win = sys.argv[1] if len(sys.argv) > 1 else tmux("display-message", "-p", "#{window_id}")
+    if fmt(win, "#{window_active}") != "1":
+        return  # superseded by a later switch; don't queue behind the lock
+    if not acquire():
+        return
+    try:
+        sync(win)
+    finally:
+        try:
+            os.rmdir(LOCK)
+        except OSError:
+            pass
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception as e:  # hooks must never surface errors in the UI
+        sys.stderr.write("sidecar: %s\n" % e)
