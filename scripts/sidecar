@@ -151,6 +151,11 @@ def place(node, anchor):
         raise RuntimeError("region too small")
     size = min(max(round(rb * (total - 1) / max(ra + rb, 1)), 1), total - 2)
     tmux("join-pane", "-d", flag, "-l", str(size), "-s", first_b, "-t", anchor)
+    # A border-status row at the window edge is taken out of the pane itself.
+    have = int(fmt(first_b, "#{pane_width}" if flag == "-h" else "#{pane_height}"))
+    if have != size:
+        tmux("resize-pane", "-t", first_b, "-x" if flag == "-h" else "-y", str(size),
+             check=False)
     place(node["a"], anchor)
     place(node["b"], first_b)
 
