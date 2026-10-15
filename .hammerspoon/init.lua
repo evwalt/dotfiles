@@ -16,7 +16,7 @@ myWatcher = hs.pathwatcher.new(os.getenv("HOME") .. "/.hammerspoon/", reloadConf
 hs.alert.show("Config loaded")
 print(os.getenv("HOME") .. "/.hammerspoon/")
 
---- Application Focus ---
+--- Multi-action Keys ---
 local hyper = { "ctrl", "alt", "cmd", "shift" }
 --- Multi-action picker for a single hotkey ---
 -- Usage: hs.hotkey.bind(hyper, "G", actionPicker({ s = "Skim", p = "Spotify" }))
@@ -59,15 +59,15 @@ hs.hotkey.bind(
 	"G",
 	actionPicker({
 		a = "Activity Monitor",
-		h = "Handy",
-		k = "Skim",
-		o = "Spotify",
-		t = {
+		g = {
 			label = "Toggle Grayscale",
 			action = function()
 				hs.screen.setForceToGray(not hs.screen.getForceToGray())
 			end,
 		},
+		h = "Handy",
+		k = "Skim",
+		o = "Spotify",
 	})
 )
 hs.hotkey.bind(hyper, "C", function()
