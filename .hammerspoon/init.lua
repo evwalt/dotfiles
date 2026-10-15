@@ -58,9 +58,10 @@ hs.hotkey.bind(
 	hyper,
 	"G",
 	actionPicker({
+		a = "Activity Monitor",
+		h = "Handy",
 		k = "Skim",
 		o = "Spotify",
-		a = "Activity Monitor",
 		t = {
 			label = "Toggle Grayscale",
 			action = function()
