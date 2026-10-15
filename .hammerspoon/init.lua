@@ -169,6 +169,21 @@ dimAppWatcher = hs.application.watcher.new(scheduleDim):start()
 dimHeartbeat = hs.timer.doEvery(1, refreshDim)
 refreshDim()
 
+--- Screenshot focused window to clipboard (no path) or to a file ---
+local function screenshotWindow(path)
+	local win = hs.window.focusedWindow()
+	if not win then
+		return
+	end
+	-- -o: no window shadow, -l: capture by window id, -c: clipboard
+	local args = { "-o", "-l", tostring(win:id()), path or "-c" }
+	hs.task
+		.new("/usr/sbin/screencapture", function(code)
+			hs.alert.show(code ~= 0 and "Screenshot failed" or (path and "Saved to Downloads" or "Window copied"))
+		end, args)
+		:start()
+end
+
 -- Dvorak keyboard layout reference: `crl tns wvz fdb`
 hs.hotkey.bind(hyper, "F", function()
 	hs.application.launchOrFocus("Reminders")
@@ -178,16 +193,30 @@ hs.hotkey.bind(
 	"G",
 	actionPicker({
 		a = "Activity Monitor",
+		c = {
+			label = "Screenshot Window to Clipboard",
+			action = function()
+				screenshotWindow()
+			end,
+		},
+		d = { label = "Toggle Firefox Dim", action = toggleDim },
 		g = {
 			label = "Toggle Grayscale",
 			action = function()
 				hs.screen.setForceToGray(not hs.screen.getForceToGray())
 			end,
 		},
-		d = { label = "Toggle Firefox Dim", action = toggleDim },
 		h = "Handy",
 		k = "Skim",
 		o = "Spotify",
+		s = {
+			label = "Screenshot Window to ~/Downloads",
+			action = function()
+				screenshotWindow(
+					os.getenv("HOME") .. "/Downloads/Screenshot " .. os.date("%Y-%m-%d at %H.%M.%S") .. ".png"
+				)
+			end,
+		},
 	})
 )
 hs.hotkey.bind(hyper, "C", function()
