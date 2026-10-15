@@ -166,3 +166,10 @@ while (( seconds > 0 )); do
 done
 show "$label 00:00 remaining... $end_msg"
 printf "\n"
+
+# Alarm: repeat until interrupted with Ctrl-C
+trap 'printf "\n"; exit 0' INT TERM
+while true; do
+  afplay /System/Library/Sounds/Hero.aiff
+  sleep 0.5
+done
