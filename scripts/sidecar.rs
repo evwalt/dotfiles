@@ -2,6 +2,9 @@
 //
 // Build:  rustc -O -o ~/scripts/sidecar ~/scripts/sidecar.rs
 //
+// Usage:  sidecar [WINDOW_ID]        follow: bring the group to that window
+//         sidecar full [WINDOW_ID]   toggle the group's full-window view
+//
 // Called from tmux hooks (see tmux.conf) with the window that just became
 // current. Before moving the group out of the window it was last in, it
 // records the group's geometry: which edge it hugs, its size and its internal
@@ -17,6 +20,8 @@
 //   window option @sidecar_nzoom  regular pane that was zoomed when the group left
 //                                 (tmux drops zoom on a lone pane, so we reapply it)
 //   window option @sidecar_active group pane that had focus when the group left
+//   window option @sidecar_full   "1" on the temporary full-view window (see toggle_full)
+//   global option @sidecar_full_from  window the full view was entered from
 
 use std::collections::HashMap;
 use std::process::Command;
@@ -26,7 +31,7 @@ use std::{env, fs, thread};
 const DEFAULT_SIZE: f64 = 0.30;
 const FMT: &str = "#{pane_id}\t#{window_id}\t#{@sidecar}\t#{pane_left}\t#{pane_top}\t\
 #{pane_width}\t#{pane_height}\t#{window_width}\t#{window_height}\t#{window_zoomed_flag}\t\
-#{pane_active}\t#{@sidecar_zoom}\t#{window_active}\t#{window_layout}\t#{@sidecar_layout}\t#{@sidecar_nzoom}\t#{@sidecar_active}";
+#{pane_active}\t#{@sidecar_zoom}\t#{window_active}\t#{window_layout}\t#{@sidecar_layout}\t#{@sidecar_nzoom}\t#{@sidecar_active}\t#{@sidecar_full}";
 const SEP: &str = "@@sep@@";
 
 type Res<T> = Result<T, String>;
@@ -72,6 +77,7 @@ struct Pane {
     slayout: String,
     nzoom: String,
     sactive: String,
+    sfull: bool,
 }
 
 fn parse_panes(s: &str) -> Vec<Pane> {
@@ -79,7 +85,7 @@ fn parse_panes(s: &str) -> Vec<Pane> {
     s.lines()
         .filter_map(|l| {
             let f: Vec<&str> = l.split('\t').collect();
-            if f.len() < 17 {
+            if f.len() < 18 {
                 return None;
             }
             Some(Pane {
@@ -100,6 +106,7 @@ fn parse_panes(s: &str) -> Vec<Pane> {
                 slayout: f[14].into(),
                 nzoom: f[15].into(),
                 sactive: f[16].into(),
+                sfull: f[17] == "1",
             })
         })
         .collect()
@@ -603,6 +610,17 @@ fn sync(win: &str) -> Res<()> {
     }
     let src_group: Vec<String> = sp.iter().filter(|p| p.tag).map(|p| p.id.clone()).collect();
     let mut snap = take_snapshot(&sp, &src_group);
+    if snap.is_none() && sp.first().map(|p| p.sfull).unwrap_or(false) {
+        // Leaving the full view: keep the old edge/size, adopt the new internal splits.
+        let rects: Vec<Rect> = sp
+            .iter()
+            .filter(|p| p.tag)
+            .map(|p| Rect { id: p.id.clone(), x: p.x, y: p.y, w: p.w, h: p.h })
+            .collect();
+        if let (Some(prev), Some(tree)) = (Snapshot::parse(&st.snap), build_tree(&rects)) {
+            snap = Some(Snapshot { edge: prev.edge, size: prev.size, dim: prev.dim, tree });
+        }
+    }
     let mut pre: Vec<String> = Vec::new();
     match &snap {
         Some(s) if s.ser() == st.built => snap = None, // exactly what we built: keep original
@@ -747,10 +765,44 @@ fn acquire(lock: &str) -> bool {
     false
 }
 
+// Toggle the full-window view of the sidecar group: it moves into its own
+// window where it fills the screen (splits and all); pressing again returns.
+// Regular panes are untouched, so their apps see no resize.
+fn toggle_full(cur: &str) -> Res<()> {
+    let st = read_state()?;
+    let in_cur: Vec<&Pane> = st.panes.iter().filter(|p| p.win == cur).collect();
+    if in_cur.first().map(|p| p.sfull).unwrap_or(false) {
+        let origin = tmux(&["show-options", "-gqv", "@sidecar_full_from"]).unwrap_or_default();
+        let live = st.panes.iter().any(|p| p.win == origin && !p.sfull);
+        let target = if live { origin } else { "{last}".to_string() };
+        tmux(&["select-window", "-t", &target])?;
+        let now = tmux(&["display-message", "-p", "#{window_id}"])?;
+        return sync(&now);
+    }
+    // Enter: a throwaway window, the group arrives beside a placeholder pane via the
+    // normal path (so layout/zoom bookkeeping for the origin window all happens),
+    // then the placeholder goes and the group fills the window.
+    let out = tmux(&["new-window", "-d", "-n", "sidecar", "-P", "-F", "#{window_id} #{pane_id}",
+                     "sleep", "600"])?;
+    let mut it = out.split_whitespace();
+    let (fw, ph) = (it.next().unwrap_or("").to_string(), it.next().unwrap_or("").to_string());
+    if fw.is_empty() || ph.is_empty() {
+        return Err("could not create the full-view window".into());
+    }
+    tmux(&["set-option", "-w", "-t", &fw, "@sidecar_full", "1", ";",
+           "set-option", "-g", "@sidecar_full_from", cur, ";",
+           "select-window", "-t", &fw])?;
+    let res = sync(&fw);
+    let _ = tmux(&["kill-pane", "-t", &ph]);
+    res
+}
+
 fn main() {
-    // Usage: sidecar [WINDOW_ID]   (default: the current window)
-    let win = match env::args().nth(1) {
-        Some(w) => w,
+    // Usage: sidecar [WINDOW_ID] | sidecar full [WINDOW_ID]
+    let args: Vec<String> = env::args().skip(1).collect();
+    let full = args.first().map(|a| a == "full").unwrap_or(false);
+    let win = match args.get(if full { 1 } else { 0 }) {
+        Some(w) => w.clone(),
         None => match tmux(&["display-message", "-p", "#{window_id}"]) {
             Ok(w) => w,
             Err(_) => return,
@@ -760,7 +812,8 @@ fn main() {
     if !acquire(&lock) {
         return;
     }
-    if let Err(e) = sync(&win) {
+    let res = if full { toggle_full(&win) } else { sync(&win) };
+    if let Err(e) = res {
         eprintln!("sidecar: {}", e);
     }
     let _ = fs::remove_dir(&lock);
