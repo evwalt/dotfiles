@@ -191,10 +191,10 @@ hs.hotkey.bind(
 	})
 )
 hs.hotkey.bind(hyper, "C", function()
-	hs.application.launchOrFocus("Finder")
+	hs.eventtap.keyStroke({ "cmd" }, "`") -- switch window in app
 end)
 hs.hotkey.bind(hyper, "R", function()
-	hs.eventtap.keyStroke({ "cmd" }, "`") -- switch window in app
+	hs.application.launchOrFocus("Finder")
 end)
 hs.hotkey.bind(hyper, "L", function()
 	hs.application.launchOrFocus("Notes")
