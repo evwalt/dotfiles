@@ -1,12 +1,28 @@
 #!/bin/sh
+# Keep a single sidecar pane in the current window, moving it there from
+# wherever it lives. Idempotent. Called from tmux hooks; see .tmux.conf.
 
-SOCKET="sidecar"
-SESSION="sidecar"
+# Serialize: rapid window switching fires overlapping hooks.
+lock="${TMPDIR:-/tmp}/tmux-sidecar.lock"
+i=0
+until mkdir "$lock" 2>/dev/null; do
+    i=$((i + 1))
+    [ "$i" -gt 50 ] && exit 0
+    sleep 0.02
+done
+trap 'rmdir "$lock"' EXIT
 
-# Create the persistent LLM session once if it doesn't exist.
-if ! tmux -L "$SOCKET" has-session -t "$SESSION" 2>/dev/null; then
-    TMUX= tmux -L "$SOCKET" new-session -d -s "$SESSION"
+# Resolve the window after taking the lock so the last switch wins.
+win=$(tmux display-message -p '#{window_id}')
+pane=$(tmux list-panes -a -F '#{pane_id} #{@sidecar}' | awk '$2 == 1 { print $1; exit }')
+
+if [ -z "$pane" ]; then
+    pane=$(tmux split-window -d -h -l 30% -t "$win" -P -F '#{pane_id}')
+    tmux set-option -p -t "$pane" @sidecar 1
+    exit 0
 fi
 
-# Attach this pane as another view of that same session.
-exec env TMUX= tmux -L "$SOCKET" attach-session -t "$SESSION"
+# Already here: nothing to move.
+tmux list-panes -t "$win" -F '#{pane_id}' | grep -qx "$pane" && exit 0
+
+tmux join-pane -d -h -l 30% -s "$pane" -t "$win"
