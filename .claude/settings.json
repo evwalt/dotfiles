@@ -69,6 +69,7 @@
       "/Users/evan/dev/resume-cov"
     ]
   },
+  "model": "sonnet",
   "enabledPlugins": {
     "vercel@claude-plugins-official": true
   },
@@ -82,6 +83,9 @@
   },
   "modelSettings": {
     "claude-sonnet-5": {
+      "effortLevel": "medium"
+    },
+    "claude-sonnet-5-5": {
       "effortLevel": "medium"
     }
   },
@@ -117,6 +121,5 @@
       "**Org-specific CLIs**: None configured",
       "routine under evwalt/resume-cov prefix: local file edits (resume.typ, cov.typ), running resume-cov.zsh, and git operations against the origin remote are routine for this project"
     ]
-  },
-  "model": "sonnet"
+  }
 }
