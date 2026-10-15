@@ -13,6 +13,8 @@ alias wua="wup && wl && wuta"
 
 # --- claude ---
 alias chs="yadm-private add ~/.claude/projects ~/.claude/history.jsonl"
+alias chc="yadm-private commit -m 'chore(claude): sync session history and project transcripts'"
+alias chap="chs && chc && yadm-private push"
 
 # --- codex ---
 alias cxs="yadm-private add ~/.codex/sessions ~/.codex/history.jsonl"
