@@ -122,7 +122,7 @@ local function refreshDim()
 			table.insert(elements, {
 				type = "rectangle",
 				action = "fill",
-				fillColor = { white = 0, alpha = 0.60 },
+				fillColor = { white = 0, alpha = 0.40 },
 				frame = { x = r.x - d.frame.x, y = r.y - d.frame.y, w = r.w, h = r.h },
 				-- match macOS window corners when nothing is occluding
 				roundedRectRadii = #d.rects == 1 and { xRadius = 10, yRadius = 10 } or nil,
