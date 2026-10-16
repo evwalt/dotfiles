@@ -3,17 +3,20 @@
 
 // --- Modified Keybindings ---
 api.unmap(';dh');
-api.unmap(';t');
-api.unmap('r');
+// api.unmap(';t');
+// api.unmap('r');
 api.map('gH', 'H');
 api.unmap('H');
-api.map('H', 'S');
-api.map('L', 'D');
+// api.map('H', 'S');
+// api.map('L', 'D');
 // api.map('K', 'R');
 api.map('J', 'R');
 // api.map('J', 'E');
 api.map('K', 'E');
-api.map('ot', 'on');
+// api.map('ot', 'on');
+api.map('ot', 't'); // Search bookmarks and browsing history
+api.map('t', 'T'); // Choose an open tab
+api.unmap('T'); // Free for future use
 
 // --- Examples ---
 // an example to create a new mapping `ctrl-y`
