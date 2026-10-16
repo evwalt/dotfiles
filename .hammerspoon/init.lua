@@ -54,10 +54,10 @@ end
 -- Dark overlay on every Firefox window that isn't the focused window.
 -- The overlay covers only the parts of the window not hidden behind other
 -- windows, since canvases can't be ordered relative to other apps' windows.
--- Enabled state persists across restarts via hs.settings (default: on).
+-- Enabled state persists across restarts via hs.settings (default: off).
 local dimEnabled = hs.settings.get("firefoxDim")
 if dimEnabled == nil then
-	dimEnabled = true
+	dimEnabled = false
 end
 local dimOverlays = {}
 
@@ -87,7 +87,75 @@ local function subtractRect(rects, o)
 	return out
 end
 
+--- Firefox Active Border ---
+-- Pink border around the focused Firefox window, only when Firefox has more
+-- than one window. Enabled state persists via hs.settings (default: on).
+local borderEnabled = hs.settings.get("firefoxBorder")
+if borderEnabled == nil then
+	borderEnabled = true
+end
+local borderWidth = 4
+local borderCanvas
+local function refreshBorder()
+	local target
+	if borderEnabled then
+		local focused = hs.window.focusedWindow()
+		local focusedApp = focused and focused:application()
+		if focusedApp and focusedApp:name() == "Firefox" then
+			local count = 0
+			for _, win in ipairs(hs.window.orderedWindows()) do
+				local app = win:application()
+				if win:isStandard() and app and app:name() == "Firefox" then
+					count = count + 1
+				end
+			end
+			if count > 1 then
+				target = focused:frame()
+			end
+		end
+	end
+	if not target then
+		if borderCanvas then
+			borderCanvas:hide()
+		end
+		return
+	end
+	-- Stroke is centered on the path, so inset by half the width to stay inside.
+	local elements = {
+		{
+			type = "rectangle",
+			action = "stroke",
+			strokeColor = { red = 1, green = 0.41, blue = 0.71, alpha = 1 },
+			strokeWidth = borderWidth,
+			frame = {
+				x = borderWidth / 2,
+				y = borderWidth / 2,
+				w = target.w - borderWidth,
+				h = target.h - borderWidth,
+			},
+			roundedRectRadii = { xRadius = 10, yRadius = 10 },
+		},
+	}
+	if borderCanvas then
+		borderCanvas:frame(target):replaceElements(elements):show()
+	else
+		-- Floating level keeps it above the window it outlines.
+		borderCanvas = hs.canvas
+			.new(target)
+			:level(hs.canvas.windowLevels.floating)
+			:appendElements(elements)
+			:show()
+	end
+end
+local function toggleBorder()
+	borderEnabled = not borderEnabled
+	hs.settings.set("firefoxBorder", borderEnabled)
+	refreshBorder()
+	hs.alert.show("Firefox border: " .. (borderEnabled and "on" or "off"))
+end
+
 local function refreshDim()
+	refreshBorder()
 	local dim = {}
 	if dimEnabled then
 		local focused = hs.window.focusedWindow()
@@ -193,6 +261,7 @@ hs.hotkey.bind(
 	"G",
 	actionPicker({
 		a = "Activity Monitor",
+		b = { label = "Toggle Firefox Border", action = toggleBorder },
 		c = {
 			label = "Screenshot Window to Clipboard",
 			action = function()
