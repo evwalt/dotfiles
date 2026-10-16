@@ -369,7 +369,10 @@ opencode-history-sync() {
 # --- Node via nvm ---
 export NVM_DIR="$HOME/.nvm"
 # Default Node on PATH up front so non-interactive children (Claude Code hooks via /bin/sh, editors, scripts) find node and global bins.
-export PATH="$NVM_DIR/versions/node/v24.21.0/bin:$PATH"
+# Resolved from nvm's default alias (major, e.g. "24") to the newest installed match, so installing/removing patch versions needs no edit here.
+_nvm_major=$(<"$NVM_DIR/alias/default"); _nvm_bin=("$NVM_DIR"/versions/node/v${_nvm_major#v}.*(Nn[-1]))
+(( $#_nvm_bin )) && export PATH="$_nvm_bin/bin:$PATH"
+unset _nvm_major _nvm_bin
 nvm()  { unset -f nvm node npm npx; . "$NVM_DIR/nvm.sh"; nvm "$@"; }
 node() { unset -f nvm node npm npx; . "$NVM_DIR/nvm.sh"; node "$@"; }
 npm()  { unset -f nvm node npm npx; . "$NVM_DIR/nvm.sh"; npm "$@"; }
