@@ -1,22 +1,29 @@
 // --- Useful Links ---
 // https://github.com/brookhong/Surfingkeys/wiki
-
+//
 // --- Modified Keybindings ---
-api.unmap(';dh');
-// api.unmap(';t');
-// api.unmap('r');
-api.map('gH', 'H');
-api.unmap('H');
-// api.map('H', 'S');
-// api.map('L', 'D');
-// api.map('K', 'R');
-api.map('J', 'R');
-// api.map('J', 'E');
-api.map('K', 'E');
-// api.map('ot', 'on');
+
+// Disable unwanted shortcuts
+api.unmap(';dh'); // Delete browsing history
+
+// Browser history navigation
+api.map('gH', 'H'); // Go back
+api.unmap('H'); // Free H for future use
+
+// Tab navigation
+api.map('J', 'R'); // Next tab
+api.map('K', 'E'); // Previous tab
+
+// Tab selection and URL search
 api.map('ot', 't'); // Search bookmarks and browsing history
 api.map('t', 'T'); // Choose an open tab
-api.unmap('T'); // Free for future use
+api.unmap('T'); // Free T for future use
+
+// Default bindings retained:
+// on = Open URL in new tab
+// r  = Reload page
+// S  = Go back in history
+// D  = Go forward in history
 
 // --- Examples ---
 // an example to create a new mapping `ctrl-y`
@@ -29,6 +36,9 @@ api.mapkey('<Ctrl-y>', 'Show me the money', function () {
 // api.map('gt', 'T');
 // an example to remove mapkey `Ctrl-i`
 // api.unmap('<Ctrl-i>');
+
+// --- Hint Characters (Dvorak) ---
+api.Hints.setCharacters('aoeuidhtns');
 
 // --- Hint Align ---
 settings.hintAlign = 'left';
