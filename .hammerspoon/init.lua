@@ -286,6 +286,15 @@ hs.hotkey.bind(
 				)
 			end,
 		},
+		v = {
+			label = "Show Desktop",
+			action = function()
+				-- Private API; fall back to the Show Desktop shortcut (F11 by default).
+				if not (hs.spaces.toggleShowDesktop and pcall(hs.spaces.toggleShowDesktop)) then
+					hs.eventtap.keyStroke({}, "f11")
+				end
+			end,
+		},
 	})
 )
 hs.hotkey.bind(hyper, "C", function()
