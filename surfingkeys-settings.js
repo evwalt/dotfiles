@@ -1,14 +1,14 @@
 // --- Useful Links ---
 // https://github.com/brookhong/Surfingkeys/wiki
-//
+
 // --- Modified Keybindings ---
 
 // Disable unwanted shortcuts
 api.unmap(';dh'); // Delete browsing history
 
 // Browser history navigation
-api.map('gH', 'H'); // Go back
-api.unmap('H'); // Free H for future use
+api.map('H', 'S'); // Go back in history
+api.map('L', 'D'); // Go forward in history
 
 // Tab navigation
 api.map('J', 'R'); // Next tab
