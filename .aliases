@@ -28,6 +28,7 @@ alias fhd="~/scripts/firefox-history-dump.zsh"
 
 # --- git ---
 # git develop and main, or git deploy
+alias ga="git add"
 alias gdp="git checkout main && git merge dev && git push && git checkout dev"
 alias gs="git status"
 alias gcm="git commit -m"
