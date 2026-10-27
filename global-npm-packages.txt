@@ -7,9 +7,9 @@
 ├── corepack@0.36.0
 ├── emmet-ls@0.4.2
 ├── eslint@10.13.0
-├── markdownlint-cli2@0.23.3
-├── npm@12.2.0
-├── opencode-ai@1.19.3
+├── markdownlint-cli2@0.24.0
+├── npm@12.2.1
+├── opencode-ai@1.19.4
 ├── prettier@3.9.10
 ├── tsx@4.23.15
 ├── typescript-language-server@6.0.2
