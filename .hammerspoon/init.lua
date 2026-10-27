@@ -40,6 +40,7 @@ local function actionPicker(choices)
 	m:bind({}, "escape", function()
 		m:exit()
 	end)
+	table.sort(hint) -- pairs() order is arbitrary; each line starts with its key
 	local hintText = table.concat(hint, "\n")
 	function m:entered()
 		hs.alert.closeAll()
