@@ -1,7 +1,7 @@
 return {
 	"nvim-telescope/telescope.nvim",
-	tag = "0.1.8",
-	-- or '...' , branch = '0.1.x',
+	-- 0.1.8 calls the legacy nvim-treesitter API (ft_to_lang), which `main` removed
+	branch = "master",
 	cmd = "Telescope",
 	keys = { "<space><space>", "<space><space><space>", "<space>fh", "<space>fb", "<space>fd" },
 	dependencies = {
