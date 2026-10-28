@@ -1,15 +1,50 @@
 # --- weekly combos ---
 # Just sync lazy.nvim plugins and then run `wua` regularly (every day, week, or two weeks)
 # "weekly update"
-alias wup="nvim --headless '+Lazy! sync' +qa && pipx upgrade-all && npm -g update && rustup update && bob update"
+wup() {
+  local failed=0
+  nvim --headless '+Lazy! sync' +qa || { echo 'Lazy sync failed'; failed=1; }
+  pipx upgrade-all                  || { echo 'pipx failed'; failed=1; }
+  npm -g update                     || { echo 'npm failed'; failed=1; }
+  rustup update                     || { echo 'rustup failed'; failed=1; }
+  bob update                        || { echo 'bob failed'; failed=1; }
+  return $failed
+}
 # "weekly log"
-alias wl="pxl && ngl && rl"
+wl() {
+  local failed=0
+  pxl || { echo 'pxl failed'; failed=1; }
+  ngl || { echo 'ngl failed'; failed=1; }
+  rl  || { echo 'rl failed'; failed=1; }
+  return $failed
+}
 # "yadm-public track all"
 # alias wuta="yadm-public add ~/.config/nvim/lazy-lock.json ~/pipx-packages.txt ~/global-npm-packages.txt ~/rust-version.txt ~/brew-leaves.txt ~/brew-list.txt ~/brew-list-cask.txt && yadm-public commit -m 'chore: update deps' && yadm-public push"
-alias wuta="yadm-public add ~/.config/nvim/lazy-lock.json ~/pipx-packages.txt ~/global-npm-packages.txt ~/rust-version.txt ~/cargo-packages.txt ~/ports.txt && yadm-public commit -m 'chore(env): update deps' && yadm-public push"
+wuta() {
+  local -a files=(
+    "$HOME/.config/nvim/lazy-lock.json"
+    "$HOME/pipx-packages.txt"
+    "$HOME/global-npm-packages.txt"
+    "$HOME/rust-version.txt"
+    "$HOME/cargo-packages.txt"
+    "$HOME/ports.txt"
+  )
+  yadm-public add -- "${files[@]}" || return 1
+  if yadm-public diff --cached --quiet -- "${files[@]}"; then
+    echo 'No dependency changes to commit.'
+    return 0
+  fi
+  yadm-public commit --only -m 'chore(env): update deps' -- "${files[@]}" && yadm-public push
+}
 # "daily update, log, and yadm track all"
 # alias wua="wup && wl && wuta && bd"
-alias wua="wup && wl && wuta"
+wua() {
+  local failed=0
+  wup  || failed=1
+  wl   || failed=1
+  wuta || failed=1
+  return $failed
+}
 
 # --- claude ---
 alias chs="yadm-private add ~/.claude/settings.json ~/.claude/projects ~/.claude/history.jsonl"
