@@ -366,6 +366,10 @@ opencode-history-sync() {
 [ -r ~/.aliases ] && source ~/.aliases
 [ -r ~/dev/resume-cov/tool-resume-cov.zsh ] && source ~/dev/resume-cov/tool-resume-cov.zsh
 
+# --- Codex CLI proxy bypass ---
+# Canopy's system proxy (127.0.0.1:9134) breaks Codex's OpenAI token exchange; bypass it for OpenAI hosts only.
+export NO_PROXY="${NO_PROXY:+$NO_PROXY,}openai.com,chatgpt.com"
+
 # --- Node via nvm ---
 export NVM_DIR="$HOME/.nvm"
 # Default Node on PATH up front so non-interactive children (Claude Code hooks via /bin/sh, editors, scripts) find node and global bins.
