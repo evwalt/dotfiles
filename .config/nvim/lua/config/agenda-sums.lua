@@ -25,13 +25,10 @@ local function sums(lines)
 		end
 	end
 
-	local r = { solopreneur = 0, freelance = 0, jon = 0, deep = 0, shallow = 0 }
+	local r = { solopreneur = 0, freelance = 0, job = 0, deep = 0, shallow = 0 }
 	for i = 1, #toks - 1 do
 		local label = text:sub(toks[i].e, toks[i + 1].s - 1):lower()
 		local d = toks[i + 1].t - toks[i].t
-		if label:find("jon work") then
-			r.jon = r.jon + d
-		end
 		local kind = label:find("deep work") and "deep" or label:find("shallow work") and "shallow"
 		if kind then
 			r[kind] = r[kind] + d
@@ -40,6 +37,9 @@ local function sums(lines)
 			end
 			if label:find("%(freelance%)") then
 				r.freelance = r.freelance + d
+			end
+			if label:find("%(job search%)") then
+				r.job = r.job + d
 			end
 		end
 	end
@@ -68,7 +68,7 @@ function M.refresh(buf)
 	local categories = {
 		{ "solopreneur", "solopreneur" },
 		{ "freelance", "freelance" },
-		{ "jon", "jon work" },
+		{ "job", "job search" },
 		{ "deep", "deep work" },
 		{ "shallow", "shallow work" },
 	}
@@ -79,8 +79,8 @@ function M.refresh(buf)
 				parts[#parts + 1] = c[2] .. ": " .. fmt(r[c[1]])
 			end
 		end
-		-- solopreneur/freelance are subsets of deep+shallow, so don't add them again
-		parts[#parts + 1] = "total: " .. fmt(r.jon + r.deep + r.shallow)
+		-- solopreneur/freelance/job search are subsets of deep+shallow, so don't add them again
+		parts[#parts + 1] = "total: " .. fmt(r.deep + r.shallow)
 		diags[#diags + 1] = {
 			lnum = lnum,
 			col = 0,
@@ -99,10 +99,10 @@ function M.refresh(buf)
 			return
 		end
 		local r = sums(acc)
-		if r.deep + r.shallow + r.jon > 0 then
+		if r.deep + r.shallow > 0 then
 			add(day, r)
 			if group then
-				total = total or { solopreneur = 0, freelance = 0, jon = 0, deep = 0, shallow = 0 }
+				total = total or { solopreneur = 0, freelance = 0, job = 0, deep = 0, shallow = 0 }
 				for k, v in pairs(r) do
 					total[k] = total[k] + v
 				end
