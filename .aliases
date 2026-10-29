@@ -197,3 +197,5 @@ alias yrlo="yadm-private log --oneline"
 
 # --- zsh ---
 alias l="ls -laF"
+alias rz='tmux list-panes -a -F '\''#{pane_id} #{pane_current_command}'\'' | awk '\''$2=="zsh"{print $1}'\'' | xargs -I{} tmux send-keys -t {} '\''exec zsh'\'' C-m'
+alias rsh='tmux list-panes -a -F '\''#{pane_id} #{pane_current_command}'\'' | awk '\''$2=="zsh"{print $1}'\'' | xargs -I{} tmux send-keys -t {} '\''exec $SHELL'\'' C-m'
