@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# bkr: back up macOS Reminders (via reminders-cli) into Dropbox/bk, archive older backups
+set -euo pipefail
+shopt -s nullglob
+
+bk=~/Library/CloudStorage/Dropbox/bk
+arch=$bk/archive/reminders
+mkdir -p "$arch"
+
+# date-HHMM; if that minute is already taken (in bk or archive), append -2, -3, ...
+base=$(date +%F-%H%M)
+stamp=$base
+n=2
+while [[ -e $bk/reminders-$stamp.txt || -e $arch/reminders-$stamp.txt ]]; do
+  stamp=$base-$n
+  ((n++))
+done
+
+out=$bk/reminders-$stamp.txt
+done_out=$bk/reminders-$stamp-completed.txt
+
+reminders show-all                  > "$out"
+reminders show-all --only-completed > "$done_out"
+echo "wrote:"
+echo "  $out"
+echo "  $done_out"
+
+# archive every other backup
+moved=()
+for f in "$bk"/reminders-*.txt; do
+  [[ $f == "$out" || $f == "$done_out" ]] && continue
+  mv "$f" "$arch/"
+  moved+=("${f##*/}")
+done
+if ((${#moved[@]})); then
+  echo "archived to $arch:"
+  printf '  %s\n' "${moved[@]}"
+fi

@@ -393,3 +393,6 @@ trap 'echo -ne "\e[2 q"' EXIT
 
 # Kill orphaned ltex-ls-plus (LanguageTool) Java processes
 alias ltexkill='pkill -f LtexLanguageServerLauncher'
+
+# ytt takes unquoted URLs; noglob stops zsh expanding the "?" in them
+alias ytt='noglob ytt'

@@ -1,0 +1,81 @@
+#!/Users/evan/.local/pipx/venvs/youtube-transcript-api/bin/python
+"""Save a YouTube video's transcript as <kebab-title>.txt in ~/dev/founder-os/transcripts.
+
+Line 1 is the video URL, then a blank line, then the transcript text.
+Use -o DIR to save elsewhere (e.g. -o . or -o ~/Downloads).
+With -t, line 2 is the title, followed by a "m:ss" line above each caption line.
+"""
+import argparse
+import json
+import os
+import re
+import sys
+import urllib.parse
+import urllib.request
+
+from youtube_transcript_api import YouTubeTranscriptApi
+
+OUT_DIR = os.path.expanduser("~/dev/founder-os/transcripts")
+FILLER = {"a", "an", "the", "of", "and", "to", "in", "on", "for", "with", "is", "how", "why", "what", "i", "you", "my", "your"}
+
+
+def video_id(url):
+    m = re.search(r"(?:v=|youtu\.be/|/shorts/|/embed/|/live/)([\w-]{11})", url)
+    return m.group(1) if m else None
+
+
+def title_of(url):
+    q = urllib.parse.quote(url, safe="")
+    try:
+        with urllib.request.urlopen(f"https://www.youtube.com/oembed?format=json&url={q}", timeout=10) as r:
+            return json.load(r)["title"]
+    except Exception:
+        return None
+
+
+def kebab(title, limit=6):
+    words = re.findall(r"[a-z0-9]+", title.lower().replace("'", ""))
+    kept = [w for w in words if w not in FILLER] or words
+    return "-".join(kept[:limit])
+
+
+def stamp(sec):
+    h, rem = divmod(int(sec), 3600)
+    m, s = divmod(rem, 60)
+    return f"{h}:{m:02}:{s:02}" if h else f"{m}:{s:02}"
+
+
+def main():
+    p = argparse.ArgumentParser(usage='ytt [-t] [-o DIR] "<youtube-url>"')
+    p.add_argument("url")
+    p.add_argument("-t", dest="timestamps", action="store_true", help="timestamps + title line")
+    p.add_argument("-o", dest="out_dir", default=OUT_DIR, help=f"output dir (default {OUT_DIR})")
+    a = p.parse_args()
+    url, timestamps, out_dir = a.url, a.timestamps, os.path.expanduser(a.out_dir)
+    vid = video_id(url)
+    if not vid:
+        sys.exit("Could not find a video ID in that URL.")
+    try:
+        snippets = YouTubeTranscriptApi().fetch(vid)
+    except Exception as e:
+        sys.exit(f"No transcript retrieved: {type(e).__name__}: {str(e).splitlines()[0] if str(e) else ''}")
+    title = title_of(url)
+    if timestamps:
+        lines = [f"{stamp(s.start)}\n{s.text.replace(chr(10), ' ').strip()}" for s in snippets if s.text.strip()]
+        text = "\n".join(lines)
+        head = f"https://www.youtube.com/watch?v={vid}\n{title or ''}\n"
+    else:
+        text = " ".join(s.text.replace("\n", " ").strip() for s in snippets if s.text.strip())
+        head = f"https://www.youtube.com/watch?v={vid}\n\n"
+    name = (kebab(title) if title else "") or f"transcript-{vid}"
+    os.makedirs(out_dir, exist_ok=True)
+    out, n = os.path.join(out_dir, f"{name}.txt"), 1
+    while os.path.exists(out):  # never overwrite: foo.txt, foo-2.txt, foo-3.txt
+        n += 1
+        out = os.path.join(out_dir, f"{name}-{n}.txt")
+    with open(out, "w") as f:
+        f.write(f"{head}{text}\n")
+    print(f"Saved: {out}")
+
+
+main()
