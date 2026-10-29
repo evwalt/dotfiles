@@ -170,17 +170,20 @@ zstyle ':vcs_info:*' unstagedstr '±'
 zstyle ':vcs_info:*' formats ' %u%c'
 zstyle ':vcs_info:*' actionformats ' %u%c'
 
-_SEGMENT_SEPARATOR=$''
-_PL_BRANCH_CHAR=$''
+# Plain-text friendly: no Powerline glyphs, so copy/paste stays clean.
+# Segments are separated by background color changes only.
+DEFAULT_USER=evan
+_SEGMENT_SEPARATOR=''
+_PL_BRANCH_CHAR=''
 
 _prompt_segment() {
   local bg fg
   [[ -n $1 ]] && bg="%K{$1}" || bg="%k"
   [[ -n $2 ]] && fg="%F{$2}" || fg="%f"
   if [[ $_CURRENT_BG != 'NONE' && $1 != $_CURRENT_BG ]]; then
-    print -n " %{$bg%F{$_CURRENT_BG}%}$_SEGMENT_SEPARATOR%{$fg%} "
+    print -n " %{$bg%F{$_CURRENT_BG}%}$_SEGMENT_SEPARATOR%{$fg%}"
   else
-    print -n "%{$bg%}%{$fg%} "
+    print -n "%{$bg%}%{$fg%}"
   fi
   _CURRENT_BG=$1
   [[ -n $3 ]] && print -n $3
@@ -199,8 +202,8 @@ _prompt_end() {
 _prompt_status() {
   local -a symbols
   [[ $RETVAL -ne 0 ]] && symbols+="%{%F{red}%}✘"
-  [[ $UID -eq 0 ]] && symbols+="%{%F{yellow}%}⚡"
-  [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}⚙"
+  [[ $UID -eq 0 ]] && symbols+="%{%F{yellow}%}#"
+  [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}&"
   [[ -n "$symbols" ]] && _prompt_segment black default "$symbols"
 }
 
@@ -246,15 +249,15 @@ _prompt_git() {
     ahead=$(command git log --oneline @{upstream}.. 2>/dev/null)
     behind=$(command git log --oneline ..@{upstream} 2>/dev/null)
     if [[ -n "$ahead" && -n "$behind" ]]; then
-      branch_char=$'⇅'
+      branch_char=$'↕'
     elif [[ -n "$ahead" ]]; then
-      branch_char=$'↱'
+      branch_char=$'↑'
     elif [[ -n "$behind" ]]; then
-      branch_char=$'↰'
+      branch_char=$'↓'
     fi
 
     vcs_info
-    print -n "${${ref/refs\/heads\//$branch_char }}${vcs_info_msg_0_%% }"
+    print -n "${${ref/refs\/heads\//${branch_char:+$branch_char }}}${vcs_info_msg_0_%% }"
   fi
 }
 
@@ -269,7 +272,7 @@ _prompt_yadm_segment() {
     _prompt_segment green black
   fi
 
-  print -n "$label $_PL_BRANCH_CHAR $branch"
+  print -n "$label $branch"
 }
 
 _prompt_yadm_private() {
@@ -337,7 +340,7 @@ build_prompt() {
   _prompt_end
 }
 
-PROMPT='%{%f%b%k%}$(build_prompt) '
+PROMPT='%{%f%b%k%}$(build_prompt)'
 
 # --- User configuration ---
 yadm-public() {
