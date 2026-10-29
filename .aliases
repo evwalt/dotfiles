@@ -111,6 +111,7 @@ alias mpl="port installed > ports.txt"
 
 # --- neovim ---
 alias nu="nvim --headless '+Lazy! sync' +qa && yadm-public add ~/.config/nvim/lazy-lock.json && (yadm-public diff --cached --quiet || (yadm-public commit -m 'chore(nvim): bump deps' && yadm-public push))"
+alias nuq="{ nu; } >/dev/null 2>&1 && echo 'nu: ok' || echo 'nu: failed (run nu to see why)'"
 
 # --- nvm node ---
 # nvm update current
