@@ -59,6 +59,19 @@ return {
 						end,
 						color = { fg = "#ff9e64" },
 					},
+					{
+						function()
+							-- position in the bufferline (what the <space>'' style jump keys use), not the nvim buffer number
+							local cur = vim.api.nvim_get_current_buf()
+							_G.nvim_bufferline() -- bufferline only fills its list when drawn, so refresh it while hidden
+							for i, el in ipairs(require("bufferline").get_elements().elements) do
+								if el.id == cur then
+									return tostring(i)
+								end
+							end
+							return ""
+						end,
+					},
 					"encoding",
 					"filetype",
 				},
@@ -85,5 +98,11 @@ return {
 			inactive_winbar = {},
 			extensions = {},
 		})
+
+		-- Statusline (mode, file, position, encoding...) is hidden by default; <space>ts toggles it.
+		vim.o.laststatus = 0
+		vim.keymap.set("n", "<space>ts", function()
+			vim.o.laststatus = vim.o.laststatus == 0 and 2 or 0
+		end, { desc = "Toggle statusline" })
 	end,
 }

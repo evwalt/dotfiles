@@ -9,8 +9,14 @@ return {
 		bufferline.setup({
 			options = {
 				numbers = "ordinal",
+				auto_toggle_bufferline = false, -- otherwise bufferline resets showtabline on every redraw
 			},
 		})
+
+		vim.o.showtabline = 0 -- hidden by default; <space>tb toggles
+		vim.keymap.set("n", "<space>tb", function()
+			vim.o.showtabline = vim.o.showtabline == 0 and 2 or 0
+		end, { desc = "Toggle bufferline" })
 
 		vim.keymap.set("n", "<space>j", ":BufferLineCyclePrev<CR>")
 		vim.keymap.set("n", "<space>k", ":BufferLineCycleNext<CR>")
