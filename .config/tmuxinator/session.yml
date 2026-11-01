@@ -46,20 +46,6 @@ root: ~/
 
 windows:
   - "7":
-      root: ~/dev/founder-os
-  - "8":
       root: ~/dev
-  - "9":
+  - "8":
       root: ~/Library/CloudStorage/Dropbox/docs/notes
-  - "6":
-      root: ~
-
-# windows:
-#   - "7":
-#       root: ~
-#   - "8":
-#       root: ~/dev
-#   - "9":
-#       root: ~/Library/CloudStorage/Dropbox/docs/notes
-#   - "6":
-#       root: ~/.config/nvim
