@@ -36,13 +36,14 @@ wuta() {
   fi
   yadm-public commit --only -m 'chore(env): update deps' -- "${files[@]}" && yadm-public push
 }
-# "daily update, log, and yadm track all"
+# "daily update, log, yadm track all, and claude history sync"
 # alias wua="wup && wl && wuta && bd"
 wua() {
   local failed=0
   wup  || failed=1
   wl   || failed=1
   wuta || failed=1
+  chap || failed=1
   return $failed
 }
 
