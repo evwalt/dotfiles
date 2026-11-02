@@ -88,3 +88,24 @@ vim.diagnostic.config({
 	update_in_insert = false,
 	severity_sort = true,
 })
+
+--- Unsaved-changes indicator ---
+-- The statusline and bufferline are hidden by default, so turn the line numbers red
+-- while a buffer has unsaved changes. (Tokyonight's current-line number is already orange,
+-- and relativenumber uses LineNrAbove/LineNrBelow, so all four groups are remapped.)
+local function set_modified_hl()
+	vim.api.nvim_set_hl(0, "ModifiedLineNr", { fg = "#f7768e", bold = true })
+end
+set_modified_hl()
+vim.api.nvim_create_autocmd("ColorScheme", { callback = set_modified_hl })
+vim.api.nvim_create_autocmd({ "BufModifiedSet", "BufWinEnter" }, {
+	group = vim.api.nvim_create_augroup("modified-linenr", { clear = true }),
+	callback = function(args)
+		local hl = vim.bo[args.buf].modified
+				and "LineNr:ModifiedLineNr,LineNrAbove:ModifiedLineNr,LineNrBelow:ModifiedLineNr,CursorLineNr:ModifiedLineNr"
+			or ""
+		for _, win in ipairs(vim.fn.win_findbuf(args.buf)) do
+			vim.wo[win].winhighlight = hl
+		end
+	end,
+})
