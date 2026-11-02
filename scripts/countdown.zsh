@@ -157,12 +157,16 @@ show() {
 }
 
 # Countdown Loop
-while (( seconds > 0 )); do
+# Recompute the remaining time from the wall clock on every tick. Counting down
+# with "sleep 1" drifts when the Mac sleeps (sleep pauses), so after waking the
+# timer resumes at the true remaining time, or fires at once if the end passed.
+while true; do
+  seconds=$(( end_epoch - $(date +%s) ))
+  (( seconds <= 0 )) && break
   mins=$(( seconds / 60 ))
   secs=$(( seconds % 60 ))
   show "$(printf "%s %02d:%02d remaining..." "$label" "$mins" "$secs")"
   sleep 1
-  ((seconds--))
 done
 show "$label 00:00 remaining... $end_msg"
 printf "\n"
