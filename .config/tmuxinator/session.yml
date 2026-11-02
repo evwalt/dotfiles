@@ -46,6 +46,6 @@ root: ~/
 
 windows:
   - "7":
-      root: ~/dev
+      root: ~/
   - "8":
       root: ~/Library/CloudStorage/Dropbox/docs/notes
