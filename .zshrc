@@ -191,7 +191,8 @@ _prompt_segment() {
 
 _prompt_end() {
   if [[ -n $_CURRENT_BG ]]; then
-    print -n " %{%k%F{$_CURRENT_BG}%}$_SEGMENT_SEPARATOR"
+    # reset bg first so the trailing space is black, not the last segment's color
+    print -n "%{%k%F{$_CURRENT_BG}%}$_SEGMENT_SEPARATOR "
   else
     print -n "%{%k%}"
   fi
