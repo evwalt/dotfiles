@@ -200,3 +200,14 @@ alias yrlo="yadm-private log --oneline"
 alias l="ls -laF"
 alias rz='tmux list-panes -a -F '\''#{pane_id} #{pane_current_command}'\'' | awk '\''$2=="zsh"{print $1}'\'' | xargs -I{} tmux send-keys -t {} '\''exec zsh'\'' C-m'
 alias rsh='tmux list-panes -a -F '\''#{pane_id} #{pane_current_command}'\'' | awk '\''$2=="zsh"{print $1}'\'' | xargs -I{} tmux send-keys -t {} '\''exec $SHELL'\'' C-m'
+
+# --- time ---
+# ck: live 24-hour time (HHMM) until <C-c>; `ck -s` adds seconds (HHMMSS)
+ck() {
+	local fmt='%H%M'
+	[[ $1 == -s ]] && fmt='%H%M%S'
+	while true; do
+		printf '\r%s' "$(date +$fmt)"
+		sleep 1
+	done
+}
