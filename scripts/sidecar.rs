@@ -3,7 +3,8 @@
 // Build:  rustc -O -o ~/scripts/sidecar ~/scripts/sidecar.rs
 //
 // Usage:  sidecar [WINDOW_ID]        follow: bring the group to that window
-//         sidecar full [WINDOW_ID]   maximize / restore the group in that window
+//         sidecar full [WINDOW_ID]   toggle: maximize whichever side has focus (the group,
+//                                    or the regular panes with the group hidden) / restore
 //
 // Called from tmux hooks (see tmux.conf) with the window that just became
 // current. Before moving the group out of the window it was last in, it
@@ -24,6 +25,9 @@
 //                                 regular panes are stashed in a hidden session, and
 //                                 @sidecar_full_{panes,layout,zoom} remember them
 //   window option @sidecar_fresume "1" if the window was maximized when the group left
+//   window option @sidecar_hide   like @sidecar_full, but the group is the part parked in
+//                                 the stash, and @sidecar_hide_{panes,layout,zoom} apply
+//   window option @sidecar_hresume "1" if the group was hidden when it left
 
 use std::collections::HashMap;
 use std::process::Command;
@@ -33,7 +37,7 @@ use std::{env, fs, thread};
 const DEFAULT_SIZE: f64 = 0.30;
 const FMT: &str = "#{pane_id}\t#{window_id}\t#{@sidecar}\t#{pane_left}\t#{pane_top}\t\
 #{pane_width}\t#{pane_height}\t#{window_width}\t#{window_height}\t#{window_zoomed_flag}\t\
-#{pane_active}\t#{@sidecar_zoom}\t#{window_active}\t#{window_layout}\t#{@sidecar_layout}\t#{@sidecar_nzoom}\t#{@sidecar_active}\t#{@sidecar_full}\t#{session_name}\t#{@sidecar_fresume}";
+#{pane_active}\t#{@sidecar_zoom}\t#{window_active}\t#{window_layout}\t#{@sidecar_layout}\t#{@sidecar_nzoom}\t#{@sidecar_active}\t#{@sidecar_full}\t#{session_name}\t#{@sidecar_fresume}\t#{@sidecar_hide}\t#{@sidecar_hresume}";
 const STASH: &str = "_sidecar_stash";
 const SEP: &str = "@@sep@@";
 
@@ -83,6 +87,8 @@ struct Pane {
     sfull: bool,
     sess: String,
     fresume: bool,
+    shide: bool,
+    hresume: bool,
 }
 
 fn parse_panes(s: &str) -> Vec<Pane> {
@@ -90,7 +96,7 @@ fn parse_panes(s: &str) -> Vec<Pane> {
     s.lines()
         .filter_map(|l| {
             let f: Vec<&str> = l.split('\t').collect();
-            if f.len() < 20 {
+            if f.len() < 22 {
                 return None;
             }
             Some(Pane {
@@ -114,6 +120,8 @@ fn parse_panes(s: &str) -> Vec<Pane> {
                 sfull: f[17] == "1",
                 sess: f[18].into(),
                 fresume: f[19] == "1",
+                shide: f[20] == "1",
+                hresume: f[21] == "1",
             })
         })
         .collect()
@@ -567,6 +575,35 @@ fn reshape(tgt: &Node, cur: &Node) {
     }
 }
 
+fn scale(n: &Node, sx: f64, sy: f64) -> Node {
+    let f = |v: i32, k: f64| ((v as f64) * k).round() as i32;
+    match n {
+        Node::Leaf { id, w, h } => Node::Leaf { id: id.clone(), w: f(*w, sx), h: f(*h, sy) },
+        Node::Split { d, w, h, a, b } => Node::Split {
+            d: *d,
+            w: f(*w, sx),
+            h: f(*h, sy),
+            a: Box::new(scale(a, sx, sy)),
+            b: Box::new(scale(b, sx, sy)),
+        },
+    }
+}
+
+// After the group left, tmux gives its space to one neighbor. Spread it over
+// the regular panes in proportion to how they were laid out before.
+fn spread(win: &str, before: &[Pane], regular: &[String]) {
+    let rects = |ps: &[Pane]| -> Vec<Rect> {
+        ps.iter()
+            .filter(|p| regular.contains(&p.id))
+            .map(|p| Rect { id: p.id.clone(), x: p.x, y: p.y, w: p.w, h: p.h })
+            .collect()
+    };
+    let (Some(t0), Ok(now)) = (build_tree(&rects(before)), list_window(win)) else { return };
+    let Some(t1) = build_tree(&rects(&now)) else { return };
+    let tgt = scale(&t0, t1.w() as f64 / t0.w().max(1) as f64, t1.h() as f64 / t0.h().max(1) as f64);
+    reshape(&tgt, &t1);
+}
+
 // --- main -------------------------------------------------------------------
 
 fn create(win: &str) -> Res<()> {
@@ -594,9 +631,12 @@ fn sync_d(win: &str, depth: u8) -> Res<()> {
     if !in_win.first().map(|p| p.wactive).unwrap_or(false) {
         return Ok(()); // a later switch superseded this one
     }
+    if in_win.iter().any(|p| p.shide) {
+        return Ok(()); // the group is hidden here on purpose
+    }
     // Stashed panes whose window no longer exists (e.g. its group was killed): rescue.
     let stashed: Vec<String> = st.panes.iter().filter(|p| p.sess == STASH).map(|p| p.id.clone()).collect();
-    if depth == 0 && !stashed.is_empty() && !st.panes.iter().any(|p| p.sfull && p.sess != STASH) {
+    if depth == 0 && !stashed.is_empty() && !st.panes.iter().any(|p| (p.sfull || p.shide) && p.sess != STASH) {
         rescue(win, &stashed);
         return sync_d(win, 1);
     }
@@ -611,6 +651,14 @@ fn sync_d(win: &str, depth: u8) -> Res<()> {
     }
     let all_ids: Vec<String> = group.iter().map(|p| p.id.clone()).collect();
 
+    // The group is hidden in another window: put it back there, then follow normally.
+    if depth == 0 {
+        if let Some(h) = st.panes.iter().find(|p| p.shide && p.sess != STASH) {
+            exit_full(&h.win.clone(), true, true)?;
+            return sync_d(win, 1);
+        }
+    }
+
     // Source window = where most of the outside panes are.
     let mut counts: HashMap<&str, usize> = HashMap::new();
     for p in group.iter().filter(|p| p.win != win) {
@@ -620,7 +668,7 @@ fn sync_d(win: &str, depth: u8) -> Res<()> {
 
     // Leaving a maximized window: bring its regular panes back first.
     if depth == 0 && st.panes.iter().any(|p| p.win == src && p.sfull) {
-        exit_full(&src, true)?;
+        exit_full(&src, false, true)?;
         return sync_d(win, 1);
     }
 
@@ -759,7 +807,11 @@ fn sync_d(win: &str, depth: u8) -> Res<()> {
     }
     if in_win.first().map(|p| p.fresume).unwrap_or(false) {
         let _ = tmux(&["set-option", "-wu", "-t", win, "@sidecar_fresume"]);
-        let _ = enter_full(win); // it was maximized when you left: maximize again
+        let _ = enter_full(win, false); // it was maximized when you left: maximize again
+    }
+    if in_win.first().map(|p| p.hresume).unwrap_or(false) {
+        let _ = tmux(&["set-option", "-wu", "-t", win, "@sidecar_hresume"]);
+        let _ = enter_full(win, true); // it was hidden when you left: hide again
     }
     Ok(())
 }
@@ -821,13 +873,23 @@ fn opt_w(win: &str, name: &str) -> String {
     tmux(&["show-options", "-wqv", "-t", win, name]).unwrap_or_default()
 }
 
-// Maximize the group: the window's regular panes are parked in a hidden session,
-// so the group fills the window (splits intact) right where you are.
-fn enter_full(win: &str) -> Res<()> {
+// Maximize one side in place. `hide` = false: maximize the group (the regular
+// panes are parked in a hidden session). `hide` = true: maximize the regular
+// panes (the group is parked instead). Splits stay intact either way.
+fn full_opt(hide: bool) -> &'static str {
+    if hide { "@sidecar_hide" } else { "@sidecar_full" }
+}
+
+fn full_keys(hide: bool) -> [String; 4] {
+    let o = full_opt(hide);
+    [o.to_string(), format!("{}_panes", o), format!("{}_layout", o), format!("{}_zoom", o)]
+}
+
+fn enter_full(win: &str, hide: bool) -> Res<()> {
     sync(win)?; // make sure the group is here
     let st = read_state()?;
     let in_win: Vec<&Pane> = st.panes.iter().filter(|p| p.win == win).collect();
-    if in_win.first().map(|p| p.sfull).unwrap_or(false) {
+    if in_win.first().map(|p| p.sfull || p.shide).unwrap_or(false) {
         return Ok(());
     }
     let group: Vec<String> = in_win.iter().filter(|p| p.tag).map(|p| p.id.clone()).collect();
@@ -835,11 +897,14 @@ fn enter_full(win: &str) -> Res<()> {
     if group.is_empty() || regular.is_empty() {
         return Ok(());
     }
+    // `parked` leaves the window; `kept` fills it.
+    let (parked, kept) = if hide { (&group, &regular) } else { (&regular, &group) };
     let zp = in_win.iter().find(|p| p.zoomed && p.active).map(|p| p.id.clone());
     if let Some(z) = &zp {
         tmux(&["resize-pane", "-Z", "-t", z])?;
     }
-    let layout = list_window(win)?.first().map(|p| p.layout.clone()).unwrap_or_default();
+    let before = list_window(win)?;
+    let layout = before.first().map(|p| p.layout.clone()).unwrap_or_default();
     let (ww, wh) = in_win.first().map(|p| (p.ww, p.wh)).unwrap_or((80, 24));
 
     let _ = tmux(&["kill-session", "-t", &format!("={}", STASH)]);
@@ -847,7 +912,7 @@ fn enter_full(win: &str) -> Res<()> {
                     "-P", "-F", "#{pane_id}", "sleep", "600"])?;
     let mut moved: Vec<String> = Vec::new();
     let mut failed = false;
-    for r in &regular {
+    for r in parked {
         let _ = tmux(&["select-layout", "-t", &ph, "tiled"]);
         if tmux(&["join-pane", "-d", "-s", r, "-t", &ph]).is_err() {
             failed = true;
@@ -857,7 +922,7 @@ fn enter_full(win: &str) -> Res<()> {
     }
     if failed {
         for r in &moved {
-            let _ = tmux(&["join-pane", "-d", "-s", r, "-t", &group[0]]);
+            let _ = tmux(&["join-pane", "-d", "-s", r, "-t", &kept[0]]);
         }
         let _ = tmux(&["kill-session", "-t", &format!("={}", STASH)]);
         if let Some(z) = zp {
@@ -866,52 +931,63 @@ fn enter_full(win: &str) -> Res<()> {
         return Err("not enough room to stash the other panes".into());
     }
     let _ = tmux(&["kill-pane", "-t", &ph]);
+    if hide {
+        spread(win, &before, &regular);
+    }
+    // A zoomed regular pane is zoomed again on exit.
     let rz = zp.filter(|z| regular.contains(z)).unwrap_or_default();
-    tmux(&["set-option", "-w", "-t", win, "@sidecar_full", "1", ";",
-           "set-option", "-w", "-t", win, "@sidecar_full_panes", &regular.join(" "), ";",
-           "set-option", "-w", "-t", win, "@sidecar_full_layout", &layout, ";",
-           "set-option", "-w", "-t", win, "@sidecar_full_zoom", &rz])?;
+    let [k, kp, kl, kz] = full_keys(hide);
+    tmux(&["set-option", "-w", "-t", win, &k, "1", ";",
+           "set-option", "-w", "-t", win, &kp, &parked.join(" "), ";",
+           "set-option", "-w", "-t", win, &kl, &layout, ";",
+           "set-option", "-w", "-t", win, &kz, &rz])?;
     Ok(())
 }
 
 // Undo enter_full. `leaving` = the group is about to move to another window, so
-// remember to maximize again when it comes back.
-fn exit_full(win: &str, leaving: bool) -> Res<()> {
+// remember to maximize/hide again when it comes back.
+fn exit_full(win: &str, hide: bool, leaving: bool) -> Res<()> {
     let st = read_state()?;
     let in_win: Vec<&Pane> = st.panes.iter().filter(|p| p.win == win).collect();
-    let ids = opt_w(win, "@sidecar_full_panes");
-    let layout = opt_w(win, "@sidecar_full_layout");
-    let zoom = opt_w(win, "@sidecar_full_zoom");
-    let regular: Vec<String> = ids
+    let [k, kp, kl, kz] = full_keys(hide);
+    let ids = opt_w(win, &kp);
+    let layout = opt_w(win, &kl);
+    let zoom = opt_w(win, &kz);
+    let parked: Vec<String> = ids
         .split_whitespace()
         .filter(|id| st.panes.iter().any(|p| p.id == *id))
         .map(String::from)
         .collect();
-    let group: Vec<String> = in_win.iter().filter(|p| p.tag).map(|p| p.id.clone()).collect();
+    // `kept` is what stayed in the window (the group, or the regular panes if hiding).
+    let kept: Vec<String> = in_win.iter().filter(|p| p.tag != hide).map(|p| p.id.clone()).collect();
     if let Some(z) = in_win.iter().find(|p| p.zoomed && p.active) {
-        let _ = tmux(&["resize-pane", "-Z", "-t", &z.id]); // a group pane was zoomed
+        let _ = tmux(&["resize-pane", "-Z", "-t", &z.id]); // a pane that stayed was zoomed
     }
-    for o in ["@sidecar_full", "@sidecar_full_panes", "@sidecar_full_layout", "@sidecar_full_zoom"] {
+    for o in &[k, kp, kl, kz] {
         let _ = tmux(&["set-option", "-wu", "-t", win, o]);
     }
-    if regular.is_empty() || group.is_empty() {
+    if parked.is_empty() || kept.is_empty() {
         return Ok(());
     }
-    let mut all = group.clone();
-    all.extend(regular.iter().cloned());
+    let mut all = kept.clone();
+    all.extend(parked.iter().cloned());
     let exact = layout_ids(&layout).map(|l| same_set(&l, &all)).unwrap_or(false);
     let wdims = in_win.first().map(|p| (p.ww, p.wh)).unwrap_or((0, 0));
     if exact {
         // Same panes as before: put everything back exactly where it was.
-        for r in &regular {
-            let _ = tmux(&["join-pane", "-d", "-s", r, "-t", &group[0]]);
+        for r in &parked {
+            let _ = tmux(&["join-pane", "-d", "-s", r, "-t", &kept[0]]);
         }
         let mut now: Vec<String> = list_window(win)?.iter().map(|p| p.id.clone()).collect();
         if !apply_layout(win, &layout, &mut now) {
             return Err("could not restore the window layout".into());
         }
+    } else if hide {
+        // Panes changed meanwhile: rebuild the group from its last recorded arrangement.
+        restore(win, wdims, &parked, Snapshot::parse(&st.snap).as_ref(), Vec::new())?;
     } else {
         // The group changed meanwhile: stack the regular panes opposite the group.
+        let regular = &parked;
         let prev = Snapshot::parse(&st.snap);
         let (edge, size, dim) = match &prev {
             Some(p) => (p.edge.clone(), p.size, p.dim),
@@ -926,25 +1002,34 @@ fn exit_full(win: &str, leaving: bool) -> Res<()> {
             edge: opp.into(),
             size: region,
             dim: wd,
-            tree: stack(&regular, if horiz { 'v' } else { 'h' }),
+            tree: stack(regular, if horiz { 'v' } else { 'h' }),
         };
-        restore(win, wdims, &regular, Some(&snap), Vec::new())?;
+        restore(win, wdims, regular, Some(&snap), Vec::new())?;
     }
     if leaving {
-        let _ = tmux(&["set-option", "-w", "-t", win, "@sidecar_fresume", "1"]);
+        let _ = tmux(&["set-option", "-w", "-t", win, if hide { "@sidecar_hresume" } else { "@sidecar_fresume" }, "1"]);
     }
-    if !zoom.is_empty() && regular.contains(&zoom) {
+    // Zoom is only recorded for a pane that stayed in the window (hide mode).
+    if hide && !zoom.is_empty() && kept.contains(&zoom) {
+        let _ = tmux(&["resize-pane", "-Z", "-t", &zoom]);
+    } else if !hide && !zoom.is_empty() && parked.contains(&zoom) {
         let _ = tmux(&["resize-pane", "-Z", "-t", &zoom]);
     }
     Ok(())
 }
 
+// Z toggles: restore if either side is maximized; otherwise maximize the side
+// that has focus.
 fn toggle_full(win: &str) -> Res<()> {
     let st = read_state()?;
-    if st.panes.iter().any(|p| p.win == win && p.sfull) {
-        exit_full(win, false)
+    let in_win: Vec<&Pane> = st.panes.iter().filter(|p| p.win == win).collect();
+    if in_win.iter().any(|p| p.sfull) {
+        exit_full(win, false, false)
+    } else if in_win.iter().any(|p| p.shide) {
+        exit_full(win, true, false)
     } else {
-        enter_full(win)
+        let on_group = in_win.iter().find(|p| p.active).map(|p| p.tag).unwrap_or(true);
+        enter_full(win, !on_group)
     }
 }
 
