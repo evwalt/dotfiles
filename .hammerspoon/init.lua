@@ -253,6 +253,86 @@ local function screenshotWindow(path)
 		:start()
 end
 
+--- Floating Clock ---
+-- 24-hour HHMM (HHMMSS with seconds) in the top-right corner, above all windows and spaces,
+-- click-through. Toggles live in the Hyper+G picker. State persists via hs.settings (default: on).
+local clockOn = hs.settings.get("clockOn")
+if clockOn == nil then
+	clockOn = true
+end
+local clockSecs = hs.settings.get("clockSecs") or false
+-- Match the terminal: Alacritty uses Hack Nerd Font at 14.5pt (~/.config/alacritty/alacritty.toml).
+local clockFont, clockSize = "Hack Nerd Font", 14.5
+local clockCanvas, clockTimer
+
+local function clockFrame()
+	local f = hs.screen.mainScreen():frame() -- excludes the menu bar
+	local w, h = (clockSecs and 6 or 4) * clockSize * 0.6 + 16, clockSize * 1.5 + 4
+	return { x = f.x + f.w - w, y = f.y, w = w, h = h }
+end
+
+local function updateClock()
+	if not clockCanvas then
+		return
+	end
+	clockCanvas:frame(clockFrame())
+	clockCanvas[2].text = os.date(clockSecs and "%H%M%S" or "%H%M")
+end
+
+local function startClock()
+	clockCanvas = hs.canvas.new(clockFrame())
+	clockCanvas:level(hs.canvas.windowLevels.overlay)
+	clockCanvas:behavior({ "canJoinAllSpaces", "stationary" })
+	clockCanvas:appendElements({
+		type = "rectangle",
+		action = "fill",
+		fillColor = { white = 0, alpha = 0.55 },
+		roundedRectRadii = { xRadius = 0, yRadius = 0 },
+	}, {
+		type = "text",
+		text = "",
+		textFont = clockFont,
+		textSize = clockSize,
+		textColor = { white = 1, alpha = 0.95 },
+		textAlignment = "center",
+		frame = { x = 0, y = 2, w = "100%", h = "100%" },
+	})
+	updateClock()
+	clockCanvas:show()
+	clockTimer = hs.timer.doEvery(1, updateClock)
+end
+
+local function stopClock()
+	if clockTimer then
+		clockTimer:stop()
+		clockTimer = nil
+	end
+	if clockCanvas then
+		clockCanvas:delete()
+		clockCanvas = nil
+	end
+end
+
+local function setClock(on)
+	clockOn = on
+	hs.settings.set("clockOn", on)
+	if on and not clockCanvas then
+		startClock()
+	elseif not on then
+		stopClock()
+	end
+end
+
+local function toggleClockSecs()
+	clockSecs = not clockSecs
+	hs.settings.set("clockSecs", clockSecs)
+	updateClock()
+end
+
+if clockOn then
+	startClock()
+end
+
 -- Dvorak keyboard layout reference: `crl tns wvz fdb`
 hs.hotkey.bind(hyper, "F", function()
 	hs.application.launchOrFocus("Reminders")
@@ -270,6 +350,7 @@ hs.hotkey.bind(
 			end,
 		},
 		d = { label = "Toggle Firefox Dim", action = toggleDim },
+		e = { label = "Toggle Clock Seconds", action = toggleClockSecs },
 		g = {
 			label = "Toggle Grayscale",
 			action = function()
@@ -285,6 +366,12 @@ hs.hotkey.bind(
 				screenshotWindow(
 					os.getenv("HOME") .. "/Downloads/Screenshot " .. os.date("%Y-%m-%d at %H.%M.%S") .. ".png"
 				)
+			end,
+		},
+		t = {
+			label = "Toggle Clock",
+			action = function()
+				setClock(not clockOn)
 			end,
 		},
 		v = {
