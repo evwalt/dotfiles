@@ -38,20 +38,6 @@ vim.keymap.set("n", "<space>u", "<C-w>", { desc = "Window commands" })
 vim.keymap.set("n", "<space>h", "<C-w>", { desc = "Window commands" })
 
 --- Terminal ---
-vim.keymap.set("n", "<space>tj", function()
-	vim.cmd.vnew()
-	vim.cmd.term()
-	vim.cmd.wincmd("J")
-	-- vim.api.nvim_win_set_height(0, 15)
-	vim.cmd("resize 50%")
-end, { desc = "Terminal below" })
-vim.keymap.set("n", "<space>tl", function()
-	-- local current_height = vim.api.nvim_win_get_height(0)
-	vim.cmd.vnew()
-	vim.cmd.term()
-	vim.cmd.wincmd("L")
-	-- vim.api.nvim_win_set_height(0, current_height)
-end, { desc = "Terminal right" })
 vim.keymap.set("t", "<esc><esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 
 --- Diagnostics Float ---
@@ -167,8 +153,23 @@ end, { desc = "Insert current date in a Markdown to-do item" })
 vim.api.nvim_create_autocmd("FileType", {
 	pattern = { "javascript", "typescript", "javascriptreact", "typescriptreact" },
 	callback = function()
-		vim.keymap.set("n", "<space><space>og", "iconsole.log();<Esc>F)i", { noremap = true, silent = true, desc = "console.log()" })
-		vim.keymap.set("n", "<space><space>pog", "iconsole.log(': ', );<Esc>F:Pf,lp", { noremap = true, silent = true, desc = "console.log() with label" })
-		vim.keymap.set("v", "<space><space>og", "yoconsole.log(': ', );<Esc>F:Pf,lp", { noremap = true, silent = true, desc = "console.log() from selection" })
+		vim.keymap.set(
+			"n",
+			"<space><space>og",
+			"iconsole.log();<Esc>F)i",
+			{ noremap = true, silent = true, desc = "console.log()" }
+		)
+		vim.keymap.set(
+			"n",
+			"<space><space>pog",
+			"iconsole.log(': ', );<Esc>F:Pf,lp",
+			{ noremap = true, silent = true, desc = "console.log() with label" }
+		)
+		vim.keymap.set(
+			"v",
+			"<space><space>og",
+			"yoconsole.log(': ', );<Esc>F:Pf,lp",
+			{ noremap = true, silent = true, desc = "console.log() from selection" }
+		)
 	end,
 })
