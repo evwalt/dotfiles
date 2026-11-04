@@ -9,9 +9,6 @@ vim.keymap.set("n", "<space>w", ":w<CR>")
 -- end)
 -- vim.keymap.set("n", "<space>q", ":q<CR>")
 vim.keymap.set("n", "<space>z", ":set wrap!<CR>")
-vim.keymap.set("n", "<space>hc", ":set cursorcolumn!<CR>")
-vim.keymap.set("n", "<space>u.", ":set cursorcolumn!<CR>")
-vim.keymap.set("n", "<space>so", ":source %<CR>")
 
 --- Netrw ---
 -- vim.keymap.set('n', '<space>e', function()
@@ -55,7 +52,7 @@ vim.keymap.set("n", "<space>tl", function()
 	vim.cmd.wincmd("L")
 	-- vim.api.nvim_win_set_height(0, current_height)
 end)
-vim.keymap.set("t", "<esc>", "<C-\\><C-n>")
+vim.keymap.set("t", "<esc><esc>", "<C-\\><C-n>")
 
 --- Diagnostics Float ---
 vim.keymap.set("n", "<space>d", ":lua vim.diagnostic.open_float()<CR>")
