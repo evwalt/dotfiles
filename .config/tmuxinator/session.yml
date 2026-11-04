@@ -15,7 +15,7 @@ root: ~/
 # on_project_start: command
 
 # Run on project start, the first time
-# on_project_first_start: command
+on_project_first_start: ~/scripts/sidecar-init.sh >/dev/null 2>&1 &
 
 # Run on project start, after the first time
 # on_project_restart: command
