@@ -86,14 +86,42 @@ if let s = stations.first(where: { $0.name == arg }) {
   fail("'\(arg)' is not a station, URL, or existing file. Run: play --list")
 }
 
-let item = AVPlayerItem(url: url)
-let player = AVPlayer(playerItem: item)
-player.play()
-// Local files end; streams never do. Exit when a file finishes.
-NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: item, queue: .main) { _ in exit(0) }
+let isFile = url.isFileURL
+let player = AVPlayer()
+var item = AVPlayerItem(url: url)
+
+func log(_ msg: String) {
+  let f = DateFormatter(); f.dateFormat = "HH:mm:ss"
+  FileHandle.standardError.write("[\(f.string(from: Date()))] \(msg)\n".data(using: .utf8)!)
+}
+
+// Streams drop (network blips, server-side listener timeouts). Reconnect instead of going silent.
+func start() {
+  item = AVPlayerItem(url: url)
+  player.replaceCurrentItem(with: item)
+  player.play()
+  for name in [Notification.Name.AVPlayerItemDidPlayToEndTime, .AVPlayerItemFailedToPlayToEndTime, .AVPlayerItemPlaybackStalled] {
+    NotificationCenter.default.addObserver(forName: name, object: item, queue: .main) { n in
+      if isFile && name == .AVPlayerItemDidPlayToEndTime { exit(0) }
+      if isFile { fail("error: playback failed") }
+      log("\(name.rawValue) → reconnecting")
+      start()
+    }
+  }
+}
+start()
 print("playing \(label), Ctrl-C to stop")
-// Surface stream failures instead of sitting silent
-Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { _ in
-  if let e = item.error { fail("error: \(e.localizedDescription)") }
+
+// Watchdog: if a stream isn't actually playing for ~20s (stuck, paused, errored), reconnect.
+var notPlaying = 0
+Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { _ in
+  if let e = item.error {
+    if isFile { fail("error: \(e.localizedDescription)") }
+    log("item error: \(e.localizedDescription) → reconnecting"); notPlaying = 0; start(); return
+  }
+  notPlaying = player.timeControlStatus == .playing ? 0 : notPlaying + 1
+  if !isFile && notPlaying >= 4 {
+    log("not playing (status \(player.timeControlStatus.rawValue)) → reconnecting"); notPlaying = 0; start()
+  }
 }
 RunLoop.main.run()
