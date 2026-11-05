@@ -70,7 +70,7 @@ return {
 			},
 		})
 
-		--- Helper Fuctions ---
+		--- Helper Functions ---
 		local function shell_escape(path)
 			return path:gsub(" ", "\\ "):gsub("%(", "\\("):gsub("%)", "\\)")
 		end
