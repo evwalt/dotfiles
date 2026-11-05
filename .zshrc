@@ -165,7 +165,7 @@ autoload -Uz vcs_info
 zstyle ':vcs_info:*' enable git
 zstyle ':vcs_info:*' get-revision true
 zstyle ':vcs_info:*' check-for-changes true
-zstyle ':vcs_info:*' stagedstr '✚'
+zstyle ':vcs_info:*' stagedstr '+'
 zstyle ':vcs_info:*' unstagedstr '±'
 zstyle ':vcs_info:*' formats ' %u%c'
 zstyle ':vcs_info:*' actionformats ' %u%c'
@@ -202,7 +202,7 @@ _prompt_end() {
 
 _prompt_status() {
   local -a symbols
-  [[ $RETVAL -ne 0 ]] && symbols+="%{%F{red}%}✘"
+  [[ $RETVAL -ne 0 ]] && symbols+="%{%F{red}%}×"
   [[ $UID -eq 0 ]] && symbols+="%{%F{yellow}%}#"
   [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}&"
   [[ -n "$symbols" ]] && _prompt_segment black default "$symbols"
@@ -238,7 +238,7 @@ _prompt_git() {
   if [[ "$(command git rev-parse --is-inside-work-tree 2>/dev/null)" = "true" ]]; then
     dirty=$(command git status --porcelain --ignore-submodules 2>/dev/null)
     ref=$(command git symbolic-ref HEAD 2>/dev/null) || \
-      ref="➦ $(command git rev-parse --short HEAD 2>/dev/null)"
+      ref="→ $(command git rev-parse --short HEAD 2>/dev/null)"
 
     if [[ -n $dirty ]]; then
       _prompt_segment yellow black
