@@ -22,6 +22,12 @@ let stations: [(name: String, url: String, desc: String)] = [
   ("deepspace",    "https://ice1.somafm.com/deepspaceone-128-mp3", "SomaFM Deep Space One: darker, spacier ambient."),
   ("spacestation", "https://ice1.somafm.com/spacestation-128-mp3", "SomaFM Space Station: spacey electronica/ambient, a bit more rhythm."),
   ("groove",       "https://ice1.somafm.com/groovesalad-128-mp3",  "SomaFM Groove Salad: downtempo/chill beats, mostly instrumental."),
+  ("darkzone",     "https://ice1.somafm.com/darkzone-128-mp3",     "SomaFM Dark Zone: dark ambient, brooding and quiet."),
+  ("n5md",         "https://ice1.somafm.com/n5md-128-mp3",         "SomaFM n5MD Radio: emotional ambient/electronic, mostly instrumental."),
+  ("fluid",        "https://ice1.somafm.com/fluid-128-mp3",        "SomaFM Fluid: instrumental hip-hop and future soul."),
+  ("cliqhop",      "https://ice1.somafm.com/cliqhop-128-mp3",      "SomaFM cliqhop idm: glitchy, textured electronic, instrumental."),
+  ("classical",    "http://stream.srg-ssr.ch/m/rsc_de/mp3_128",   "Radio Swiss Classic: classical, no ads, minimal talking."),
+  ("jazz",         "http://stream.srg-ssr.ch/m/rsj/mp3_128",      "Radio Swiss Jazz: jazz, no ads, minimal talking."),
   // Broader / with vocals
   ("paradise",     "https://stream.radioparadise.com/mellow-128",  "Radio Paradise Mellow Mix: laid-back eclectic, has vocals."),
   ("kexp",         "https://kexp.streamguys1.com/kexp128.mp3",     "KEXP Seattle: indie/alt/world, human DJs, has vocals and talking."),
