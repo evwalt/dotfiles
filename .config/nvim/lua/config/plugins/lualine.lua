@@ -100,9 +100,11 @@ return {
 		})
 
 		-- Statusline (mode, file, position, encoding...) is hidden by default; <space>ts toggles it.
-		vim.o.laststatus = 0
+		-- The all-caps global is saved in shada (already loaded by VeryLazy), so it survives restarts.
+		vim.o.laststatus = vim.g.UI_LASTSTATUS or 0
 		vim.keymap.set("n", "<space>ts", function()
 			vim.o.laststatus = vim.o.laststatus == 0 and 2 or 0
+			vim.g.UI_LASTSTATUS = vim.o.laststatus
 		end, { desc = "Toggle statusline" })
 	end,
 }

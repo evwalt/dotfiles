@@ -13,9 +13,18 @@ return {
 			},
 		})
 
-		vim.o.showtabline = 0 -- hidden by default; <space>tb toggles
+		-- Hidden by default; <space>tb toggles. The all-caps global is saved in shada, so the choice
+		-- survives restarts. shada loads after init, so apply it on VimEnter.
+		vim.o.showtabline = 0
+		vim.api.nvim_create_autocmd("VimEnter", {
+			once = true,
+			callback = function()
+				vim.o.showtabline = vim.g.UI_SHOWTABLINE or 0
+			end,
+		})
 		vim.keymap.set("n", "<space>tb", function()
 			vim.o.showtabline = vim.o.showtabline == 0 and 2 or 0
+			vim.g.UI_SHOWTABLINE = vim.o.showtabline
 		end, { desc = "Toggle bufferline" })
 
 		vim.keymap.set("n", "<space>j", ":BufferLineCyclePrev<CR>")
