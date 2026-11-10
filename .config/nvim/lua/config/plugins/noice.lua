@@ -24,6 +24,8 @@ return {
 			--         ["cmp.entry.get_documentation"] = true, -- requires hrsh7th/nvim-cmp
 			--     },
 			-- },
+			-- Search count ("/\<word\>  [1/3]") in the mini view, which fades, instead of virtual text that sticks
+			messages = { view_search = "mini" },
 			-- you can enable a preset for easier configuration
 			presets = {
 				bottom_search = false, -- use a classic bottom cmdline for search

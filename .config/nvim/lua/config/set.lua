@@ -82,7 +82,8 @@ vim.api.nvim_create_autocmd("BufEnter", {
 
 --- Virtual Text ---
 vim.diagnostic.config({
-	virtual_text = true,
+	-- Messages only on the cursor line; other lines keep underline and sign
+	virtual_text = { current_line = true },
 	signs = true,
 	underline = true,
 	update_in_insert = false,
