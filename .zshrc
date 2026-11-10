@@ -368,7 +368,7 @@ opencode-history-sync() {
 }
 
 [ -r ~/.aliases ] && source ~/.aliases
-[ -r ~/dev/resume-cov/tool-resume-cov.zsh ] && source ~/dev/resume-cov/tool-resume-cov.zsh
+[ -r ~/dev/job-search/tool-job-search.zsh ] && source ~/dev/job-search/tool-job-search.zsh
 
 # --- Codex CLI proxy bypass ---
 # Canopy's system proxy (127.0.0.1:9134) breaks Codex's OpenAI token exchange; bypass it for OpenAI hosts only.
