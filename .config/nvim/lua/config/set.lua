@@ -94,7 +94,10 @@ vim.diagnostic.config({
 -- while a buffer has unsaved changes. (Tokyonight's current-line number is already orange,
 -- and relativenumber uses LineNrAbove/LineNrBelow, so all four groups are remapped.)
 local function set_modified_hl()
-	vim.api.nvim_set_hl(0, "ModifiedLineNr", { fg = "#f7768e", bold = true })
+	-- Tokyonight's red; other themes use their own error color.
+	local fg = (vim.g.colors_name or ""):find("^tokyonight") and "#f7768e"
+		or vim.api.nvim_get_hl(0, { name = "DiagnosticError", link = false }).fg
+	vim.api.nvim_set_hl(0, "ModifiedLineNr", { fg = fg, bold = true })
 end
 set_modified_hl()
 vim.api.nvim_create_autocmd("ColorScheme", { callback = set_modified_hl })
