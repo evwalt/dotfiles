@@ -255,19 +255,25 @@ end
 
 --- Floating Clock ---
 -- 24-hour HHMM (HHMMSS with seconds) in the top-right corner, above all windows and spaces,
--- click-through. Toggles live in the Hyper+G picker. State persists via hs.settings (default: on).
+-- click-through, with optional YYYY-MM-DD date prefix. Toggles live in the Hyper+G picker.
+-- State persists via hs.settings (default: on).
 local clockOn = hs.settings.get("clockOn")
 if clockOn == nil then
 	clockOn = true
 end
 local clockSecs = hs.settings.get("clockSecs") or false
+local clockDate = hs.settings.get("clockDate") or false
 -- Match the terminal: Alacritty uses Hack Nerd Font at 14.5pt (~/.config/alacritty/alacritty.toml).
 local clockFont, clockSize = "Hack Nerd Font", 14.5
 local clockCanvas, clockTimer
 
+local function clockText()
+	return os.date((clockDate and "%Y-%m-%d " or "") .. (clockSecs and "%H%M%S" or "%H%M"))
+end
+
 local function clockFrame()
 	local f = hs.screen.mainScreen():frame() -- excludes the menu bar
-	local w, h = (clockSecs and 6 or 4) * clockSize * 0.6 + 16, clockSize * 1.5 + 4
+	local w, h = #clockText() * clockSize * 0.6 + 8, clockSize * 1.5
 	return { x = f.x + f.w - w, y = f.y, w = w, h = h }
 end
 
@@ -276,7 +282,7 @@ local function updateClock()
 		return
 	end
 	clockCanvas:frame(clockFrame())
-	clockCanvas[2].text = os.date(clockSecs and "%H%M%S" or "%H%M")
+	clockCanvas[2].text = clockText()
 end
 
 local function startClock()
@@ -326,6 +332,12 @@ end
 local function toggleClockSecs()
 	clockSecs = not clockSecs
 	hs.settings.set("clockSecs", clockSecs)
+	updateClock()
+end
+
+local function toggleClockDate()
+	clockDate = not clockDate
+	hs.settings.set("clockDate", clockDate)
 	updateClock()
 end
 
@@ -383,6 +395,7 @@ hs.hotkey.bind(
 				end
 			end,
 		},
+		y = { label = "Toggle Clock Date", action = toggleClockDate },
 	})
 )
 hs.hotkey.bind(hyper, "C", function()
