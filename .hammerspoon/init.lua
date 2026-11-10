@@ -52,43 +52,6 @@ local function actionPicker(choices)
 	end
 end
 
---- Firefox Dim Mode ---
--- Dark overlay on every Firefox window that isn't the focused window.
--- The overlay covers only the parts of the window not hidden behind other
--- windows, since canvases can't be ordered relative to other apps' windows.
--- Enabled state persists across restarts via hs.settings (default: off).
-local dimEnabled = hs.settings.get("firefoxDim")
-if dimEnabled == nil then
-	dimEnabled = false
-end
-local dimOverlays = {}
-
--- Returns the pieces of each rect in `rects` that lie outside `o`.
-local function subtractRect(rects, o)
-	local out = {}
-	for _, r in ipairs(rects) do
-		local ix1, iy1 = math.max(r.x, o.x), math.max(r.y, o.y)
-		local ix2, iy2 = math.min(r.x + r.w, o.x + o.w), math.min(r.y + r.h, o.y + o.h)
-		if ix1 >= ix2 or iy1 >= iy2 then
-			table.insert(out, r)
-		else
-			if iy1 > r.y then
-				table.insert(out, { x = r.x, y = r.y, w = r.w, h = iy1 - r.y })
-			end
-			if iy2 < r.y + r.h then
-				table.insert(out, { x = r.x, y = iy2, w = r.w, h = r.y + r.h - iy2 })
-			end
-			if ix1 > r.x then
-				table.insert(out, { x = r.x, y = iy1, w = ix1 - r.x, h = iy2 - iy1 })
-			end
-			if ix2 < r.x + r.w then
-				table.insert(out, { x = ix2, y = iy1, w = r.x + r.w - ix2, h = iy2 - iy1 })
-			end
-		end
-	end
-	return out
-end
-
 --- Firefox Active Border ---
 -- Pink border around the focused Firefox window, only when Firefox has more
 -- than one window. Enabled state persists via hs.settings (default: on).
@@ -156,68 +119,13 @@ local function toggleBorder()
 	hs.alert.show("Firefox border: " .. (borderEnabled and "on" or "off"))
 end
 
-local function refreshDim()
-	refreshBorder()
-	local dim = {}
-	if dimEnabled then
-		local focused = hs.window.focusedWindow()
-		local focusedId = focused and focused:id()
-		local above = {} -- frames of windows in front of the current one
-		for _, win in ipairs(hs.window.orderedWindows()) do
-			if win:isStandard() then
-				local frame = win:frame()
-				local app = win:application()
-				if app and app:name() == "Firefox" and win:id() ~= focusedId then
-					local rects = { frame }
-					for _, o in ipairs(above) do
-						rects = subtractRect(rects, o)
-					end
-					if #rects > 0 then
-						dim[win:id()] = { frame = frame, rects = rects }
-					end
-				end
-				table.insert(above, frame)
-			end
-		end
-	end
-	for id, canvas in pairs(dimOverlays) do
-		if not dim[id] then
-			canvas:delete()
-			dimOverlays[id] = nil
-		end
-	end
-	for id, d in pairs(dim) do
-		local elements = {}
-		for _, r in ipairs(d.rects) do
-			table.insert(elements, {
-				type = "rectangle",
-				action = "fill",
-				fillColor = { white = 0, alpha = 0.40 },
-				frame = { x = r.x - d.frame.x, y = r.y - d.frame.y, w = r.w, h = r.h },
-				-- match macOS window corners when nothing is occluding
-				roundedRectRadii = #d.rects == 1 and { xRadius = 10, yRadius = 10 } or nil,
-			})
-		end
-		if dimOverlays[id] then
-			dimOverlays[id]:frame(d.frame):replaceElements(elements)
-		else
-			dimOverlays[id] = hs.canvas.new(d.frame):appendElements(elements):show()
-		end
-	end
-end
-local function toggleDim()
-	dimEnabled = not dimEnabled
-	hs.settings.set("firefoxDim", dimEnabled)
-	refreshDim()
-	hs.alert.show("Firefox dim: " .. (dimEnabled and "on" or "off"))
-end
 -- Debounced: window moves fire many events while dragging. A second, later
 -- pass catches focus changes where focusedWindow() lags behind the event.
-local dimRefresh = hs.timer.delayed.new(0.05, refreshDim)
-local dimRefreshLate = hs.timer.delayed.new(0.3, refreshDim)
-local function scheduleDim()
-	dimRefresh:start()
-	dimRefreshLate:start()
+local borderRefresh = hs.timer.delayed.new(0.05, refreshBorder)
+local borderRefreshLate = hs.timer.delayed.new(0.3, refreshBorder)
+local function scheduleBorder()
+	borderRefresh:start()
+	borderRefreshLate:start()
 end
 hs.window.filter.default:subscribe({
 	hs.window.filter.windowCreated,
@@ -229,15 +137,15 @@ hs.window.filter.default:subscribe({
 	hs.window.filter.windowUnminimized,
 	hs.window.filter.windowVisible,
 	hs.window.filter.windowNotVisible,
-}, scheduleDim)
+}, scheduleBorder)
 ---@diagnostic disable-next-line: lowercase-global
-dimSpaceWatcher = hs.spaces.watcher.new(scheduleDim):start()
+borderSpaceWatcher = hs.spaces.watcher.new(scheduleBorder):start()
 ---@diagnostic disable-next-line: lowercase-global
-dimAppWatcher = hs.application.watcher.new(scheduleDim):start()
+borderAppWatcher = hs.application.watcher.new(scheduleBorder):start()
 -- Safety net for any focus change that emits no event.
 ---@diagnostic disable-next-line: lowercase-global
-dimHeartbeat = hs.timer.doEvery(1, refreshDim)
-refreshDim()
+borderHeartbeat = hs.timer.doEvery(1, refreshBorder)
+refreshBorder()
 
 --- Screenshot focused window to clipboard (no path) or to a file ---
 local function screenshotWindow(path)
@@ -361,7 +269,6 @@ hs.hotkey.bind(
 				screenshotWindow()
 			end,
 		},
-		d = { label = "Toggle Firefox Dim", action = toggleDim },
 		e = { label = "Toggle Clock Seconds", action = toggleClockSecs },
 		g = {
 			label = "Toggle Grayscale",
