@@ -262,6 +262,12 @@ hs.hotkey.bind(
 	hyper,
 	"G",
 	actionPicker({
+		["."] = {
+			label = "Screenshot Window to Clipboard",
+			action = function()
+				screenshotWindow()
+			end,
+		},
 		b = { label = "Toggle Firefox Border", action = toggleBorder },
 		c = {
 			label = "Screenshot Window to Clipboard",
