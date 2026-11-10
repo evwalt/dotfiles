@@ -354,7 +354,6 @@ hs.hotkey.bind(
 	hyper,
 	"G",
 	actionPicker({
-		a = "Activity Monitor",
 		b = { label = "Toggle Firefox Border", action = toggleBorder },
 		c = {
 			label = "Screenshot Window to Clipboard",
@@ -412,7 +411,7 @@ hs.hotkey.bind(hyper, "I", function()
 	hs.application.launchOrFocus("Google Chrome")
 end)
 hs.hotkey.bind(hyper, "S", function()
-	hs.application.launchOrFocus("GitHub Desktop")
+	hs.application.launchOrFocus("Activity Monitor")
 end)
 hs.hotkey.bind(hyper, "B", function()
 	hs.application.launchOrFocus("Messages")
