@@ -20,7 +20,7 @@ print(os.getenv("HOME") .. "/.hammerspoon/")
 local hyper = { "ctrl", "alt", "cmd", "shift" }
 --- Multi-action picker for a single hotkey ---
 -- Usage: hs.hotkey.bind(hyper, "G", actionPicker({ s = "Skim", p = "Spotify" }))
--- Press the hyper combo, then one of the listed sub-keys. Esc cancels.
+-- Press the hyper combo, then one of the listed sub-keys. Esc cancels. The hint stays up until either.
 local function actionPicker(choices)
 	local m = hs.hotkey.modal.new()
 	local hint = {}
@@ -38,13 +38,14 @@ local function actionPicker(choices)
 		end)
 	end
 	m:bind({}, "escape", function()
+		hs.alert.closeAll()
 		m:exit()
 	end)
 	table.sort(hint) -- pairs() order is arbitrary; each line starts with its key
 	local hintText = table.concat(hint, "\n")
 	function m:entered()
 		hs.alert.closeAll()
-		hs.alert.show(hintText, 2)
+		hs.alert.show(hintText, true) -- non-number duration: stays up until closed
 	end
 	return function()
 		m:enter()
