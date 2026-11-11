@@ -32,10 +32,6 @@ pyenv() {
   pyenv "$@"
 }
 
-# MacPorts Installer addition on 2025-10-18_at_16:38:30: adding an appropriate PATH variable for use with MacPorts.
-export PATH="$PATH:/opt/local/bin:/opt/local/sbin"
-# Finished adapting your PATH environment variable for use with MacPorts.
-
 # sbin fix per `brew doctor`
 export PATH="$PATH:/usr/local/sbin"
 
