@@ -1,6 +1,5 @@
 -- Change this to switch themes; open nvim instances pick it up on restart.
--- Options: tokyonight-{storm,night,moon,day}, catppuccin-{mocha,macchiato,frappe,latte},
--- rose-pine-{main,moon,dawn}
+-- Options: tokyonight-{storm,night,moon,day}
 local colorscheme = "tokyonight-night"
 
 return {
@@ -22,24 +21,11 @@ return {
 					end
 				end,
 			})
-			-- Apply the chosen theme (any of the three) here, since this plugin loads first.
+			-- Apply the chosen theme here, since this plugin loads first.
 			-- pcall: fall back to tokyonight-night if the name above is mistyped
 			if not pcall(vim.cmd.colorscheme, colorscheme) then
 				vim.cmd.colorscheme("tokyonight-night")
 			end
 		end,
 	},
-	{
-		"catppuccin/nvim",
-		name = "catppuccin",
-		lazy = true, -- loads when the colorscheme above is set to it, so no priority needed
-		opts = {
-			-- Line numbers to match the tuned tokyonight (contrast 1.8 -> 3.4).
-			-- Comments are already bright enough (5.8), so they're left alone.
-			custom_highlights = function(c)
-				return { LineNr = { fg = c.overlay0 } }
-			end,
-		},
-	},
-	{ "rose-pine/neovim", name = "rose-pine", lazy = true },
 }
