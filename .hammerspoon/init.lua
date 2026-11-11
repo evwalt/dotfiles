@@ -262,6 +262,7 @@ hs.hotkey.bind(
 	hyper,
 	"G",
 	actionPicker({
+		["'"] = "Notes",
 		["."] = {
 			label = "Screenshot Window to Clipboard",
 			action = function()
@@ -284,6 +285,7 @@ hs.hotkey.bind(
 		},
 		h = "Handy",
 		k = "Skim",
+		l = "Notes",
 		o = "Spotify",
 		s = {
 			label = "Screenshot Window to ~/Downloads",
@@ -317,9 +319,6 @@ end)
 hs.hotkey.bind(hyper, "R", function()
 	hs.application.launchOrFocus("Finder")
 end)
-hs.hotkey.bind(hyper, "L", function()
-	hs.application.launchOrFocus("Notes")
-end)
 hs.hotkey.bind(hyper, "I", function()
 	hs.application.launchOrFocus("Google Chrome")
 end)
@@ -338,6 +337,18 @@ end)
 hs.hotkey.bind(hyper, "Z", function()
 	hs.application.launchOrFocus("System Settings")
 end)
+-- Cursor beacon: re-run tmux's client-focus-in hook (fading block at the cursor).
+-- If Alacritty isn't frontmost, focusing it fires the hook by itself.
+local function cursorBeacon()
+	local front = hs.application.frontmostApplication()
+	if front and front:name() == "Alacritty" then
+		hs.task.new("/usr/local/bin/tmux", nil, { "set-hook", "-R", "client-focus-in" }):start()
+	else
+		hs.application.launchOrFocus("Alacritty")
+	end
+end
+hs.hotkey.bind(hyper, "L", cursorBeacon)
+hs.hotkey.bind(hyper, "'", cursorBeacon)
 hs.hotkey.bind(hyper, "J", function()
 	hs.application.launchOrFocus("zoom.us")
 end)
