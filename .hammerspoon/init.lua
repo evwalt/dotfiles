@@ -36,6 +36,11 @@ for _, keys in ipairs(MIRROR_ROWS) do
 		MIRROR[right] = keys[2]:sub(col, col)
 	end
 end
+local PROMPT_STYLE = {
+	textFont = "Hack Nerd Font",
+	textSize = 17,
+	textStyle = { paragraphStyle = { alignment = "left" } },
+}
 local function actionPicker(items)
 	local m = hs.hotkey.modal.new()
 	local labels = {} -- right key -> label
@@ -70,14 +75,33 @@ local function actionPicker(items)
 		m:exit()
 	end)
 	local hintText = table.concat(lines, "\n")
-	local style = {
-		textFont = "Hack Nerd Font",
-		textSize = 17,
-		textStyle = { paragraphStyle = { alignment = "left" } },
-	}
 	function m:entered()
 		hs.alert.closeAll()
-		hs.alert.show(hintText, style, hs.screen.mainScreen(), true) -- non-number duration: stays up until closed
+		hs.alert.show(hintText, PROMPT_STYLE, hs.screen.mainScreen(), true) -- non-number duration: stays up until closed
+	end
+	return function()
+		m:enter()
+	end
+end
+
+--- Y/N confirm prompt, styled like the picker hint ---
+-- Returns a function that shows `message` and waits: Y runs fn, N or Esc cancels.
+-- The prompt stays up until one of those is pressed.
+local function confirmPrompt(message, fn)
+	local m = hs.hotkey.modal.new()
+	local function close()
+		hs.alert.closeAll()
+		m:exit()
+	end
+	m:bind({}, "y", function()
+		close()
+		fn()
+	end)
+	m:bind({}, "n", close)
+	m:bind({}, "escape", close)
+	function m:entered()
+		hs.alert.closeAll()
+		hs.alert.show(message .. "\n\nY  confirm\nN  cancel (or Esc)", PROMPT_STYLE, hs.screen.mainScreen(), true)
 	end
 	return function()
 		m:enter()
@@ -353,6 +377,8 @@ hs.hotkey.bind(
 		},
 		{ "f", "Toggle Clock Date", toggleClockDate },
 		{ "d", "Toggle Clock Seconds", toggleClockSecs },
+		{ "r", "Restart", confirmPrompt("Restart the computer?", hs.caffeinate.restartSystem) },
+		{ "z", "Shut Down", confirmPrompt("Shut down the computer?", hs.caffeinate.shutdownSystem) },
 	})
 )
 hs.hotkey.bind(hyper, "C", function()
