@@ -19,33 +19,65 @@ print(os.getenv("HOME") .. "/.hammerspoon/")
 --- Multi-action Keys ---
 local hyper = { "ctrl", "alt", "cmd", "shift" }
 --- Multi-action picker for a single hotkey ---
--- Usage: hs.hotkey.bind(hyper, "G", actionPicker({ s = "Skim", p = "Spotify" }))
--- Press the hyper combo, then one of the listed sub-keys. Esc cancels. The hint stays up until either.
-local function actionPicker(choices)
+-- Usage: hs.hotkey.bind(hyper, "G", actionPicker({ { "m", "Skim" }, { "w", "Label", fn } }))
+-- Each item is { rightKey, appName } or { rightKey, label, action }. Every action is also bound
+-- to the mirror key on the left hand (same finger and row, Dvorak), shown in parens. The hint
+-- lists every key in right-hand keyboard order, one block per row, free keys shown as "—".
+-- Press the hyper combo, then a sub-key. Esc cancels. The hint stays up until either.
+local MIRROR_ROWS = { -- Dvorak right-hand keys and their left-hand mirrors, row by row
+	{ "fgcrl", "yp.,'" },
+	{ "dhtns", "iueoa" },
+	{ "bmwvz", "xkjq;" },
+}
+local MIRROR = {} -- right key -> left key
+for _, keys in ipairs(MIRROR_ROWS) do
+	for col = 1, #keys[1] do
+		local right = keys[1]:sub(col, col)
+		MIRROR[right] = keys[2]:sub(col, col)
+	end
+end
+local function actionPicker(items)
 	local m = hs.hotkey.modal.new()
-	local hint = {}
-	for key, choice in pairs(choices) do
-		local label = type(choice) == "table" and choice.label or choice
-		table.insert(hint, key .. " → " .. label)
-		m:bind({}, key, function()
-			hs.alert.closeAll()
-			m:exit()
-			if type(choice) == "table" then
-				choice.action()
-			else
-				hs.application.launchOrFocus(choice)
-			end
-		end)
+	local labels = {} -- right key -> label
+	for _, item in ipairs(items) do
+		local right, label, action = item[1], item[2], item[3]
+		assert(MIRROR[right], "no mirror key for " .. right)
+		labels[right] = label
+		local run = action or function()
+			hs.application.launchOrFocus(label)
+		end
+		for _, key in ipairs({ right, MIRROR[right] }) do
+			m:bind({}, key, function()
+				hs.alert.closeAll()
+				m:exit()
+				run()
+			end)
+		end
+	end
+	-- Every key in keyboard order, unused ones shown as free slots.
+	local lines = {}
+	for row, keys in ipairs(MIRROR_ROWS) do
+		if row > 1 then
+			table.insert(lines, "")
+		end
+		for col = 1, #keys[1] do
+			local right = keys[1]:sub(col, col)
+			table.insert(lines, string.format("%s (%s)  %s", right, MIRROR[right], labels[right] or "—"))
+		end
 	end
 	m:bind({}, "escape", function()
 		hs.alert.closeAll()
 		m:exit()
 	end)
-	table.sort(hint) -- pairs() order is arbitrary; each line starts with its key
-	local hintText = table.concat(hint, "\n")
+	local hintText = table.concat(lines, "\n")
+	local style = {
+		textFont = "Hack Nerd Font",
+		textSize = 17,
+		textStyle = { paragraphStyle = { alignment = "left" } },
+	}
 	function m:entered()
 		hs.alert.closeAll()
-		hs.alert.show(hintText, true) -- non-number duration: stays up until closed
+		hs.alert.show(hintText, style, hs.screen.mainScreen(), true) -- non-number duration: stays up until closed
 	end
 	return function()
 		m:enter()
@@ -254,6 +286,17 @@ if clockOn then
 	startClock()
 end
 
+-- Cursor beacon: re-run tmux's client-focus-in hook (fading block at the cursor).
+-- If Alacritty isn't frontmost, focusing it fires the hook by itself.
+local function cursorBeacon()
+	local front = hs.application.frontmostApplication()
+	if front and front:name() == "Alacritty" then
+		hs.task.new("/usr/local/bin/tmux", nil, { "set-hook", "-R", "client-focus-in" }):start()
+	else
+		hs.application.launchOrFocus("Alacritty")
+	end
+end
+
 -- Dvorak keyboard layout reference: `crl tns wvz fdb`
 hs.hotkey.bind(hyper, "F", function()
 	hs.application.launchOrFocus("Reminders")
@@ -262,55 +305,54 @@ hs.hotkey.bind(
 	hyper,
 	"G",
 	actionPicker({
-		["'"] = "Notes",
-		["."] = {
-			label = "Screenshot Window to Clipboard",
-			action = function()
+		{ "l", "Notes" },
+		{ "h", "Handy" },
+		{ "m", "Skim" },
+		{ "n", "Spotify" },
+		{
+			"c",
+			"Screenshot Window to Clipboard",
+			function()
 				screenshotWindow()
 			end,
 		},
-		b = { label = "Toggle Firefox Border", action = toggleBorder },
-		c = {
-			label = "Screenshot Window to Clipboard",
-			action = function()
-				screenshotWindow()
-			end,
-		},
-		e = { label = "Toggle Clock Seconds", action = toggleClockSecs },
-		g = {
-			label = "Toggle Grayscale",
-			action = function()
-				hs.screen.setForceToGray(not hs.screen.getForceToGray())
-			end,
-		},
-		h = "Handy",
-		k = "Skim",
-		l = "Notes",
-		o = "Spotify",
-		s = {
-			label = "Screenshot Window to ~/Downloads",
-			action = function()
+		{
+			"s",
+			"Screenshot Window to ~/Downloads",
+			function()
 				screenshotWindow(
 					os.getenv("HOME") .. "/Downloads/Screenshot " .. os.date("%Y-%m-%d at %H.%M.%S") .. ".png"
 				)
 			end,
 		},
-		t = {
-			label = "Toggle Clock",
-			action = function()
-				setClock(not clockOn)
-			end,
-		},
-		v = {
-			label = "Show Desktop",
-			action = function()
+		{
+			"v",
+			"Show Desktop",
+			function()
 				-- Private API; fall back to the Show Desktop shortcut (F11 by default).
 				if not (hs.spaces.toggleShowDesktop and pcall(hs.spaces.toggleShowDesktop)) then
 					hs.eventtap.keyStroke({}, "f11")
 				end
 			end,
 		},
-		y = { label = "Toggle Clock Date", action = toggleClockDate },
+		{ "w", "Cursor Beacon", cursorBeacon },
+		{
+			"g",
+			"Toggle Grayscale",
+			function()
+				hs.screen.setForceToGray(not hs.screen.getForceToGray())
+			end,
+		},
+		{ "b", "Toggle Firefox Border", toggleBorder },
+		{
+			"t",
+			"Toggle Clock",
+			function()
+				setClock(not clockOn)
+			end,
+		},
+		{ "f", "Toggle Clock Date", toggleClockDate },
+		{ "d", "Toggle Clock Seconds", toggleClockSecs },
 	})
 )
 hs.hotkey.bind(hyper, "C", function()
@@ -337,18 +379,6 @@ end)
 hs.hotkey.bind(hyper, "Z", function()
 	hs.application.launchOrFocus("System Settings")
 end)
--- Cursor beacon: re-run tmux's client-focus-in hook (fading block at the cursor).
--- If Alacritty isn't frontmost, focusing it fires the hook by itself.
-local function cursorBeacon()
-	local front = hs.application.frontmostApplication()
-	if front and front:name() == "Alacritty" then
-		hs.task.new("/usr/local/bin/tmux", nil, { "set-hook", "-R", "client-focus-in" }):start()
-	else
-		hs.application.launchOrFocus("Alacritty")
-	end
-end
-hs.hotkey.bind(hyper, "L", cursorBeacon)
-hs.hotkey.bind(hyper, "'", cursorBeacon)
 hs.hotkey.bind(hyper, "J", function()
 	hs.application.launchOrFocus("zoom.us")
 end)
