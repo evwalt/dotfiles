@@ -332,6 +332,7 @@ local function cursorBeacon()
 end
 
 -- Dvorak keyboard layout reference: `crl tns wvz fdb`
+-- Which Hyper chords are reachable depends on the keyboard firmware's layers; check the keyboard config.
 local function showDesktop()
 	-- Private API; fall back to the Show Desktop shortcut (F11 by default).
 	if not (hs.spaces.toggleShowDesktop and pcall(hs.spaces.toggleShowDesktop)) then
