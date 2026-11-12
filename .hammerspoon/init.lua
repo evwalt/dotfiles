@@ -338,6 +338,9 @@ local function showDesktop()
 		hs.eventtap.keyStroke({}, "f11")
 	end
 end
+local function handyDictate()
+	hs.task.new("/Applications/Handy.app/Contents/MacOS/handy", nil, { "--toggle-transcription" }):start()
+end
 local function keyStroker(mods, key)
 	return function()
 		hs.eventtap.keyStroke(mods, key)
@@ -356,13 +359,7 @@ hs.hotkey.bind(
 			end,
 		},
 		{ "c", "Copy", keyStroker({ "cmd" }, "c") },
-		{
-			"r",
-			"Handy Dictate",
-			function()
-				hs.task.new("/Applications/Handy.app/Contents/MacOS/handy", nil, { "--toggle-transcription" }):start()
-			end,
-		},
+		{ "r", "Handy Dictate", handyDictate },
 		{ "l", "Notes" },
 		{ "d", "Toggle Clock Seconds", toggleClockSecs },
 		{ "h", "Handy" },
@@ -393,7 +390,7 @@ hs.hotkey.bind(
 	hyper,
 	"F",
 	actionPicker({
-		{ "f", "Skim" },
+		{ "f", "Finder" },
 		{
 			"g",
 			"Toggle Grayscale",
@@ -402,17 +399,16 @@ hs.hotkey.bind(
 			end,
 		},
 		{ "c", "Toggle Firefox Border", toggleBorder },
-		{ "r", "Sleep", confirmPrompt("Sleep the computer?", hs.caffeinate.systemSleep) },
+		{ "r", "Skim" },
 		{ "d", "Show Desktop", showDesktop },
 		{ "h", "Shut Down", confirmPrompt("Shut down the computer?", hs.caffeinate.shutdownSystem) },
 		{ "t", "Restart", confirmPrompt("Restart the computer?", hs.caffeinate.restartSystem) },
+		{ "n", "Sleep", confirmPrompt("Sleep the computer?", hs.caffeinate.systemSleep) },
 	})
 )
-hs.hotkey.bind(hyper, "C", function()
-	hs.eventtap.keyStroke({ "cmd" }, "`") -- switch window in app
-end)
+hs.hotkey.bind(hyper, "C", handyDictate)
 hs.hotkey.bind(hyper, "R", function()
-	hs.application.launchOrFocus("Finder")
+	hs.eventtap.keyStroke({ "cmd" }, "`") -- switch window in app
 end)
 hs.hotkey.bind(hyper, "I", function()
 	hs.application.launchOrFocus("Google Chrome")
