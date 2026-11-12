@@ -332,9 +332,6 @@ local function cursorBeacon()
 end
 
 -- Dvorak keyboard layout reference: `crl tns wvz fdb`
-hs.hotkey.bind(hyper, "F", function()
-	hs.application.launchOrFocus("Reminders")
-end)
 local function showDesktop()
 	-- Private API; fall back to the Show Desktop shortcut (F11 by default).
 	if not (hs.spaces.toggleShowDesktop and pcall(hs.spaces.toggleShowDesktop)) then
@@ -394,7 +391,7 @@ hs.hotkey.bind(
 )
 hs.hotkey.bind(
 	hyper,
-	"Y",
+	"F",
 	actionPicker({
 		{ "f", "Skim" },
 		{
