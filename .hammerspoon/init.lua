@@ -13,6 +13,7 @@ end
 
 ---@diagnostic disable-next-line: lowercase-global
 myWatcher = hs.pathwatcher.new(os.getenv("HOME") .. "/.hammerspoon/", reloadConfig):start()
+hs.alert.defaultStyle.radius = 4 -- all alerts: slight rounding instead of the default pill
 hs.alert.show("Config loaded")
 print(os.getenv("HOME") .. "/.hammerspoon/")
 
@@ -41,6 +42,20 @@ local PROMPT_STYLE = {
 	textSize = 17,
 	textStyle = { paragraphStyle = { alignment = "left" } },
 }
+-- Every key in keyboard order, unused ones shown as free slots.
+local function hintText(labels)
+	local lines = {}
+	for row, keys in ipairs(MIRROR_ROWS) do
+		if row > 1 then
+			table.insert(lines, "")
+		end
+		for col = 1, #keys[1] do
+			local right = keys[1]:sub(col, col)
+			table.insert(lines, string.format("%s (%s)  %s", right, MIRROR[right], labels[right] or "—"))
+		end
+	end
+	return table.concat(lines, "\n")
+end
 local function actionPicker(items)
 	local m = hs.hotkey.modal.new()
 	local labels = {} -- right key -> label
@@ -59,25 +74,14 @@ local function actionPicker(items)
 			end)
 		end
 	end
-	-- Every key in keyboard order, unused ones shown as free slots.
-	local lines = {}
-	for row, keys in ipairs(MIRROR_ROWS) do
-		if row > 1 then
-			table.insert(lines, "")
-		end
-		for col = 1, #keys[1] do
-			local right = keys[1]:sub(col, col)
-			table.insert(lines, string.format("%s (%s)  %s", right, MIRROR[right], labels[right] or "—"))
-		end
-	end
 	m:bind({}, "escape", function()
 		hs.alert.closeAll()
 		m:exit()
 	end)
-	local hintText = table.concat(lines, "\n")
+	local hint = hintText(labels)
 	function m:entered()
 		hs.alert.closeAll()
-		hs.alert.show(hintText, PROMPT_STYLE, hs.screen.mainScreen(), true) -- non-number duration: stays up until closed
+		hs.alert.show(hint, PROMPT_STYLE, hs.screen.mainScreen(), true) -- non-number duration: stays up until closed
 	end
 	return function()
 		m:enter()
@@ -333,6 +337,7 @@ end
 
 -- Dvorak keyboard layout reference: `crl tns wvz fdb`
 -- Which Hyper chords are reachable depends on the keyboard firmware's layers; check the keyboard config.
+local showHyperHints -- defined after the Hyper keys below
 local function showDesktop()
 	-- Private API; fall back to the Show Desktop shortcut (F11 by default).
 	if not (hs.spaces.toggleShowDesktop and pcall(hs.spaces.toggleShowDesktop)) then
@@ -401,37 +406,68 @@ hs.hotkey.bind(
 		},
 		{ "c", "Toggle Firefox Border", toggleBorder },
 		{ "r", "Skim" },
-		{ "d", "Show Desktop", showDesktop },
+		{
+			"d",
+			"Hyper Keys",
+			function()
+				showHyperHints()
+			end,
+		},
+		{ "m", "Show Desktop", showDesktop },
 		{ "h", "Shut Down", confirmPrompt("Shut down the computer?", hs.caffeinate.shutdownSystem) },
 		{ "t", "Restart", confirmPrompt("Restart the computer?", hs.caffeinate.restartSystem) },
 		{ "n", "Sleep", confirmPrompt("Sleep the computer?", hs.caffeinate.systemSleep) },
 	})
 )
-hs.hotkey.bind(hyper, "C", handyDictate)
-hs.hotkey.bind(hyper, "R", function()
-	hs.eventtap.keyStroke({ "cmd" }, "`") -- switch window in app
+-- Top-level Hyper keys. Each is { key, label, action }; no action launches the app named by
+-- label. Labels in parens are handled outside Hammerspoon and only listed in the hint.
+local hyperKeys = {
+	{ "c", "Handy Dictate", handyDictate },
+	{
+		"r",
+		"Switch Window in App",
+		function()
+			hs.eventtap.keyStroke({ "cmd" }, "`")
+		end,
+	},
+	{ "d", "(Homerow)" },
+	{ "h", "(Enter)" },
+	{ "s", "Activity Monitor" },
+	{ "b", "Messages" },
+	{ "m", "Firefox" },
+	{ "v", "Alacritty" },
+	{ "z", "System Settings" },
+	{ "i", "Google Chrome" },
+	{ "j", "zoom.us" },
+}
+local hyperLabels = { f = "Picker 2", g = "Picker" }
+local extraHints = {} -- keys outside the mirrored grid
+for _, item in ipairs(hyperKeys) do
+	local key, label, action = item[1], item[2], item[3]
+	if label:sub(1, 1) ~= "(" then
+		hs.hotkey.bind(hyper, key:upper(), action or function()
+			hs.application.launchOrFocus(label)
+		end)
+	end
+	if MIRROR[key] then
+		hyperLabels[key] = label
+	else
+		table.insert(extraHints, key .. "      " .. label)
+	end
+end
+local hyperHint = "Hyper Keys\n\n" .. hintText(hyperLabels) .. "\n\n" .. table.concat(extraHints, "\n")
+local hyperHintModal = hs.hotkey.modal.new()
+hyperHintModal:bind({}, "escape", function()
+	hs.alert.closeAll()
+	hyperHintModal:exit()
 end)
-hs.hotkey.bind(hyper, "I", function()
-	hs.application.launchOrFocus("Google Chrome")
-end)
-hs.hotkey.bind(hyper, "S", function()
-	hs.application.launchOrFocus("Activity Monitor")
-end)
-hs.hotkey.bind(hyper, "B", function()
-	hs.application.launchOrFocus("Messages")
-end)
-hs.hotkey.bind(hyper, "M", function()
-	hs.application.launchOrFocus("Firefox")
-end)
-hs.hotkey.bind(hyper, "V", function()
-	hs.application.launchOrFocus("Alacritty")
-end)
-hs.hotkey.bind(hyper, "Z", function()
-	hs.application.launchOrFocus("System Settings")
-end)
-hs.hotkey.bind(hyper, "J", function()
-	hs.application.launchOrFocus("zoom.us")
-end)
+function hyperHintModal:entered()
+	hs.alert.closeAll()
+	hs.alert.show(hyperHint, PROMPT_STYLE, hs.screen.mainScreen(), true)
+end
+showHyperHints = function()
+	hyperHintModal:enter()
+end
 
 --- Firefox Quit, Raindrop Save Tabs Warning ---
 local function frontmostAppName()
