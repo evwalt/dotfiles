@@ -85,7 +85,7 @@ local function actionPicker(items)
 end
 
 --- Y/N confirm prompt, styled like the picker hint ---
--- Returns a function that shows `message` and waits: Y runs fn, N or Esc cancels.
+-- Returns a function that shows `message` and waits: Y or Enter runs fn, N or Esc cancels.
 -- The prompt stays up until one of those is pressed.
 local function confirmPrompt(message, fn)
 	local m = hs.hotkey.modal.new()
@@ -93,15 +93,18 @@ local function confirmPrompt(message, fn)
 		hs.alert.closeAll()
 		m:exit()
 	end
-	m:bind({}, "y", function()
-		close()
-		fn()
-	end)
+	for _, key in ipairs({ "y", "return" }) do
+		m:bind({}, key, function()
+			close()
+			fn()
+		end)
+	end
 	m:bind({}, "n", close)
 	m:bind({}, "escape", close)
 	function m:entered()
 		hs.alert.closeAll()
-		hs.alert.show(message .. "\n\nY  confirm\nN  cancel (or Esc)", PROMPT_STYLE, hs.screen.mainScreen(), true)
+		local text = message .. "\n\nY  confirm (or Enter)\nN  cancel (or Esc)"
+		hs.alert.show(text, PROMPT_STYLE, hs.screen.mainScreen(), true)
 	end
 	return function()
 		m:enter()
@@ -332,21 +335,48 @@ end
 hs.hotkey.bind(hyper, "F", function()
 	hs.application.launchOrFocus("Reminders")
 end)
+local function showDesktop()
+	-- Private API; fall back to the Show Desktop shortcut (F11 by default).
+	if not (hs.spaces.toggleShowDesktop and pcall(hs.spaces.toggleShowDesktop)) then
+		hs.eventtap.keyStroke({}, "f11")
+	end
+end
+local function keyStroker(mods, key)
+	return function()
+		hs.eventtap.keyStroke(mods, key)
+	end
+end
 hs.hotkey.bind(
 	hyper,
 	"G",
 	actionPicker({
-		{ "l", "Notes" },
-		{ "h", "Handy" },
-		{ "m", "Skim" },
-		{ "n", "Spotify" },
+		{ "f", "Reminders" },
 		{
-			"c",
+			"g",
 			"Screenshot Window to Clipboard",
 			function()
 				screenshotWindow()
 			end,
 		},
+		{ "c", "Copy", keyStroker({ "cmd" }, "c") },
+		{
+			"r",
+			"Handy Dictate",
+			function()
+				hs.task.new("/Applications/Handy.app/Contents/MacOS/handy", nil, { "--toggle-transcription" }):start()
+			end,
+		},
+		{ "l", "Notes" },
+		{ "d", "Toggle Clock Seconds", toggleClockSecs },
+		{ "h", "Handy" },
+		{
+			"t",
+			"Toggle Clock",
+			function()
+				setClock(not clockOn)
+			end,
+		},
+		{ "n", "Spotify" },
 		{
 			"s",
 			"Screenshot Window to ~/Downloads",
@@ -356,17 +386,17 @@ hs.hotkey.bind(
 				)
 			end,
 		},
-		{
-			"v",
-			"Show Desktop",
-			function()
-				-- Private API; fall back to the Show Desktop shortcut (F11 by default).
-				if not (hs.spaces.toggleShowDesktop and pcall(hs.spaces.toggleShowDesktop)) then
-					hs.eventtap.keyStroke({}, "f11")
-				end
-			end,
-		},
+		{ "b", "Cut", keyStroker({ "cmd" }, "x") },
+		{ "m", "Toggle Clock Date", toggleClockDate },
 		{ "w", "Cursor Beacon", cursorBeacon },
+		{ "v", "Paste", keyStroker({ "cmd" }, "v") },
+	})
+)
+hs.hotkey.bind(
+	hyper,
+	"Y",
+	actionPicker({
+		{ "f", "Skim" },
 		{
 			"g",
 			"Toggle Grayscale",
@@ -374,18 +404,11 @@ hs.hotkey.bind(
 				hs.screen.setForceToGray(not hs.screen.getForceToGray())
 			end,
 		},
-		{ "b", "Toggle Firefox Border", toggleBorder },
-		{
-			"t",
-			"Toggle Clock",
-			function()
-				setClock(not clockOn)
-			end,
-		},
-		{ "f", "Toggle Clock Date", toggleClockDate },
-		{ "d", "Toggle Clock Seconds", toggleClockSecs },
-		{ "r", "Restart", confirmPrompt("Restart the computer?", hs.caffeinate.restartSystem) },
-		{ "z", "Shut Down", confirmPrompt("Shut down the computer?", hs.caffeinate.shutdownSystem) },
+		{ "c", "Toggle Firefox Border", toggleBorder },
+		{ "r", "Sleep", confirmPrompt("Sleep the computer?", hs.caffeinate.systemSleep) },
+		{ "d", "Show Desktop", showDesktop },
+		{ "h", "Shut Down", confirmPrompt("Shut down the computer?", hs.caffeinate.shutdownSystem) },
+		{ "t", "Restart", confirmPrompt("Restart the computer?", hs.caffeinate.restartSystem) },
 	})
 )
 hs.hotkey.bind(hyper, "C", function()
