@@ -14,7 +14,7 @@ end
 ---@diagnostic disable-next-line: lowercase-global
 myWatcher = hs.pathwatcher.new(os.getenv("HOME") .. "/.hammerspoon/", reloadConfig):start()
 hs.alert.defaultStyle.radius = 4 -- all alerts: slight rounding instead of the default pill
-hs.alert.show("Config loaded")
+hs.alert.defaultStyle.atScreenEdge = 1 -- all alerts: top of screen, centered horizontally
 print(os.getenv("HOME") .. "/.hammerspoon/")
 
 --- Multi-action Keys ---
@@ -42,6 +42,7 @@ local PROMPT_STYLE = {
 	textSize = 17,
 	textStyle = { paragraphStyle = { alignment = "left" } },
 }
+hs.alert.show("Config loaded", PROMPT_STYLE)
 -- Every key in keyboard order, unused ones shown as free slots.
 local function hintText(labels)
 	local lines = {}
@@ -235,8 +236,9 @@ if clockOn == nil then
 end
 local clockSecs = hs.settings.get("clockSecs") or false
 local clockDate = hs.settings.get("clockDate") or false
--- Match the terminal: Alacritty uses Hack Nerd Font at 14.5pt (~/.config/alacritty/alacritty.toml).
-local clockFont, clockSize = "Hack Nerd Font", 14.5
+-- macOS system font (San Francisco) at roughly menu bar size; its digits are fixed-width.
+local clockFont, clockSize = ".AppleSystemUIFont", 14
+local CLOCK_PAD_X, CLOCK_PAD_Y, CLOCK_INSET = 8, 3, 0
 local clockCanvas, clockTimer
 
 local function clockText()
@@ -245,8 +247,9 @@ end
 
 local function clockFrame()
 	local f = hs.screen.mainScreen():frame() -- excludes the menu bar
-	local w, h = #clockText() * clockSize * 0.6 + 8, clockSize * 1.5
-	return { x = f.x + f.w - w, y = f.y, w = w, h = h }
+	local size = hs.drawing.getTextDrawingSize(clockText(), { font = clockFont, size = clockSize })
+	local w, h = math.ceil(size.w) + 2 * CLOCK_PAD_X, math.ceil(size.h) + 2 * CLOCK_PAD_Y
+	return { x = f.x + f.w - w - CLOCK_INSET, y = f.y + CLOCK_INSET, w = w, h = h }
 end
 
 local function updateClock()
@@ -263,17 +266,19 @@ local function startClock()
 	clockCanvas:behavior({ "canJoinAllSpaces", "stationary" })
 	clockCanvas:appendElements({
 		type = "rectangle",
-		action = "fill",
-		fillColor = { white = 0, alpha = 0.55 },
-		roundedRectRadii = { xRadius = 0, yRadius = 0 },
+		action = "strokeAndFill",
+		fillColor = { white = 0.1, alpha = 0.65 },
+		strokeColor = { white = 1, alpha = 0.15 },
+		strokeWidth = 1,
+		roundedRectRadii = { xRadius = 8, yRadius = 8 },
 	}, {
 		type = "text",
 		text = "",
 		textFont = clockFont,
 		textSize = clockSize,
-		textColor = { white = 1, alpha = 0.95 },
+		textColor = { white = 1, alpha = 0.9 },
 		textAlignment = "center",
-		frame = { x = 0, y = 2, w = "100%", h = "100%" },
+		frame = { x = 0, y = CLOCK_PAD_Y, w = "100%", h = "100%" },
 	})
 	updateClock()
 	clockCanvas:show()
