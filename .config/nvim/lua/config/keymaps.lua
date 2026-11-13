@@ -24,13 +24,13 @@ vim.keymap.set("n", "<space>q", ":bd<CR>", { desc = "Delete buffer" })
 vim.keymap.set("n", "<space>x", ":bd<CR>", { desc = "Delete buffer" })
 vim.keymap.set("n", "<space><space>xf", ":bd!<CR>", { desc = "Force delete buffer" })
 vim.keymap.set("n", "<space><space>qf", ":bd!<CR>", { desc = "Force delete buffer" })
--- vim.keymap.set("n", "<space>cp", ":let @+ = expand('%:p')<CR>")
--- vim.keymap.set("n", "<space>cp", ":let @+ = substitute(expand('%:p'), expand('$HOME'), '~', '')<CR>")
--- vim.keymap.set("n", "<space>cp", function()
--- 	vim.fn.setreg("+", vim.fn.expand("%:p"))
--- end)
 vim.keymap.set("n", "<space>cp", function()
-	vim.fn.setreg("+", vim.fn.fnamemodify(vim.fn.expand("%:p"), ":~"))
+	local path = vim.fn.fnamemodify(vim.fn.expand("%:p"), ":~")
+	if path == "" then
+		return vim.notify("No file path", vim.log.levels.WARN)
+	end
+	vim.fn.setreg("+", path)
+	vim.notify("Copied " .. path)
 end, { desc = "Copy file path" })
 
 --- Windows ---

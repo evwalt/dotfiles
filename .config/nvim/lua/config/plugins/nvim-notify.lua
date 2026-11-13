@@ -12,10 +12,13 @@ return {
 	event = "VeryLazy",
 	opts = {
 		top_down = false,
-		max_width = 50,
+		-- Grow with the window; longer messages wrap instead of being cut off
+		max_width = function()
+			return math.floor(vim.o.columns * 0.6)
+		end,
 		minimum_width = 20,
 		max_height = 8,
-		render = "compact",
+		render = "wrapped-compact",
 		stages = "static",
 		timeout = 3000, -- ms (default: ~5000)
 	},
