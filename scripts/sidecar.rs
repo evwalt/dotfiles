@@ -1149,14 +1149,26 @@ fn exit_pz(win: &str) -> Res<()> {
         }
     }
     for r in parked {
-        // Exact restore rearranges everything anyway, so split the roomiest pane.
-        let target = if exact {
-            list_window(win)?.into_iter().max_by_key(|p| p.w * p.h).map(|p| p.id)
-        } else {
-            near.clone()
+        if !exact {
+            let Some(t) = &near else { break };
+            tmux(&["join-pane", "-d", "-v", "-s", &r.id, "-t", t])?;
+            continue;
+        }
+        // Exact restore rearranges everything anyway. Split the roomiest pane on the
+        // same side, so panes on the other side (e.g. nvim) are never resized and
+        // don't flash; fall back to the roomiest pane anywhere if that one is too small.
+        let now = list_window(win)?;
+        let roomiest = |same: bool| {
+            now.iter().filter(|p| !same || p.tag == side_tag).max_by_key(|p| p.w * p.h).map(|p| p.id.clone())
         };
-        let Some(t) = target else { break };
-        tmux(&["join-pane", "-d", "-v", "-s", &r.id, "-t", &t])?;
+        let joined = match roomiest(true) {
+            Some(t) => tmux(&["join-pane", "-d", "-v", "-s", &r.id, "-t", &t]).is_ok(),
+            None => false,
+        };
+        if !joined {
+            let Some(t) = roomiest(false) else { break };
+            tmux(&["join-pane", "-d", "-v", "-s", &r.id, "-t", &t])?;
+        }
     }
     for o in ["@sidecar_pzoom", "@sidecar_pzoom_panes", "@sidecar_pzoom_layout"] {
         let _ = tmux(&["set-option", "-wu", "-t", win, o]);
