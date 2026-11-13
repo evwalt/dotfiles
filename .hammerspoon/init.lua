@@ -237,7 +237,7 @@ end
 local clockSecs = hs.settings.get("clockSecs") or false
 local clockDate = hs.settings.get("clockDate") or false
 -- macOS system font (San Francisco) at roughly menu bar size; its digits are fixed-width.
-local clockFont, clockSize = ".AppleSystemUIFont", 14
+local clockFont, clockSize = ".AppleSystemUIFont", 15
 local CLOCK_PAD_X, CLOCK_PAD_Y, CLOCK_INSET = 8, 3, 0
 local clockCanvas, clockTimer
 
