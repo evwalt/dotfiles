@@ -20,7 +20,7 @@ print(os.getenv("HOME") .. "/.hammerspoon/")
 --- Multi-action Keys ---
 local hyper = { "ctrl", "alt", "cmd", "shift" }
 --- Multi-action picker for a single hotkey ---
--- Usage: hs.hotkey.bind(hyper, "G", actionPicker({ { "m", "Skim" }, { "w", "Label", fn } }))
+-- Usage: hs.hotkey.bind(hyper, "G", actionPicker("Title", { { "m", "Skim" }, { "w", "Label", fn } }))
 -- Each item is { rightKey, appName } or { rightKey, label, action }. Every action is also bound
 -- to the mirror key on the left hand (same finger and row, Dvorak), shown in parens. The hint
 -- lists every key in right-hand keyboard order, one block per row, free keys shown as "—".
@@ -56,7 +56,7 @@ local function hintText(labels)
 	end
 	return table.concat(lines, "\n")
 end
-local function actionPicker(items)
+local function actionPicker(title, items)
 	local m = hs.hotkey.modal.new()
 	local labels = {} -- right key -> label
 	for _, item in ipairs(items) do
@@ -78,7 +78,7 @@ local function actionPicker(items)
 		hs.alert.closeAll()
 		m:exit()
 	end)
-	local hint = hintText(labels)
+	local hint = title .. "\n\n" .. hintText(labels)
 	function m:entered()
 		hs.alert.closeAll()
 		hs.alert.show(hint, PROMPT_STYLE, hs.screen.mainScreen(), true) -- non-number duration: stays up until closed
@@ -89,9 +89,9 @@ local function actionPicker(items)
 end
 
 --- Y/N confirm prompt, styled like the picker hint ---
--- Returns a function that shows `message` and waits: Y or Enter runs fn, N or Esc cancels.
+-- Returns a function that shows `title`, then `message`, and waits: Y or Enter runs fn, N or Esc cancels.
 -- The prompt stays up until one of those is pressed.
-local function confirmPrompt(message, fn)
+local function confirmPrompt(title, message, fn)
 	local m = hs.hotkey.modal.new()
 	local function close()
 		hs.alert.closeAll()
@@ -107,7 +107,7 @@ local function confirmPrompt(message, fn)
 	m:bind({}, "escape", close)
 	function m:entered()
 		hs.alert.closeAll()
-		local text = message .. "\n\nY  confirm (or Enter)\nN  cancel (or Esc)"
+		local text = title .. "\n\n" .. message .. "\n\nY  confirm (or Enter)\nN  cancel (or Esc)"
 		hs.alert.show(text, PROMPT_STYLE, hs.screen.mainScreen(), true)
 	end
 	return function()
@@ -355,7 +355,7 @@ end
 hs.hotkey.bind(
 	hyper,
 	"G",
-	actionPicker({
+	actionPicker("H-g  Picker 1", {
 		{ "f", "Reminders" },
 		{
 			"g",
@@ -395,7 +395,7 @@ hs.hotkey.bind(
 hs.hotkey.bind(
 	hyper,
 	"F",
-	actionPicker({
+	actionPicker("H-f  Picker 2", {
 		{ "f", "Finder" },
 		{
 			"g",
@@ -414,9 +414,19 @@ hs.hotkey.bind(
 			end,
 		},
 		{ "m", "Show Desktop", showDesktop },
-		{ "h", "Shut Down", confirmPrompt("Shut down the computer?", hs.caffeinate.shutdownSystem) },
-		{ "t", "Restart", confirmPrompt("Restart the computer?", hs.caffeinate.restartSystem) },
-		{ "n", "Sleep", confirmPrompt("Sleep the computer?", hs.caffeinate.systemSleep) },
+		{
+			"h",
+			"Shut Down",
+			confirmPrompt("H-f h  Shut Down", "Shut down the computer?", hs.caffeinate.shutdownSystem),
+		},
+		{
+			"t",
+			"Restart",
+			confirmPrompt("H-f t  Restart", "Restart the computer?", hs.caffeinate.restartSystem),
+		},
+		{ "v", "Quit App (s-q)", keyStroker({ "cmd" }, "q") },
+		{ "s", "Select All (s-a)", keyStroker({ "cmd" }, "a") },
+		{ "n", "Sleep", confirmPrompt("H-f n  Sleep", "Sleep the computer?", hs.caffeinate.systemSleep) },
 	})
 )
 -- Top-level Hyper keys. Each is { key, label, action }; no action launches the app named by
@@ -440,7 +450,7 @@ local hyperKeys = {
 	{ "i", "Google Chrome" },
 	{ "j", "zoom.us" },
 }
-local hyperLabels = { f = "Picker 2", g = "Picker" }
+local hyperLabels = { f = "Picker 2", g = "Picker 1" }
 local extraHints = {} -- keys outside the mirrored grid
 for _, item in ipairs(hyperKeys) do
 	local key, label, action = item[1], item[2], item[3]
@@ -455,7 +465,7 @@ for _, item in ipairs(hyperKeys) do
 		table.insert(extraHints, key .. "      " .. label)
 	end
 end
-local hyperHint = "Hyper Keys\n\n" .. hintText(hyperLabels) .. "\n\n" .. table.concat(extraHints, "\n")
+local hyperHint = "H-f d  Hyper Keys\n\n" .. hintText(hyperLabels) .. "\n\n" .. table.concat(extraHints, "\n")
 local hyperHintModal = hs.hotkey.modal.new()
 hyperHintModal:bind({}, "escape", function()
 	hs.alert.closeAll()
@@ -474,23 +484,16 @@ local function frontmostAppName()
 	local app = hs.application.frontmostApplication()
 	return app and app:name() or ""
 end
-local confirmModal = hs.hotkey.modal.new()
-confirmModal:bind({}, "y", function()
-	hs.alert.closeAll()
-	confirmModal:exit()
-	local fx = hs.application.get("Firefox")
-	if fx then
-		fx:selectMenuItem({ "Firefox", "Quit Firefox" })
+local confirmFirefoxQuit = confirmPrompt(
+	"s-q  Quit Firefox",
+	"Session/tabs saved in Surfingkeys/Raindrop as needed?",
+	function()
+		local fx = hs.application.get("Firefox")
+		if fx then
+			fx:selectMenuItem({ "Firefox", "Quit Firefox" })
+		end
 	end
-end)
-confirmModal:bind({}, "n", function()
-	hs.alert.closeAll()
-	confirmModal:exit()
-end)
-confirmModal:bind({}, "escape", function()
-	hs.alert.closeAll()
-	confirmModal:exit()
-end)
+)
 ---@diagnostic disable-next-line: lowercase-global
 cmdQTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(e)
 	local flags = e:getFlags()
@@ -502,13 +505,7 @@ cmdQTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(e)
 	if frontmostAppName() ~= "Firefox" then
 		return false
 	end
-	hs.alert.show(
-		"Have you saved wanted open tabs to Raindrop?\n"
-			.. "If yes, press Y to quit Firefox.\n"
-			.. "If no, press N or Esc to cancel.",
-		3
-	)
-	confirmModal:enter()
+	confirmFirefoxQuit()
 	return true
 end)
 cmdQTap:start()
