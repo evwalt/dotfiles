@@ -15,6 +15,8 @@ end
 myWatcher = hs.pathwatcher.new(os.getenv("HOME") .. "/.hammerspoon/", reloadConfig):start()
 hs.alert.defaultStyle.radius = 4 -- all alerts: slight rounding instead of the default pill
 hs.alert.defaultStyle.atScreenEdge = 1 -- all alerts: top of screen, centered horizontally
+hs.alert.defaultStyle.textFont = "Hack Nerd Font" -- all alerts: same font and size as the prompts
+hs.alert.defaultStyle.textSize = 17
 print(os.getenv("HOME") .. "/.hammerspoon/")
 
 --- Multi-action Keys ---
@@ -38,8 +40,6 @@ for _, keys in ipairs(MIRROR_ROWS) do
 	end
 end
 local PROMPT_STYLE = {
-	textFont = "Hack Nerd Font",
-	textSize = 17,
 	textStyle = { paragraphStyle = { alignment = "left" } },
 }
 hs.alert.show("Config loaded", PROMPT_STYLE)
