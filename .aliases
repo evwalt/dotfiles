@@ -55,6 +55,7 @@ alias chc="yadm-private commit -m 'chore(claude): sync settings, session history
 alias chap="chs && chc && yadm-private push"
 
 # --- codex ---
+alias co="codex"
 alias cor="codex resume"
 alias cos="yadm-private add ~/.codex/config.toml ~/.codex/AGENTS.md ~/.codex/sessions ~/.codex/history.jsonl ~/.codex/session_index.jsonl"
 alias coc="yadm-private commit -m 'chore(codex): sync config, session history, and transcripts'"
