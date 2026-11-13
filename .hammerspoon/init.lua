@@ -360,7 +360,7 @@ end
 hs.hotkey.bind(
 	hyper,
 	"G",
-	actionPicker("H-g  Picker 1", {
+	actionPicker("Picker 1 (H-g)", {
 		{ "f", "Reminders" },
 		{
 			"g",
@@ -369,7 +369,7 @@ hs.hotkey.bind(
 				screenshotWindow()
 			end,
 		},
-		{ "c", "Copy", keyStroker({ "cmd" }, "c") },
+		{ "c", "Copy (s-c)", keyStroker({ "cmd" }, "c") },
 		{ "r", "Handy Dictate", handyDictate },
 		{ "l", "Notes" },
 		{ "d", "Toggle Clock Seconds", toggleClockSecs },
@@ -391,16 +391,16 @@ hs.hotkey.bind(
 				)
 			end,
 		},
-		{ "b", "Cut", keyStroker({ "cmd" }, "x") },
+		{ "b", "Cut (s-x)", keyStroker({ "cmd" }, "x") },
 		{ "m", "Toggle Clock Date", toggleClockDate },
 		{ "w", "Cursor Beacon", cursorBeacon },
-		{ "v", "Paste", keyStroker({ "cmd" }, "v") },
+		{ "v", "Paste (s-v)", keyStroker({ "cmd" }, "v") },
 	})
 )
 hs.hotkey.bind(
 	hyper,
 	"F",
-	actionPicker("H-f  Picker 2", {
+	actionPicker("Picker 2 (H-f)", {
 		{ "f", "Finder" },
 		{
 			"g",
@@ -422,16 +422,16 @@ hs.hotkey.bind(
 		{
 			"h",
 			"Shut Down",
-			confirmPrompt("H-f h  Shut Down", "Shut down the computer?", hs.caffeinate.shutdownSystem),
+			confirmPrompt("Shut Down (H-f h)", "Shut down the computer?", hs.caffeinate.shutdownSystem),
 		},
 		{
 			"t",
 			"Restart",
-			confirmPrompt("H-f t  Restart", "Restart the computer?", hs.caffeinate.restartSystem),
+			confirmPrompt("Restart (H-f t)", "Restart the computer?", hs.caffeinate.restartSystem),
 		},
 		{ "v", "Quit App (s-q)", keyStroker({ "cmd" }, "q") },
 		{ "s", "Select All (s-a)", keyStroker({ "cmd" }, "a") },
-		{ "n", "Sleep", confirmPrompt("H-f n  Sleep", "Sleep the computer?", hs.caffeinate.systemSleep) },
+		{ "n", "Sleep", confirmPrompt("Sleep (H-f n)", "Sleep the computer?", hs.caffeinate.systemSleep) },
 	})
 )
 -- Top-level Hyper keys. Each is { key, label, action }; no action launches the app named by
@@ -470,7 +470,7 @@ for _, item in ipairs(hyperKeys) do
 		table.insert(extraHints, key .. "      " .. label)
 	end
 end
-local hyperHint = "H-f d  Hyper Keys\n\n" .. hintText(hyperLabels) .. "\n\n" .. table.concat(extraHints, "\n")
+local hyperHint = "Hyper Keys (H-f d)\n\n" .. hintText(hyperLabels) .. "\n\n" .. table.concat(extraHints, "\n")
 local hyperHintModal = hs.hotkey.modal.new()
 hyperHintModal:bind({}, "escape", function()
 	hs.alert.closeAll()
@@ -490,7 +490,7 @@ local function frontmostAppName()
 	return app and app:name() or ""
 end
 local confirmFirefoxQuit = confirmPrompt(
-	"s-q  Quit Firefox",
+	"Quit Firefox (s-q)",
 	"Session/tabs saved in Surfingkeys/Raindrop as needed?",
 	function()
 		local fx = hs.application.get("Firefox")
