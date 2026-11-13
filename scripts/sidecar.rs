@@ -33,7 +33,8 @@
 //   window option @sidecar_pzoom  pane expanded to fill its side; the other panes on that
 //                                 side wait in a second hidden session, and
 //                                 @sidecar_pzoom_{panes,layout} remember them. Only lives
-//                                 in the window holding the group: undone when it leaves
+//                                 in the window holding the group: undone when it leaves,
+//                                 with @sidecar_presume set to redo it when it returns
 
 use std::collections::HashMap;
 use std::process::Command;
@@ -652,9 +653,11 @@ fn sync_d(win: &str, depth: u8) -> Res<()> {
     if in_win.iter().any(|p| !p.spz.is_empty()) {
         return Ok(()); // a pane is expanded here (its parked siblings would look "outside")
     }
-    // The group is leaving a window with an expanded pane: collapse it first.
-    if let Some(w) = st.panes.iter().find(|p| !p.spz.is_empty()).map(|p| p.win.clone()) {
+    // The group is leaving a window with an expanded pane: collapse it first, and
+    // remember the pane so it is expanded again when the group comes back.
+    if let Some((w, z)) = st.panes.iter().find(|p| !p.spz.is_empty()).map(|p| (p.win.clone(), p.spz.clone())) {
         exit_pz(&w)?;
+        let _ = tmux(&["set-option", "-w", "-t", &w, "@sidecar_presume", &z]);
         return sync_d(win, depth);
     }
     // Stashed panes whose window no longer exists (e.g. its group was killed): rescue.
@@ -835,6 +838,11 @@ fn sync_d(win: &str, depth: u8) -> Res<()> {
     if in_win.first().map(|p| p.hresume).unwrap_or(false) {
         let _ = tmux(&["set-option", "-wu", "-t", win, "@sidecar_hresume"]);
         let _ = enter_full(win, true); // it was hidden when you left: hide again
+    }
+    let pz = opt_w(win, "@sidecar_presume");
+    if !pz.is_empty() {
+        let _ = tmux(&["set-option", "-wu", "-t", win, "@sidecar_presume"]);
+        let _ = enter_pz(win, Some(&pz)); // a pane was expanded when you left: expand again
     }
     Ok(())
 }
@@ -1061,19 +1069,26 @@ fn toggle_full(win: &str) -> Res<()> {
 
 // --- expand one pane within its side -----------------------------------------
 
-// Park the focused pane's siblings on its side (group or regular) in a hidden
-// session, so it fills that side. The other side is untouched.
-fn enter_pz(win: &str) -> Res<()> {
+// Park the siblings of the focused pane (or `resume`, when re-expanding after a
+// window switch) on its side (group or regular) in a hidden session, so it fills
+// that side. The other side is untouched.
+fn enter_pz(win: &str, resume: Option<&str>) -> Res<()> {
     let st = read_state()?;
     if st.panes.iter().any(|p| p.sess == PSTASH) {
         return Err("expand stash already holds panes".into());
     }
     let in_win: Vec<&Pane> = st.panes.iter().filter(|p| p.win == win).collect();
-    let Some(cur) = in_win.iter().find(|p| p.active).map(|p| (*p).clone()) else { return Ok(()) };
+    let pick = |p: &&&Pane| match resume { Some(id) => p.id == id, None => p.active };
+    let Some(cur) = in_win.iter().find(pick).map(|p| (*p).clone()) else { return Ok(()) };
+    if resume.is_some() && cur.zoomed {
+        return Ok(()); // a z-zoom was restored on arrival: leave it be
+    }
     let side: Vec<&Pane> = in_win.iter().copied().filter(|p| p.tag == cur.tag).collect();
     let parked: Vec<String> = side.iter().filter(|p| p.id != cur.id).map(|p| p.id.clone()).collect();
     if parked.is_empty() {
-        let _ = tmux(&["display-message", "sidecar: no other pane on this side"]);
+        if resume.is_none() {
+            let _ = tmux(&["display-message", "sidecar: no other pane on this side"]);
+        }
         return Ok(());
     }
     if cur.zoomed {
@@ -1187,7 +1202,7 @@ fn exit_pz(win: &str) -> Res<()> {
 
 fn toggle_pz(win: &str) -> Res<()> {
     if opt_w(win, "@sidecar_pzoom").is_empty() {
-        enter_pz(win)
+        enter_pz(win, None)
     } else {
         exit_pz(win)
     }
