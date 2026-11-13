@@ -1,6 +1,5 @@
 /Users/evan/.nvm/versions/node/v24.21.0/lib
 ├── @bitwarden/cli@2026.10.1
-├── @google/gemini-cli@0.68.0
 ├── @googleworkspace/cli@0.22.5
 ├── @marp-team/marp-cli@4.5.1
 ├── @mermaid-js/mermaid-cli@12.2.0
