@@ -13,7 +13,12 @@ end
 
 ---@diagnostic disable-next-line: lowercase-global
 myWatcher = hs.pathwatcher.new(os.getenv("HOME") .. "/.hammerspoon/", reloadConfig):start()
-hs.alert.defaultStyle.radius = 4 -- all alerts: slight rounding instead of the default pill
+-- All alerts: same translucent dark panel, hairline border and rounding as the floating clock.
+hs.alert.defaultStyle.radius = 10
+hs.alert.defaultStyle.strokeWidth = 1
+hs.alert.defaultStyle.strokeColor = { white = 1, alpha = 0.15 }
+hs.alert.defaultStyle.fillColor = { white = 0.1, alpha = 0.8 } -- more opaque than the clock: alerts carry more text
+hs.alert.defaultStyle.textColor = { white = 1, alpha = 0.9 }
 hs.alert.defaultStyle.atScreenEdge = 1 -- all alerts: top of screen, centered horizontally
 hs.alert.defaultStyle.textFont = "Hack Nerd Font" -- all alerts: same font and size as the prompts
 hs.alert.defaultStyle.textSize = 17
