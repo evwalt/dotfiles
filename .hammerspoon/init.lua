@@ -32,6 +32,9 @@ local hyper = { "ctrl", "alt", "cmd", "shift" }
 -- to the mirror key on the left hand (same finger and row, Dvorak), shown in parens. The hint
 -- lists every key in right-hand keyboard order, one block per row, free keys shown as "—".
 -- Press the hyper combo, then a sub-key. Esc cancels. The hint stays up until either.
+-- z (;) opens a search over every picker and Hyper key (see searchAll). "space" and "delete"
+-- (Backspace) are extra slots with no mirror, listed below the grid as SPC and DEL.
+-- An item with `front = true` acts on the front app; from search it asks to confirm first.
 local MIRROR_ROWS = { -- Dvorak right-hand keys and their left-hand mirrors, row by row
 	{ "fgcrl", "yp.,'" },
 	{ "dhtns", "iueoa" },
@@ -62,17 +65,19 @@ local function hintText(labels)
 	end
 	return table.concat(lines, "\n")
 end
+local EXTRA_KEYS = { { "space", "SPC" }, { "delete", "DEL" } } -- unmirrored slots, hint name
+local SEARCH_KEY = "z"
+local searchAll -- defined after the Hyper keys below
+local function itemAction(label, action)
+	return action or function()
+		hs.application.launchOrFocus(label)
+	end
+end
 local function actionPicker(title, items)
 	local m = hs.hotkey.modal.new()
-	local labels = {} -- right key -> label
-	for _, item in ipairs(items) do
-		local right, label, action = item[1], item[2], item[3]
-		assert(MIRROR[right], "no mirror key for " .. right)
-		labels[right] = label
-		local run = action or function()
-			hs.application.launchOrFocus(label)
-		end
-		for _, key in ipairs({ right, MIRROR[right] }) do
+	local labels = { [SEARCH_KEY] = "Search" } -- right key -> label
+	local function bindRun(keys, run)
+		for _, key in ipairs(keys) do
 			m:bind({}, key, function()
 				hs.alert.closeAll()
 				m:exit()
@@ -80,11 +85,25 @@ local function actionPicker(title, items)
 			end)
 		end
 	end
+	for _, item in ipairs(items) do
+		local key, label = item[1], item[2]
+		assert(key ~= SEARCH_KEY, SEARCH_KEY .. " is reserved for search")
+		assert(MIRROR[key] or key == "space" or key == "delete", "no mirror key for " .. key)
+		labels[key] = label
+		bindRun(MIRROR[key] and { key, MIRROR[key] } or { key }, itemAction(label, item[3]))
+	end
+	bindRun({ SEARCH_KEY, MIRROR[SEARCH_KEY] }, function()
+		searchAll()
+	end)
 	m:bind({}, "escape", function()
 		hs.alert.closeAll()
 		m:exit()
 	end)
-	local hint = title .. "\n\n" .. hintText(labels)
+	local extras = {}
+	for _, extra in ipairs(EXTRA_KEYS) do
+		table.insert(extras, string.format("%-7s%s", extra[2], labels[extra[1]] or "—"))
+	end
+	local hint = title .. "\n\n" .. hintText(labels) .. "\n\n" .. table.concat(extras, "\n")
 	function m:entered()
 		hs.alert.closeAll()
 		hs.alert.show(hint, PROMPT_STYLE, hs.screen.mainScreen(), true) -- non-number duration: stays up until closed
@@ -362,84 +381,80 @@ local function keyStroker(mods, key)
 		hs.eventtap.keyStroke(mods, key)
 	end
 end
-hs.hotkey.bind(
-	hyper,
-	"G",
-	actionPicker("Picker 1 (H-g)", {
-		{ "f", "Reminders" },
-		{
-			"g",
-			"Screenshot Window to Clipboard",
-			function()
-				screenshotWindow()
-			end,
-		},
-		{ "c", "Copy (s-c)", keyStroker({ "cmd" }, "c") },
-		{ "r", "Handy Dictate", handyDictate },
-		{ "l", "Notes" },
-		{ "d", "Toggle Clock Seconds", toggleClockSecs },
-		{ "h", "Handy" },
-		{
-			"t",
-			"Toggle Clock",
-			function()
-				setClock(not clockOn)
-			end,
-		},
-		{ "n", "Spotify" },
-		{
-			"s",
-			"Screenshot Window to ~/Downloads",
-			function()
-				screenshotWindow(
-					os.getenv("HOME") .. "/Downloads/Screenshot " .. os.date("%Y-%m-%d at %H.%M.%S") .. ".png"
-				)
-			end,
-		},
-		{ "b", "Cut (s-x)", keyStroker({ "cmd" }, "x") },
-		{ "m", "Toggle Clock Date", toggleClockDate },
-		{ "w", "Cursor Beacon", cursorBeacon },
-		{ "v", "Paste (s-v)", keyStroker({ "cmd" }, "v") },
-	})
-)
-hs.hotkey.bind(
-	hyper,
-	"F",
-	actionPicker("Picker 2 (H-f)", {
-		{ "f", "Finder" },
-		{
-			"g",
-			"Toggle Grayscale",
-			function()
-				hs.screen.setForceToGray(not hs.screen.getForceToGray())
-			end,
-		},
-		{ "c", "Toggle Firefox Border", toggleBorder },
-		{ "r", "Skim" },
-		{
-			"d",
-			"Hyper Keys",
-			function()
-				showHyperHints()
-			end,
-		},
-		{ "m", "Show Desktop", showDesktop },
-		{
-			"h",
-			"Shut Down",
-			confirmPrompt("Shut Down (H-f h)", "Shut down the computer?", hs.caffeinate.shutdownSystem),
-		},
-		{
-			"t",
-			"Restart",
-			confirmPrompt("Restart (H-f t)", "Restart the computer?", hs.caffeinate.restartSystem),
-		},
-		{ "v", "Quit App (s-q)", keyStroker({ "cmd" }, "q") },
-		{ "s", "Select All (s-a)", keyStroker({ "cmd" }, "a") },
-		{ "n", "Sleep", confirmPrompt("Sleep (H-f n)", "Sleep the computer?", hs.caffeinate.systemSleep) },
-	})
-)
--- Top-level Hyper keys. Each is { key, label, action }; no action launches the app named by
+local picker1Items = {
+	{ "f", "Reminders" },
+	{
+		"g",
+		"Screenshot Window to Clipboard",
+		function()
+			screenshotWindow()
+		end,
+		front = true,
+	},
+	{ "c", "Copy (s-c)", keyStroker({ "cmd" }, "c"), front = true },
+	{ "r", "Handy Dictate", handyDictate },
+	{ "l", "Notes" },
+	{ "d", "Toggle Clock Seconds", toggleClockSecs },
+	{ "h", "Handy" },
+	{
+		"t",
+		"Toggle Clock",
+		function()
+			setClock(not clockOn)
+		end,
+	},
+	{ "n", "Spotify" },
+	{
+		"s",
+		"Screenshot Window to ~/Downloads",
+		function()
+			screenshotWindow(
+				os.getenv("HOME") .. "/Downloads/Screenshot " .. os.date("%Y-%m-%d at %H.%M.%S") .. ".png"
+			)
+		end,
+		front = true,
+	},
+	{ "b", "Cut (s-x)", keyStroker({ "cmd" }, "x"), front = true },
+	{ "m", "Toggle Clock Date", toggleClockDate },
+	{ "w", "Cursor Beacon", cursorBeacon, front = true },
+	{ "v", "Paste (s-v)", keyStroker({ "cmd" }, "v"), front = true },
+}
+hs.hotkey.bind(hyper, "G", actionPicker("Picker 1 (H-g)", picker1Items))
+local picker2Items = {
+	{ "f", "Finder" },
+	{
+		"g",
+		"Toggle Grayscale",
+		function()
+			hs.screen.setForceToGray(not hs.screen.getForceToGray())
+		end,
+	},
+	{ "c", "Toggle Firefox Border", toggleBorder },
+	{ "r", "Skim" },
+	{
+		"d",
+		"Hyper Keys",
+		function()
+			showHyperHints()
+		end,
+	},
+	{ "m", "Show Desktop", showDesktop },
+	{
+		"h",
+		"Shut Down",
+		confirmPrompt("Shut Down (H-f h)", "Shut down the computer?", hs.caffeinate.shutdownSystem),
+	},
+	{
+		"t",
+		"Restart",
+		confirmPrompt("Restart (H-f t)", "Restart the computer?", hs.caffeinate.restartSystem),
+	},
+	{ "v", "Quit App (s-q)", keyStroker({ "cmd" }, "q"), front = true },
+	{ "s", "Select All (s-a)", keyStroker({ "cmd" }, "a"), front = true },
+	{ "n", "Sleep", confirmPrompt("Sleep (H-f n)", "Sleep the computer?", hs.caffeinate.systemSleep) },
+}
+hs.hotkey.bind(hyper, "F", actionPicker("Picker 2 (H-f)", picker2Items))
+-- Top-level Hyper keys. Each is { key, label, action, front = bool }; no action launches the app named by
 -- label. Labels in parens are handled outside Hammerspoon and only listed in the hint.
 local hyperKeys = {
 	{ "c", "Handy Dictate", handyDictate },
@@ -449,6 +464,7 @@ local hyperKeys = {
 		function()
 			hs.eventtap.keyStroke({ "cmd" }, "`")
 		end,
+		front = true,
 	},
 	{ "d", "(Homerow)" },
 	{ "h", "(Enter)" },
@@ -487,6 +503,134 @@ function hyperHintModal:entered()
 end
 showHyperHints = function()
 	hyperHintModal:enter()
+end
+
+--- Search every picker item and Hyper key (z (;) in a picker) ---
+-- Drawn as an alert like the pickers, growing with the matches and scrolling only past the screen
+-- bottom. While open, a key tap reads every key press and keeps it from the front app: type to
+-- filter (case-insensitive substring of the label), C-n/Down and C-p/Up to move, Enter to run,
+-- DEL to erase, Esc to cancel. A front-app item asks to confirm first.
+local searchEntries = {} -- { label, keys, run }
+local function addSearchEntry(label, keys, action, front, shortKeys)
+	local run = itemAction(label, action)
+	if front then
+		run = confirmPrompt(label .. " (" .. (shortKeys or keys) .. ")", "Run in the front app?", run)
+	end
+	table.insert(searchEntries, { label = label, keys = keys, run = run })
+end
+for _, picker in ipairs({ { "H-g", picker1Items }, { "H-f", picker2Items } }) do
+	for _, item in ipairs(picker[2]) do
+		local key = item[1]
+		local keyName = key
+		for _, extra in ipairs(EXTRA_KEYS) do
+			if extra[1] == key then
+				keyName = extra[2]
+			end
+		end
+		local shortKeys = picker[1] .. " " .. keyName -- confirm title, like "Shut Down (H-f h)"
+		local keys = MIRROR[key] and string.format("%s (%s)", shortKeys, MIRROR[key]) or shortKeys
+		addSearchEntry(item[2], keys, item[3], item.front, shortKeys)
+	end
+end
+for _, item in ipairs(hyperKeys) do
+	if item[2]:sub(1, 1) ~= "(" then
+		addSearchEntry(item[2], "H-" .. item[1], item[3], item.front)
+	end
+end
+local keysWidth = 0
+for _, entry in ipairs(searchEntries) do
+	keysWidth = math.max(keysWidth, #entry.keys)
+end
+-- No fades: the alert is redrawn on every key press.
+local SEARCH_STYLE = { textStyle = PROMPT_STYLE.textStyle, fadeInDuration = 0, fadeOutDuration = 0 }
+local search = { query = "", matches = {}, selected = 1, top = 1 }
+local searchTap, searchAlert
+local function searchFilter()
+	local q = search.query:lower()
+	search.matches = {}
+	for _, entry in ipairs(searchEntries) do
+		if entry.label:lower():find(q, 1, true) then
+			table.insert(search.matches, entry)
+		end
+	end
+	search.selected, search.top = 1, 1
+end
+local function searchRender()
+	local lineHeight = hs.drawing.getTextDrawingSize("x", {
+		font = hs.alert.defaultStyle.textFont,
+		size = hs.alert.defaultStyle.textSize,
+	}).h
+	-- Rows that fit on screen, less the title and query (4 lines) and 2 lines of padding.
+	local fit = math.max(1, math.floor(hs.screen.mainScreen():frame().h / lineHeight) - 6)
+	local n = #search.matches
+	if n > fit then
+		fit = fit - 1 -- room for the position line
+	end
+	search.top = math.min(search.top, search.selected)
+	search.top = math.max(search.top, search.selected - fit + 1)
+	local last = math.min(n, search.top + fit - 1)
+	local lines = { "Search", "", search.query .. "_", "" }
+	for i = search.top, last do
+		local entry = search.matches[i]
+		local mark = i == search.selected and ">" or " "
+		table.insert(lines, string.format("%s %-" .. keysWidth .. "s  %s", mark, entry.keys, entry.label))
+	end
+	if n == 0 then
+		table.insert(lines, "  —")
+	elseif n > fit then
+		table.insert(lines, string.format("  %d-%d of %d", search.top, last, n))
+	end
+	if searchAlert then
+		hs.alert.closeSpecific(searchAlert, 0)
+	end
+	searchAlert = hs.alert.show(table.concat(lines, "\n"), SEARCH_STYLE, hs.screen.mainScreen(), true)
+end
+local function searchClose()
+	searchTap:stop()
+	if searchAlert then
+		hs.alert.closeSpecific(searchAlert, 0)
+		searchAlert = nil
+	end
+end
+searchTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(event)
+	local key, flags = hs.keycodes.map[event:getKeyCode()], event:getFlags()
+	local ctrlOnly = flags.ctrl and not (flags.cmd or flags.alt)
+	local down = key == "down" or (ctrlOnly and key == "n")
+	local up = key == "up" or (ctrlOnly and key == "p")
+	local move = down and 1 or up and -1
+	if key == "escape" then
+		searchClose()
+	elseif key == "return" or key == "padenter" then
+		local entry = search.matches[search.selected]
+		searchClose()
+		if entry then
+			hs.timer.doAfter(0, entry.run) -- outside the tap callback
+		end
+	elseif move then
+		search.selected = math.max(1, math.min(#search.matches, search.selected + move))
+		searchRender()
+	elseif key == "delete" then
+		local length = utf8.len(search.query)
+		if length > 0 then
+			search.query = search.query:sub(1, utf8.offset(search.query, length) - 1)
+			searchFilter()
+			searchRender()
+		end
+	elseif not (flags.cmd or flags.ctrl or flags.alt) then
+		local chars = event:getCharacters()
+		if chars ~= "" and not chars:find("%c") then
+			search.query = search.query .. chars
+			searchFilter()
+			searchRender()
+		end
+	end
+	return true -- every key press stays out of the front app while searching
+end)
+searchAll = function()
+	search.query = ""
+	searchFilter()
+	searchTap:start()
+	searchRender()
 end
 
 --- Firefox Quit, Raindrop Save Tabs Warning ---
