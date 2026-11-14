@@ -537,10 +537,13 @@ for _, item in ipairs(hyperKeys) do
 		addSearchEntry(item[2], "H-" .. item[1], item[3], item.front)
 	end
 end
-local keysWidth = 0
+local keysWidth, labelWidth = 0, 0
 for _, entry in ipairs(searchEntries) do
 	keysWidth = math.max(keysWidth, #entry.keys)
+	labelWidth = math.max(labelWidth, utf8.len(entry.label))
 end
+-- Every line is padded to the widest row, so the alert keeps its width and position while typing.
+local searchWidth = 2 + keysWidth + 2 + labelWidth
 -- No fades: the alert is redrawn on every key press.
 local SEARCH_STYLE = { textStyle = PROMPT_STYLE.textStyle, fadeInDuration = 0, fadeOutDuration = 0 }
 local search = { query = "", matches = {}, selected = 1, top = 1 }
@@ -579,6 +582,9 @@ local function searchRender()
 		table.insert(lines, "  —")
 	elseif n > fit then
 		table.insert(lines, string.format("  %d-%d of %d", search.top, last, n))
+	end
+	for i, line in ipairs(lines) do
+		lines[i] = line .. string.rep(" ", searchWidth - utf8.len(line))
 	end
 	if searchAlert then
 		hs.alert.closeSpecific(searchAlert, 0)
