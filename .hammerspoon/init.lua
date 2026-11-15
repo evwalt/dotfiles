@@ -392,7 +392,6 @@ local picker1Items = {
 		front = true,
 	},
 	{ "c", "Copy (s-c)", keyStroker({ "cmd" }, "c"), front = true },
-	{ "r", "Handy Dictate", handyDictate },
 	{ "l", "Notes" },
 	{ "d", "Toggle Clock Seconds", toggleClockSecs },
 	{ "h", "Handy" },
