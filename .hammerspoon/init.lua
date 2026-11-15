@@ -707,7 +707,9 @@ searchTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(event)
 			hs.timer.doAfter(0, match.entry.run) -- outside the tap callback
 		end
 	elseif move then
-		search.selected = math.max(1, math.min(#search.matches, search.selected + move))
+		if #search.matches > 0 then -- wraps past either end
+			search.selected = (search.selected - 1 + move) % #search.matches + 1
+		end
 		searchRender()
 	elseif key == "delete" then
 		local length = utf8.len(search.query)
