@@ -507,7 +507,8 @@ end
 --- Search every picker item and Hyper key (z (;) in a picker) ---
 -- Drawn as an alert like the pickers, growing with the matches and scrolling only past the screen
 -- bottom. While open, a key tap reads every key press and keeps it from the front app: type to
--- filter, C-n/Down and C-p/Up to move, Enter to run, DEL to erase, Esc to cancel. A front-app
+-- filter, C-n/Down and C-p/Up to move, Enter to run, Esc to cancel. The query edits like a
+-- readline prompt (see searchEdit), with a block cursor like Alacritty's. A front-app
 -- item asks to confirm first. Matching is fuzzy over the label and the keys (see fuzzyMatch), with
 -- smartcase. Rows keep their table order; the best match is selected and matched chars are pink.
 local searchEntries = {} -- { group, label, keys, run }
@@ -552,7 +553,12 @@ local SEARCH_TEXT_STYLE = {
 	paragraphStyle = PROMPT_STYLE.textStyle.paragraphStyle,
 }
 local SEARCH_MATCH_COLOR = { red = 1, green = 0.41, blue = 0.71, alpha = 1 } -- the Firefox border pink
-local search = { query = "", matches = {}, selected = 1, top = 1 }
+local SEARCH_CURSOR_STYLE = { -- inverted cell, like Alacritty's default block cursor
+	color = { white = 0.1, alpha = 1 },
+	backgroundColor = hs.alert.defaultStyle.textColor,
+}
+-- text: query chars; cursor: chars before it; killed: last killed text, for C-y.
+local search = { query = "", text = {}, cursor = 0, killed = "", matches = {}, selected = 1, top = 1 }
 local searchTap, searchAlert
 local function chars(text)
 	local list = {}
@@ -643,8 +649,9 @@ local function searchRender()
 	search.top = math.min(search.top, search.selected)
 	search.top = math.max(search.top, search.selected - fit + 1)
 	local last = math.min(n, search.top + fit - 1)
-	local lines = { "Search", "", search.query .. "_" }
-	local highlights = {} -- { line, char column }
+	local lines = { "Search", "", search.query .. " " } -- trailing space holds the cursor at the end
+	local highlights = {} -- { line, char column, style }
+	local cursor = { 3, search.cursor + 1, SEARCH_CURSOR_STYLE }
 	local group
 	for i = search.top, last do
 		local match = search.matches[i]
@@ -676,9 +683,10 @@ local function searchRender()
 		offset = offset + utf8.len(lines[i]) + 1
 	end
 	local text = hs.styledtext.new(table.concat(lines, "\n"), SEARCH_TEXT_STYLE)
+	table.insert(highlights, cursor)
 	for _, h in ipairs(highlights) do
 		local at = lineStart[h[1]] + h[2]
-		text = text:setStyle({ color = SEARCH_MATCH_COLOR }, at, at)
+		text = text:setStyle(h[3] or { color = SEARCH_MATCH_COLOR }, at, at)
 	end
 	if searchAlert then
 		hs.alert.closeSpecific(searchAlert, 0)
@@ -691,6 +699,107 @@ local function searchClose()
 		hs.alert.closeSpecific(searchAlert, 0)
 		searchAlert = nil
 	end
+end
+local function isWordChar(c)
+	return c:find("^%w") ~= nil
+end
+-- Cursor positions after word motions, Emacs style: skip separators, then the word.
+local function wordForward(t, i)
+	while i < #t and not isWordChar(t[i + 1]) do
+		i = i + 1
+	end
+	while i < #t and isWordChar(t[i + 1]) do
+		i = i + 1
+	end
+	return i
+end
+local function wordBackward(t, i)
+	while i > 0 and not isWordChar(t[i]) do
+		i = i - 1
+	end
+	while i > 0 and isWordChar(t[i]) do
+		i = i - 1
+	end
+	return i
+end
+local function spaceWordBackward(t, i) -- C-w: back to the previous whitespace, like readline
+	while i > 0 and t[i]:find("^%s") do
+		i = i - 1
+	end
+	while i > 0 and not t[i]:find("^%s") do
+		i = i - 1
+	end
+	return i
+end
+-- Readline-style editing. Returns "text" if the query changed, "cursor" if only the cursor moved,
+-- nil if the key isn't an editing key.
+--   C-a/Home, C-e/End     start, end          C-f/Right, C-b/Left   char forward, back
+--   M-f, M-b              word forward, back  DEL/C-h, C-d/Fwd Del  delete char back, forward
+--   M-DEL, C-w            kill word back      M-d                   kill word forward
+--   C-k, C-u              kill to end, start  C-y                   yank last kill
+local function searchEdit(event, key, flags)
+	local t, c = search.text, search.cursor
+	local ctrl = flags.ctrl and not (flags.cmd or flags.alt)
+	local meta = flags.alt and not (flags.cmd or flags.ctrl)
+	local plain = not (flags.cmd or flags.ctrl or flags.alt)
+	local function remove(from, to, keep) -- chars from+1..to
+		if to <= from then
+			return "cursor"
+		end
+		if keep then
+			search.killed = table.concat(t, "", from + 1, to)
+		end
+		for _ = from + 1, to do
+			table.remove(t, from + 1)
+		end
+		search.cursor = from
+		return "text"
+	end
+	local function insert(str)
+		for _, code in utf8.codes(str) do
+			search.cursor = search.cursor + 1
+			table.insert(t, search.cursor, utf8.char(code))
+		end
+		return str ~= "" and "text" or "cursor"
+	end
+	if (ctrl and key == "a") or (plain and key == "home") then
+		search.cursor = 0
+	elseif (ctrl and key == "e") or (plain and key == "end") then
+		search.cursor = #t
+	elseif (ctrl and key == "f") or (plain and key == "right") then
+		search.cursor = math.min(#t, c + 1)
+	elseif (ctrl and key == "b") or (plain and key == "left") then
+		search.cursor = math.max(0, c - 1)
+	elseif meta and key == "f" then
+		search.cursor = wordForward(t, c)
+	elseif meta and key == "b" then
+		search.cursor = wordBackward(t, c)
+	elseif (plain and key == "delete") or (ctrl and key == "h") then
+		return remove(math.max(0, c - 1), c)
+	elseif (plain and key == "forwarddelete") or (ctrl and key == "d") then
+		return remove(c, math.min(#t, c + 1))
+	elseif meta and key == "delete" then
+		return remove(wordBackward(t, c), c, true)
+	elseif ctrl and key == "w" then
+		return remove(spaceWordBackward(t, c), c, true)
+	elseif meta and key == "d" then
+		return remove(c, wordForward(t, c), true)
+	elseif ctrl and key == "k" then
+		return remove(c, #t, true)
+	elseif ctrl and key == "u" then
+		return remove(0, c, true)
+	elseif ctrl and key == "y" then
+		return insert(search.killed)
+	elseif plain then
+		local typed = event:getCharacters()
+		if typed == "" or typed:find("%c") then
+			return nil
+		end
+		return insert(typed)
+	else
+		return nil
+	end
+	return "cursor"
 end
 searchTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(event)
 	local key, flags = hs.keycodes.map[event:getKeyCode()], event:getFlags()
@@ -711,25 +820,20 @@ searchTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(event)
 			search.selected = (search.selected - 1 + move) % #search.matches + 1
 		end
 		searchRender()
-	elseif key == "delete" then
-		local length = utf8.len(search.query)
-		if length > 0 then
-			search.query = search.query:sub(1, utf8.offset(search.query, length) - 1)
+	else
+		local edit = searchEdit(event, key, flags)
+		if edit == "text" then
+			search.query = table.concat(search.text)
 			searchFilter()
-			searchRender()
 		end
-	elseif not (flags.cmd or flags.ctrl or flags.alt) then
-		local chars = event:getCharacters()
-		if chars ~= "" and not chars:find("%c") then
-			search.query = search.query .. chars
-			searchFilter()
+		if edit then
 			searchRender()
 		end
 	end
 	return true -- every key press stays out of the front app while searching
 end)
 searchAll = function()
-	search.query = ""
+	search.query, search.text, search.cursor = "", {}, 0
 	searchFilter()
 	searchTap:start()
 	searchRender()
