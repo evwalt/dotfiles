@@ -507,8 +507,9 @@ end
 --- Search every picker item and Hyper key (z (;) in a picker) ---
 -- Drawn as an alert like the pickers, growing with the matches and scrolling only past the screen
 -- bottom. While open, a key tap reads every key press and keeps it from the front app: type to
--- filter (case-insensitive substring of the label), C-n/Down and C-p/Up to move, Enter to run,
--- DEL to erase, Esc to cancel. A front-app item asks to confirm first.
+-- filter, C-n/Down and C-p/Up to move, Enter to run, DEL to erase, Esc to cancel. A front-app
+-- item asks to confirm first. Matching is fuzzy over the label and the keys (see fuzzyMatch), with
+-- smartcase. Rows keep their table order; the best match is selected and matched chars are pink.
 local searchEntries = {} -- { group, label, keys, run }
 local function addSearchEntry(group, label, keys, action, front, shortKeys)
 	local run = itemAction(label, action)
@@ -545,17 +546,87 @@ end
 local searchWidth = 2 + keysWidth + 2 + labelWidth
 -- No fades: the alert is redrawn on every key press.
 local SEARCH_STYLE = { textStyle = PROMPT_STYLE.textStyle, fadeInDuration = 0, fadeOutDuration = 0 }
+local SEARCH_TEXT_STYLE = {
+	font = { name = hs.alert.defaultStyle.textFont, size = hs.alert.defaultStyle.textSize },
+	color = hs.alert.defaultStyle.textColor,
+	paragraphStyle = PROMPT_STYLE.textStyle.paragraphStyle,
+}
+local SEARCH_MATCH_COLOR = { red = 1, green = 0.41, blue = 0.71, alpha = 1 } -- the Firefox border pink
 local search = { query = "", matches = {}, selected = 1, top = 1 }
 local searchTap, searchAlert
-local function searchFilter()
-	local q = search.query:lower()
-	search.matches = {}
-	for _, entry in ipairs(searchEntries) do
-		if entry.label:lower():find(q, 1, true) then
-			table.insert(search.matches, entry)
+local function chars(text)
+	local list = {}
+	for _, code in utf8.codes(text) do
+		table.insert(list, utf8.char(code))
+	end
+	return list
+end
+-- Subsequence match, fzf-style: every query char must appear in order. Scores favour consecutive
+-- chars and word starts and penalise gaps. Tries each start of the first query char and keeps the
+-- best. Returns score and matched char positions, or nil.
+local function fuzzyMatch(text, query, caseSensitive)
+	local t, q = chars(caseSensitive and text or text:lower()), chars(caseSensitive and query or query:lower())
+	if #q == 0 then
+		return 0, {}
+	end
+	local best, bestPositions
+	for start = 1, #t do
+		if t[start] == q[1] then
+			local positions, ti = { start }, start + 1
+			for qi = 2, #q do
+				while ti <= #t and t[ti] ~= q[qi] do
+					ti = ti + 1
+				end
+				if ti > #t then
+					positions = nil
+					break
+				end
+				table.insert(positions, ti)
+				ti = ti + 1
+			end
+			if not positions then
+				break -- later starts can only match less
+			end
+			local score = 0
+			for i, pos in ipairs(positions) do
+				score = score + 1
+				if pos == 1 or not t[pos - 1]:find("%w") then
+					score = score + 3
+				end
+				if i > 1 then
+					local gap = pos - positions[i - 1] - 1
+					score = score + (gap == 0 and 5 or -0.2 * gap)
+				end
+			end
+			if not best or score > best then
+				best, bestPositions = score, positions
+			end
 		end
 	end
-	search.selected, search.top = 1, 1
+	return best, bestPositions
+end
+local function searchFilter()
+	local caseSensitive = search.query:find("%u") ~= nil -- smartcase
+	search.matches = {}
+	local bestScore
+	for _, entry in ipairs(searchEntries) do
+		local labelScore, labelPositions = fuzzyMatch(entry.label, search.query, caseSensitive)
+		local keysScore, keysPositions = fuzzyMatch(entry.keys, search.query, caseSensitive)
+		if labelScore or keysScore then
+			local match = { entry = entry }
+			if keysScore and (not labelScore or keysScore > labelScore) then
+				match.score, match.keysPositions = keysScore, keysPositions
+			else
+				match.score, match.labelPositions = labelScore, labelPositions
+			end
+			table.insert(search.matches, match)
+			if not bestScore or match.score > bestScore then
+				bestScore, search.selected = match.score, #search.matches
+			end
+		end
+	end
+	search.selected = bestScore and search.selected or 1
+	search.top = 1
 end
 local function searchRender()
 	local lineHeight = hs.drawing.getTextDrawingSize("x", {
@@ -573,9 +644,11 @@ local function searchRender()
 	search.top = math.max(search.top, search.selected - fit + 1)
 	local last = math.min(n, search.top + fit - 1)
 	local lines = { "Search", "", search.query .. "_" }
+	local highlights = {} -- { line, char column }
 	local group
 	for i = search.top, last do
-		local entry = search.matches[i]
+		local match = search.matches[i]
+		local entry = match.entry
 		if entry.group ~= group then -- a header above each group, titled like its hint
 			group = entry.group
 			table.insert(lines, "")
@@ -583,6 +656,12 @@ local function searchRender()
 		end
 		local mark = i == search.selected and ">" or " "
 		table.insert(lines, string.format("%s %-" .. keysWidth .. "s  %s", mark, entry.keys, entry.label))
+		for _, pos in ipairs(match.keysPositions or {}) do
+			table.insert(highlights, { #lines, 2 + pos })
+		end
+		for _, pos in ipairs(match.labelPositions or {}) do
+			table.insert(highlights, { #lines, 2 + keysWidth + 2 + pos })
+		end
 	end
 	if n == 0 then
 		table.insert(lines, "")
@@ -590,13 +669,21 @@ local function searchRender()
 	elseif n > fit then
 		table.insert(lines, string.format("  %d-%d of %d", search.top, last, n))
 	end
+	local lineStart, offset = {}, 0 -- char offset of each line in the joined text
 	for i, line in ipairs(lines) do
 		lines[i] = line .. string.rep(" ", searchWidth - utf8.len(line))
+		lineStart[i] = offset
+		offset = offset + utf8.len(lines[i]) + 1
+	end
+	local text = hs.styledtext.new(table.concat(lines, "\n"), SEARCH_TEXT_STYLE)
+	for _, h in ipairs(highlights) do
+		local at = lineStart[h[1]] + h[2]
+		text = text:setStyle({ color = SEARCH_MATCH_COLOR }, at, at)
 	end
 	if searchAlert then
 		hs.alert.closeSpecific(searchAlert, 0)
 	end
-	searchAlert = hs.alert.show(table.concat(lines, "\n"), SEARCH_STYLE, hs.screen.mainScreen(), true)
+	searchAlert = hs.alert.show(text, SEARCH_STYLE, hs.screen.mainScreen(), true)
 end
 local function searchClose()
 	searchTap:stop()
@@ -614,10 +701,10 @@ searchTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(event)
 	if key == "escape" then
 		searchClose()
 	elseif key == "return" or key == "padenter" then
-		local entry = search.matches[search.selected]
+		local match = search.matches[search.selected]
 		searchClose()
-		if entry then
-			hs.timer.doAfter(0, entry.run) -- outside the tap callback
+		if match then
+			hs.timer.doAfter(0, match.entry.run) -- outside the tap callback
 		end
 	elseif move then
 		search.selected = math.max(1, math.min(#search.matches, search.selected + move))
