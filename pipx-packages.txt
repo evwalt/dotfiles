@@ -11,11 +11,11 @@ manual pages are exposed at /Users/evan/.local/share/man
     - pyright-langserver
     - pyright-python
     - pyright-python-langserver
-   package ruff 0.17.3, installed using Python 3.13.2
+   package ruff 0.17.5, installed using Python 3.13.2
     - ruff
-   package sqlfluff 4.4.0, installed using Python 3.13.7
+   package sqlfluff 4.5.0, installed using Python 3.13.7
     - sqlfluff
-   package vsg 3.35.0, installed using Python 3.13.7
+   package vsg 3.36.0, installed using Python 3.13.7
     - vsg
-   package youtube-transcript-api 1.2.4, installed using Python 3.13.7
+   package youtube-transcript-api 1.2.5, installed using Python 3.13.7
     - youtube_transcript_api
