@@ -29,10 +29,10 @@ local hyper = { "ctrl", "alt", "cmd", "shift" }
 --- Multi-action picker for a single hotkey ---
 -- Usage: hs.hotkey.bind(hyper, "G", actionPicker("Title", { { "m", "Skim" }, { "w", "Label", fn } }))
 -- Each item is { rightKey, appName } or { rightKey, label, action }. Every action is also bound
--- to the mirror key on the left hand (same finger and row, Dvorak), shown in parens. The hint
+-- to the mirror key on the left hand (same finger and row, Dvorak), shown after a slash. The hint
 -- lists every key in right-hand keyboard order, one block per row, free keys shown as "—".
 -- Press the hyper combo, then a sub-key. Esc cancels. The hint stays up until either.
--- z (;) opens a search over every picker and Hyper key (see searchAll). "space" and "delete"
+-- z/; opens a search over every picker and Hyper key (see searchAll). "space" and "delete"
 -- (Backspace) are extra slots with no mirror, listed below the grid as SPC and DEL.
 -- An item with `front = true` acts on the front app; from search it asks to confirm first.
 local MIRROR_ROWS = { -- Dvorak right-hand keys and their left-hand mirrors, row by row
@@ -60,7 +60,7 @@ local function hintText(labels)
 		end
 		for col = 1, #keys[1] do
 			local right = keys[1]:sub(col, col)
-			table.insert(lines, string.format("%s (%s)  %s", right, MIRROR[right], labels[right] or "—"))
+			table.insert(lines, string.format("%s/%s  %s", right, MIRROR[right], labels[right] or "—"))
 		end
 	end
 	return table.concat(lines, "\n")
@@ -101,7 +101,7 @@ local function actionPicker(title, items)
 	end)
 	local extras = {}
 	for _, extra in ipairs(EXTRA_KEYS) do
-		table.insert(extras, string.format("%-7s%s", extra[2], labels[extra[1]] or "—"))
+		table.insert(extras, string.format("%-5s%s", extra[2], labels[extra[1]] or "—"))
 	end
 	local hint = title .. "\n\n" .. hintText(labels) .. "\n\n" .. table.concat(extras, "\n")
 	function m:entered()
@@ -504,7 +504,7 @@ showHyperHints = function()
 	hyperHintModal:enter()
 end
 
---- Search every picker item and Hyper key (z (;) in a picker) ---
+--- Search every picker item and Hyper key (z/; in a picker) ---
 -- Drawn as an alert like the pickers, growing with the matches and scrolling only past the screen
 -- bottom. While open, a key tap reads every key press and keeps it from the front app: type to
 -- filter, C-n/Down and C-p/Up to move, Enter to run, Esc to cancel. The query edits like a
@@ -529,7 +529,7 @@ for _, picker in ipairs({ { "H-g", picker1Items, "Picker 1 (H-g)" }, { "H-f", pi
 			end
 		end
 		local shortKeys = picker[1] .. " " .. keyName -- confirm title, like "Shut Down (H-f h)"
-		local keys = MIRROR[key] and string.format("%s (%s)", shortKeys, MIRROR[key]) or shortKeys
+		local keys = MIRROR[key] and string.format("%s/%s", shortKeys, MIRROR[key]) or shortKeys
 		addSearchEntry(picker[3], item[2], keys, item[3], item.front, shortKeys)
 	end
 end
