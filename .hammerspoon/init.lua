@@ -510,15 +510,15 @@ end
 -- bottom. While open, a key tap reads every key press and keeps it from the front app: type to
 -- filter (case-insensitive substring of the label), C-n/Down and C-p/Up to move, Enter to run,
 -- DEL to erase, Esc to cancel. A front-app item asks to confirm first.
-local searchEntries = {} -- { label, keys, run }
-local function addSearchEntry(label, keys, action, front, shortKeys)
+local searchEntries = {} -- { group, label, keys, run }
+local function addSearchEntry(group, label, keys, action, front, shortKeys)
 	local run = itemAction(label, action)
 	if front then
 		run = confirmPrompt(label .. " (" .. (shortKeys or keys) .. ")", "Run in the front app?", run)
 	end
-	table.insert(searchEntries, { label = label, keys = keys, run = run })
+	table.insert(searchEntries, { group = group, label = label, keys = keys, run = run })
 end
-for _, picker in ipairs({ { "H-g", picker1Items }, { "H-f", picker2Items } }) do
+for _, picker in ipairs({ { "H-g", picker1Items, "Picker 1 (H-g)" }, { "H-f", picker2Items, "Picker 2 (H-f)" } }) do
 	for _, item in ipairs(picker[2]) do
 		local key = item[1]
 		local keyName = key
@@ -529,12 +529,12 @@ for _, picker in ipairs({ { "H-g", picker1Items }, { "H-f", picker2Items } }) do
 		end
 		local shortKeys = picker[1] .. " " .. keyName -- confirm title, like "Shut Down (H-f h)"
 		local keys = MIRROR[key] and string.format("%s (%s)", shortKeys, MIRROR[key]) or shortKeys
-		addSearchEntry(item[2], keys, item[3], item.front, shortKeys)
+		addSearchEntry(picker[3], item[2], keys, item[3], item.front, shortKeys)
 	end
 end
 for _, item in ipairs(hyperKeys) do
 	if item[2]:sub(1, 1) ~= "(" then
-		addSearchEntry(item[2], "H-" .. item[1], item[3], item.front)
+		addSearchEntry("Hyper Keys", item[2], "H-" .. item[1], item[3], item.front)
 	end
 end
 local keysWidth, labelWidth = 0, 0
@@ -563,8 +563,9 @@ local function searchRender()
 		font = hs.alert.defaultStyle.textFont,
 		size = hs.alert.defaultStyle.textSize,
 	}).h
-	-- Rows that fit on screen, less the title and query (4 lines) and 2 lines of padding.
-	local fit = math.max(1, math.floor(hs.screen.mainScreen():frame().h / lineHeight) - 6)
+	-- Rows that fit on screen, less the title and query (3 lines), a blank and header per group
+	-- (6 lines) and 2 lines of padding.
+	local fit = math.max(1, math.floor(hs.screen.mainScreen():frame().h / lineHeight) - 11)
 	local n = #search.matches
 	if n > fit then
 		fit = fit - 1 -- room for the position line
@@ -572,13 +573,20 @@ local function searchRender()
 	search.top = math.min(search.top, search.selected)
 	search.top = math.max(search.top, search.selected - fit + 1)
 	local last = math.min(n, search.top + fit - 1)
-	local lines = { "Search", "", search.query .. "_", "" }
+	local lines = { "Search", "", search.query .. "_" }
+	local group
 	for i = search.top, last do
 		local entry = search.matches[i]
+		if entry.group ~= group then -- a header above each group, titled like its hint
+			group = entry.group
+			table.insert(lines, "")
+			table.insert(lines, group)
+		end
 		local mark = i == search.selected and ">" or " "
 		table.insert(lines, string.format("%s %-" .. keysWidth .. "s  %s", mark, entry.keys, entry.label))
 	end
 	if n == 0 then
+		table.insert(lines, "")
 		table.insert(lines, "  —")
 	elseif n > fit then
 		table.insert(lines, string.format("  %d-%d of %d", search.top, last, n))
