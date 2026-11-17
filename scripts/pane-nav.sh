@@ -5,16 +5,24 @@
 #  u: no sidecar target; only the un-expand/un-zoom step below, then select-pane -U.
 # Anything else falls back to plain select-pane -R / -D / -U.
 # First leaves any zoomed state, so the move works on the real layout: tmux zoom
-# (prefix z), sidecar full/hide (prefix Z) and sidecar expand (prefix e).
+# (prefix z), sidecar full/hide (prefix Z) and sidecar expand (prefix e) when the
+# move stays on the expanded side.
 dir=$1 win=$2 cur=$3
 IFS=: read -r zoomed full pzoom <<EOF
 $(tmux display-message -p -t "$cur" '#{window_zoomed_flag}:#{@sidecar_full}#{@sidecar_hide}:#{@sidecar_pzoom}')
 EOF
+cur_sc=$(tmux display-message -p -t "$cur" '#{@sidecar}')
 [ "$zoomed" = 1 ] && tmux resize-pane -Z -t "$cur"
-[ -n "$pzoom" ] && ~/scripts/sidecar pzoom "$win"
+# Keep an expand when the move leaves its side (e.g. prefix l from the regular
+# panes into an expanded sidecar pane); collapse it only for moves within it.
+if [ -n "$pzoom" ]; then
+  pz_sc=$(tmux display-message -p -t "$pzoom" '#{@sidecar}')
+  if [ "$pz_sc" = "$cur_sc" ] && ! { [ "$dir" = r ] && [ "$cur_sc" != 1 ]; }; then
+    ~/scripts/sidecar pzoom "$win"
+  fi
+fi
 [ -n "$full" ] && ~/scripts/sidecar full "$win"
 panes=$(tmux list-panes -t "$win" -F '#{pane_id} #{@sidecar} #{pane_left} #{pane_top} #{pane_width} #{pane_height}')
-cur_sc=$(echo "$panes" | awk -v c="$cur" '$1==c{print $2}')
 p=
 if [ "$dir" = r ] && [ "$cur_sc" != 1 ]; then
   p=$(echo "$panes" | awk '$2==1{print $6, $1}' | sort -nr | head -1 | cut -d' ' -f2)
