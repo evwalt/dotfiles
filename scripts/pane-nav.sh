@@ -1,8 +1,9 @@
 #!/bin/sh
-# Prefix+l / prefix+j with sidecar-aware targets. Usage: pane-nav.sh r|d WINDOW_ID PANE_ID
+# Prefix+l / prefix+j / prefix+k with sidecar-aware targets. Usage: pane-nav.sh r|d|u WINDOW_ID PANE_ID
 #  r: from a regular pane, go to the tallest @sidecar pane (the big claude pane).
 #  d: from a sidecar pane, go to the leftmost sidecar pane directly below it.
-# Anything else falls back to plain select-pane -R / -D.
+#  u: no sidecar target; only the un-expand/un-zoom step below, then select-pane -U.
+# Anything else falls back to plain select-pane -R / -D / -U.
 # First leaves any zoomed state, so the move works on the real layout: tmux zoom
 # (prefix z), sidecar full/hide (prefix Z) and sidecar expand (prefix e).
 dir=$1 win=$2 cur=$3
@@ -23,4 +24,7 @@ elif [ "$dir" = d ] && [ "$cur_sc" = 1 ]; then
     {id[NR]=$1; sc[NR]=$2; l[NR]=$3; r[NR]=$3+$5; t[NR]=$4}
     END {best=""; for (i=1;i<=NR;i++) if (sc[i]==1 && t[i]==below && l[i]<cr && r[i]>cl && (best=="" || l[i]<bl)) {best=id[i]; bl=l[i]}; print best}')
 fi
-if [ -n "$p" ]; then tmux select-pane -t "$p"; elif [ "$dir" = r ]; then tmux select-pane -R -t "$cur"; else tmux select-pane -D -t "$cur"; fi
+if [ -n "$p" ]; then tmux select-pane -t "$p"
+elif [ "$dir" = r ]; then tmux select-pane -R -t "$cur"
+elif [ "$dir" = u ]; then tmux select-pane -U -t "$cur"
+else tmux select-pane -D -t "$cur"; fi
