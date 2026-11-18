@@ -95,16 +95,17 @@ return {
 					end
 					hl.CursorLineNr = { fg = c.blue, bold = true }
 
-					-- Markdown, Claude Code style: neutral heading bars, bright bold text, periwinkle H1 only
+					-- Markdown: neutral heading bars, one palette color per heading level for scanning
+					local heading_fg = { c.blue, c.yellow, c.cyan, c.green, c.magenta, c.orange }
 					for i = 1, 6 do
-						local fg = i == 1 and c.blue or "#e4e9f5"
+						local fg = heading_fg[i]
 						hl["@markup.heading." .. i .. ".markdown"] = { fg = fg, bg = "#151626", bold = true }
 						hl["RenderMarkdownH" .. i .. "Bg"] = { bg = "#151626" }
 					end
 					hl["@markup.raw.markdown_inline"] = { fg = c.blue, bg = "#191b30" }
 					hl["@markup.link.label.markdown_inline"] = { fg = c.blue }
 					hl["@markup.link.url.markdown_inline"] = { fg = c.dark5, underline = true }
-					hl.RenderMarkdownDash = { fg = "#33344f" }
+					hl.RenderMarkdownDash = { fg = "#3d3f5e" }
 				end,
 			})
 			-- Apply the chosen theme here, since this plugin loads first.
