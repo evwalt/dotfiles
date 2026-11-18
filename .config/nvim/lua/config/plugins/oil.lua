@@ -20,20 +20,11 @@ return {
 					return name == ".."
 				end,
 			},
+			keymaps = {
+				["gq"] = { "actions.close", mode = "n" },
+			},
 		})
 
-		vim.keymap.set("n", "<space>e", function()
-			if vim.bo.filetype == "oil" then
-				vim.cmd(":e #")
-			else
-				vim.cmd(":Oil")
-			end
-		end)
 		vim.keymap.set("n", "-", ":Oil<CR>")
-		vim.keymap.set("n", "<esc>", function()
-			if vim.bo.filetype == "oil" then
-				vim.cmd(":e #")
-			end
-		end)
 	end,
 }
