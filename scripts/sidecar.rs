@@ -677,6 +677,9 @@ fn sync_d(win: &str, depth: u8) -> Res<()> {
         return Ok(());
     }
     let all_ids: Vec<String> = group.iter().map(|p| p.id.clone()).collect();
+    // The window's own focused pane, to give focus back after the rebuild (swap-pane -d
+    // keeps the active cell, not the active pane, so focus can drift into the group).
+    let mine = in_win.iter().find(|p| p.active && !p.tag).map(|p| p.id.clone());
 
     // The group is hidden in another window: put it back there, then follow normally.
     if depth == 0 {
@@ -831,6 +834,8 @@ fn sync_d(win: &str, depth: u8) -> Res<()> {
         let _ = tmux(&["resize-pane", "-Z", "-t", &w]);
     } else if let Some(f) = focus {
         let _ = tmux(&["select-pane", "-t", &f]);
+    } else if let Some(m) = mine {
+        let _ = tmux(&["select-pane", "-t", &m]);
     }
     if in_win.first().map(|p| p.fresume).unwrap_or(false) {
         let _ = tmux(&["set-option", "-wu", "-t", win, "@sidecar_fresume"]);
@@ -1249,6 +1254,28 @@ fn toggle_pz(win: &str) -> Res<()> {
     }
 }
 
+// Focus the window's leftmost regular pane: skip restoring the group's focus, zoom or
+// maximize on arrival, and leave those if already applied. A zoomed regular pane, a
+// hidden group and an expanded pane stay as they are.
+fn left(win: &str) -> Res<()> {
+    for o in ["@sidecar_active", "@sidecar_zoom", "@sidecar_fresume"] {
+        tmux(&["set-option", "-wu", "-t", win, o])?;
+    }
+    sync(win)?; // arrive now if the hook hasn't yet; a later hook run is then a no-op
+    let st = read_state()?;
+    let in_win: Vec<&Pane> = st.panes.iter().filter(|p| p.win == win).collect();
+    if in_win.iter().any(|p| p.sfull) {
+        exit_full(win, false, false)?;
+    } else if in_win.iter().any(|p| p.zoomed && p.active && p.tag) {
+        tmux(&["resize-pane", "-Z", "-t", win])?;
+    }
+    let panes = list_window(win)?;
+    if let Some(p) = panes.iter().filter(|p| !p.tag).min_by_key(|p| (p.x, p.y)) {
+        tmux(&["select-pane", "-t", &p.id])?;
+    }
+    Ok(())
+}
+
 // After a pane closes: collapse any expand whose expanded pane is gone.
 fn reap() -> Res<()> {
     let wins = tmux(&["list-windows", "-a", "-F", "#{window_id}\t#{@sidecar_pzoom}"])?;
@@ -1264,9 +1291,9 @@ fn reap() -> Res<()> {
 }
 
 fn main() {
-    // Usage: sidecar [WINDOW_ID] | sidecar full [WINDOW_ID] | sidecar pzoom [WINDOW_ID]
+    // Usage: sidecar [WINDOW_ID] | sidecar full|pzoom|left [WINDOW_ID]
     let args: Vec<String> = env::args().skip(1).collect();
-    let mode = args.first().map(|a| a.as_str()).filter(|a| ["full", "pzoom", "reap"].contains(a)).map(String::from);
+    let mode = args.first().map(|a| a.as_str()).filter(|a| ["full", "pzoom", "reap", "left"].contains(a)).map(String::from);
     let win = match args.get(if mode.is_some() { 1 } else { 0 }) {
         Some(w) => w.clone(),
         None => match tmux(&["display-message", "-p", "#{window_id}"]) {
@@ -1282,6 +1309,7 @@ fn main() {
         Some("full") => toggle_full(&win),
         Some("pzoom") => toggle_pz(&win),
         Some("reap") => reap(),
+        Some("left") => left(&win),
         _ => sync(&win),
     };
     if let Err(e) = res {
