@@ -12,34 +12,40 @@ size = 14.5
 option_as_alt = "Both" # (macos only)
 decorations = "None"
 
-# Color Theme - Midnight Haze: <https://github.com/hafiz-muhammad/midnight-haze-alacritty-theme/blob/main/midnight-haze.toml>
+# Color Theme - Harbor Night: matches the Claude Code theme in ~/.claude/themes/harbor-night.json.
+# The zsh prompt and ls use these named colors, so this palette themes them too.
+# Previously Midnight Haze: <https://github.com/hafiz-muhammad/midnight-haze-alacritty-theme/blob/main/midnight-haze.toml>
 #
 # Default colors
 [colors.primary]
 background = "#0c0c16"
-foreground = "#d8dee9"
+foreground = "#cdd3e2"
+
+[colors.selection]
+background = "#252a48"
+text = "CellForeground"
 
 # Normal colors
 [colors.normal]
-black   = "#2c2c3d"
-red     = "#ff6e6e"
-green   = "#9ec875"
-yellow  = "#ffa759"
-blue    = "#70a7d4"
-magenta = "#d291e0"
-cyan    = "#96e0e0"
-white   = "#d8dee9"
+black   = "#2c2d45"
+red     = "#e08592"
+green   = "#8fbf98"
+yellow  = "#dbbd84"
+blue    = "#7fa9d1"
+magenta = "#b996c4"
+cyan    = "#6aaa9e"
+white   = "#cdd3e2"
 
 # Bright colors
 [colors.bright]
-black   = "#414166"
-red     = "#ff8d8d"
-green   = "#b3d987"
-yellow  = "#ffc57f"
-blue    = "#9bb3d3"
-magenta = "#ffa1ff"
-cyan    = "#9cd8d8"
-white   = "#ffffff"
+black   = "#6b7091"
+red     = "#ebaab4"
+green   = "#b0d4b6"
+yellow  = "#ead5ad"
+blue    = "#a9c6e3"
+magenta = "#d4bddc"
+cyan    = "#93c4ba"
+white   = "#eef1f7"
 
 [keyboard]
 bindings = [
