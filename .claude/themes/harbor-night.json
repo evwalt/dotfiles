@@ -1,0 +1,58 @@
+{
+  "name": "Harbor Night",
+  "base": "dark",
+  "overrides": {
+    "text": "#cdd3e2",
+    "inverseText": "#0c0c16",
+    "inactive": "#6b7091",
+    "inactiveShimmer": "#8a8fb0",
+    "subtle": "#2c2d45",
+    "promptBorder": "#33344f",
+    "promptBorderShimmer": "#4a4c70",
+
+    "claude": "#d9a184",
+    "claudeShimmer": "#ebc2aa",
+    "clawd_body": "#d9a184",
+    "briefLabelClaude": "#d9a184",
+    "briefLabelYou": "#659dce",
+
+    "claudeBlue_FOR_SYSTEM_SPINNER": "#7fa9d1",
+    "claudeBlueShimmer_FOR_SYSTEM_SPINNER": "#a9c6e3",
+    "permission": "#7fa9d1",
+    "permissionShimmer": "#a9c6e3",
+    "suggestion": "#7fa9d1",
+    "remember": "#7fa9d1",
+    "ide": "#7896c4",
+    "background": "#6aaa9e",
+    "planMode": "#6aaa9e",
+
+    "autoAccept": "#b996c4",
+    "autoAcceptShimmer": "#d4bddc",
+    "skill": "#b996c4",
+    "merged": "#b996c4",
+    "effortUltra": "#b996c4",
+    "bashBorder": "#c98aa6",
+
+    "success": "#8fbf98",
+    "error": "#e08592",
+    "warning": "#dbbd84",
+    "warningShimmer": "#ead5ad",
+
+    "diffAdded": "#16261f",
+    "diffRemoved": "#2a1720",
+    "diffAddedDimmed": "#121b18",
+    "diffRemovedDimmed": "#1c1418",
+    "diffAddedWord": "#24453a",
+    "diffRemovedWord": "#5a2a3a",
+
+    "userMessageBackground": "#0c0c16",
+    "userMessageBackgroundHover": "#151626",
+    "composerSidebarBackground": "#0c0c16",
+    "selectionBg": "#252a48",
+    "bashMessageBackgroundColor": "#0c0c16",
+    "memoryBackgroundColor": "#0c0c16",
+
+    "rate_limit_fill": "#7fa9d1",
+    "rate_limit_empty": "#2c2d45"
+  }
+}
