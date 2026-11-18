@@ -17,7 +17,7 @@ myWatcher = hs.pathwatcher.new(os.getenv("HOME") .. "/.hammerspoon/", reloadConf
 hs.alert.defaultStyle.radius = 10
 hs.alert.defaultStyle.strokeWidth = 1
 hs.alert.defaultStyle.strokeColor = { hex = "#cdd3e2", alpha = 0.15 }
-hs.alert.defaultStyle.fillColor = { hex = "#0c0c16", alpha = 0.8 } -- more opaque than the clock: alerts carry more text
+hs.alert.defaultStyle.fillColor = { hex = "#0c0c16", alpha = 0.9 } -- more opaque than the clock: alerts carry more text
 hs.alert.defaultStyle.textColor = { hex = "#cdd3e2", alpha = 0.95 }
 hs.alert.defaultStyle.atScreenEdge = 1 -- all alerts: top of screen, centered horizontally
 hs.alert.defaultStyle.textFont = "Hack Nerd Font" -- all alerts: same font and size as the prompts
@@ -291,7 +291,7 @@ local function startClock()
 	clockCanvas:appendElements({
 		type = "rectangle",
 		action = "strokeAndFill",
-		fillColor = { hex = "#0c0c16", alpha = 0.65 },
+		fillColor = { hex = "#0c0c16", alpha = 0.75 },
 		strokeColor = { hex = "#cdd3e2", alpha = 0.15 },
 		strokeWidth = 1,
 		roundedRectRadii = { xRadius = 8, yRadius = 8 },
@@ -552,7 +552,7 @@ local SEARCH_TEXT_STYLE = {
 	color = hs.alert.defaultStyle.textColor,
 	paragraphStyle = PROMPT_STYLE.textStyle.paragraphStyle,
 }
-local SEARCH_MATCH_COLOR = { hex = "#b1b9f9", alpha = 1 } -- the Firefox border periwinkle
+local SEARCH_MATCH_COLOR = { hex = "#97a3ff", alpha = 1 } -- more saturated than the border periwinkle so matches stand out from the off-white text
 local SEARCH_CURSOR_STYLE = { -- inverted cell, like Alacritty's default block cursor
 	color = { hex = "#0c0c16", alpha = 1 },
 	backgroundColor = hs.alert.defaultStyle.textColor,
