@@ -2,7 +2,7 @@
   "name": "Harbor Night",
   "base": "dark",
   "overrides": {
-    "text": "#cdd3e2",
+    "text": "#c0c6d6",
     "inverseText": "#0c0c16",
     "inactive": "#6b7091",
     "inactiveShimmer": "#8a8fb0",
@@ -45,8 +45,8 @@
     "diffAddedWord": "#24453a",
     "diffRemovedWord": "#5a2a3a",
 
-    "userMessageBackground": "#0c0c16",
-    "userMessageBackgroundHover": "#151626",
+    "userMessageBackground": "#151626",
+    "userMessageBackgroundHover": "#1c1f36",
     "composerSidebarBackground": "#0c0c16",
     "selectionBg": "#252a48",
     "bashMessageBackgroundColor": "#0c0c16",
