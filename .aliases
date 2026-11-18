@@ -192,7 +192,8 @@ wup() {
   pipx upgrade-all                  || { echo 'pipx failed'; failed=1; }
   nup                               || { echo 'npm failed'; failed=1; }
   rustup update                     || { echo 'rustup failed'; failed=1; }
-  bob update                        || { echo 'bob failed'; failed=1; }
+  cargo binstall -y bob-nvim        || { echo 'bob self-update failed'; failed=1; }
+  bob update                      || { echo 'bob failed'; failed=1; }
   return $failed
 }
 # "weekly log"
