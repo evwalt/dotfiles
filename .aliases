@@ -67,6 +67,14 @@ alias mpl="port installed > ports.txt"
 alias n="nvim"
 alias nu="nvim --headless '+Lazy! sync' +qa && yadm-public add ~/.config/nvim/lazy-lock.json && (yadm-public diff --cached --quiet || (yadm-public commit -m 'chore(nvim): bump deps' && yadm-public push))"
 alias nuq="{ nu; } >/dev/null 2>&1 && echo 'nu: ok' || echo 'nu: failed (run nu to see why)'"
+# "bob log": installed Neovim versions, color codes stripped
+bobl() {
+  local out
+  out=$(bob list) || return 1
+  print -r -- "$out" | sed $'s/\e\\[[0-9;]*m//g' > ~/bob-versions.txt
+}
+# "bob display logs"
+alias bobdl="less ~/bob-versions.txt"
 
 # --- nvm node ---
 # nvm update current
@@ -193,7 +201,7 @@ wup() {
   nup                               || { echo 'npm failed'; failed=1; }
   rustup update                     || { echo 'rustup failed'; failed=1; }
   cargo binstall -y bob-nvim        || { echo 'bob self-update failed'; failed=1; }
-  bob update                        ||{ echo 'bob failed'; failed=1; }
+  bob update                        || { echo 'bob failed'; failed=1; }
   return $failed
 }
 # "weekly log"
@@ -202,6 +210,7 @@ wl() {
   pxl || { echo 'pxl failed'; failed=1; }
   ngl || { echo 'ngl failed'; failed=1; }
   rl  || { echo 'rl failed'; failed=1; }
+  bobl || { echo 'bobl failed'; failed=1; }
   return $failed
 }
 # "yadm-public track all"
@@ -213,6 +222,7 @@ wuta() {
     "$HOME/global-npm-packages.txt"
     "$HOME/rust-toolchains.txt"
     "$HOME/cargo-packages.txt"
+    "$HOME/bob-versions.txt"
     "$HOME/ports.txt"
   )
   yadm-public add -- "${files[@]}" || return 1
