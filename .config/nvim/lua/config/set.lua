@@ -92,11 +92,11 @@ vim.diagnostic.config({
 
 --- Unsaved-changes indicator ---
 -- The statusline and bufferline are hidden by default, so turn the line numbers red
--- while a buffer has unsaved changes. (Tokyonight's current-line number is already orange,
+-- while a buffer has unsaved changes. (The current-line number is already orange/coral,
 -- and relativenumber uses LineNrAbove/LineNrBelow, so all four groups are remapped.)
 local function set_modified_hl()
-	-- Tokyonight's red; other themes use their own error color.
-	local fg = (vim.g.colors_name or ""):find("^tokyonight") and "#f7768e"
+	-- Harbor Night red; other themes use their own error color.
+	local fg = (vim.g.colors_name or ""):find("^tokyonight") and "#e08592"
 		or vim.api.nvim_get_hl(0, { name = "DiagnosticError", link = false }).fg
 	vim.api.nvim_set_hl(0, "ModifiedLineNr", { fg = fg, bold = true })
 end

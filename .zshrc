@@ -228,7 +228,8 @@ _prompt_context() {
 }
 
 _prompt_dir() {
-  _prompt_segment blue black '%~'
+  # Harbor Night coral (Claude's accent color); was blue
+  _prompt_segment '#d9a184' black '%~'
 }
 
 _prompt_git() {

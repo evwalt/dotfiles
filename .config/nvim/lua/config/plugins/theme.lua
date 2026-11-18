@@ -10,14 +10,87 @@ return {
 
 		config = function()
 			require("tokyonight").setup({
-				-- Slightly brighter than the defaults (contrast vs Storm bg: comments 2.4 -> 3.3, line numbers 1.5 -> 2.4; a bit higher on Night)
+				-- Harbor Night: Tokyonight's structure with the palette of the Claude Code theme
+				-- (~/.claude/themes/harbor-night.json) and the Alacritty background.
+				-- on_colors runs after Tokyonight derives its secondary colors, so those are set here too.
 				on_colors = function(c)
-					c.comment = "#6b75ad"
+					c.bg = "#0c0c16"
+					c.bg_dark = "#09090f"
+					c.bg_dark1 = "#07070c"
+					c.bg_highlight = "#151626"
+					c.fg = "#cdd3e2"
+					c.fg_dark = "#a8aec4"
+					c.fg_gutter = "#2c2d45"
+					c.dark3 = "#4a4c70"
+					c.dark5 = "#6b7091"
+					-- Brighter than Harbor's #6b7091 "inactive" so comments stay readable on the darker bg
+					c.comment = "#757a9e"
+					c.terminal_black = "#33344f"
+
+					c.blue = "#7fa9d1"
+					c.blue0 = "#34406a"
+					c.blue1 = "#8cbdd8"
+					c.blue2 = "#6aaa9e"
+					c.blue5 = "#a9c6e3"
+					c.blue6 = "#c6dcef"
+					c.blue7 = "#2a3352"
+					c.cyan = "#93c4ba"
+					c.green = "#8fbf98"
+					c.green1 = "#6aaa9e"
+					c.green2 = "#4f8f84"
+					c.teal = "#6aaa9e"
+					c.magenta = "#b996c4"
+					c.magenta2 = "#c98aa6"
+					c.purple = "#9d8bc9"
+					c.orange = "#d9a184"
+					c.yellow = "#dbbd84"
+					c.red = "#e08592"
+					c.red1 = "#c96a78"
+					c.git = { add = "#5f9e86", change = "#6a8cbf", delete = "#b56473", ignore = c.dark3 }
+
+					-- Derived colors
+					c.diff = { add = "#16261f", delete = "#2a1720", change = "#151a2e", text = "#24304f" }
+					c.black = "#07070c"
+					c.border = "#33344f"
+					c.border_highlight = "#4a4c70"
+					c.bg_popup = c.bg_dark
+					c.bg_statusline = c.bg_dark
+					c.bg_sidebar = c.bg_dark
+					c.bg_float = c.bg_dark
+					c.bg_visual = "#252a48"
+					c.bg_search = c.blue0
+					c.fg_sidebar = c.fg_dark
+					c.fg_float = c.fg
+					c.error = c.red
+					c.todo = c.blue
+					c.warning = c.yellow
+					c.info = c.blue
+					c.hint = c.teal
+					c.rainbow = { c.blue, c.yellow, c.green, c.teal, c.magenta, c.purple, c.orange, c.red }
+					-- :terminal palette, same as alacritty.toml
+					c.terminal = {
+						black = "#2c2d45",
+						black_bright = "#6b7091",
+						red = "#e08592",
+						red_bright = "#ebaab4",
+						green = "#8fbf98",
+						green_bright = "#b0d4b6",
+						yellow = "#dbbd84",
+						yellow_bright = "#ead5ad",
+						blue = "#7fa9d1",
+						blue_bright = "#a9c6e3",
+						magenta = "#b996c4",
+						magenta_bright = "#d4bddc",
+						cyan = "#6aaa9e",
+						cyan_bright = "#93c4ba",
+						white = "#cdd3e2",
+						white_bright = "#eef1f7",
+					}
 				end,
 				on_highlights = function(hl)
 					-- Set the groups directly: c.fg_gutter is also used for backgrounds (folds, popup selection)
 					for _, group in ipairs({ "LineNr", "LineNrAbove", "LineNrBelow" }) do
-						hl[group] = { fg = "#565f89" }
+						hl[group] = { fg = "#4e5275" }
 					end
 				end,
 			})

@@ -57,10 +57,10 @@ return {
 								return ""
 							end
 						end,
-						-- Tokyonight's orange; other themes use their own warning color.
+						-- Harbor Night warning; other themes use their own warning color.
 						color = function()
 							if (vim.g.colors_name or ""):find("^tokyonight") then
-								return { fg = "#ff9e64" }
+								return { fg = "#dbbd84" }
 							end
 							local fg = vim.api.nvim_get_hl(0, { name = "DiagnosticWarn", link = false }).fg
 							return fg and { fg = string.format("#%06x", fg) } or nil
