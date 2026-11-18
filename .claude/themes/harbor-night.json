@@ -1,6 +1,6 @@
 {
   "name": "Harbor Night",
-  "base": "dark",
+  "base": "dark-ansi",
   "overrides": {
     "text": "#c0c6d6",
     "inverseText": "#0c0c16",

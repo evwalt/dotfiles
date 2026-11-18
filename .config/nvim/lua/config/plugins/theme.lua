@@ -71,7 +71,7 @@ return {
 					-- :terminal palette, same as alacritty.toml
 					c.terminal = {
 						black = "#2c2d45",
-						black_bright = "#6b7091",
+						black_bright = "#8a8fb0",
 						red = "#e08592",
 						red_bright = "#ebaab4",
 						green = "#8fbf98",
@@ -96,7 +96,8 @@ return {
 					hl.CursorLineNr = { fg = c.blue, bold = true }
 
 					-- Markdown: neutral heading bars, one color per level; favorite colors on the most-used levels (H2/H3)
-					local heading_fg = { "#dce1ec", c.blue, c.cyan, c.blue1, c.green, c.yellow }
+					-- (H3 is the steel blue #7fa9d1; teal moved down to H4)
+					local heading_fg = { "#dce1ec", c.blue, c.blue1, c.cyan, c.green, c.yellow }
 					for i = 1, 6 do
 						local fg = heading_fg[i]
 						hl["@markup.heading." .. i .. ".markdown"] = { fg = fg, bg = "#151626", bold = true }
@@ -106,6 +107,11 @@ return {
 					hl["@markup.link.label.markdown_inline"] = { fg = c.blue }
 					hl["@markup.link.url.markdown_inline"] = { fg = c.dark5, underline = true }
 					hl.RenderMarkdownDash = { fg = "#3d3f5e" }
+
+					-- Steel blue over teal for fields/properties and link brackets; teal stays for hints
+					hl["@property"] = { fg = c.blue1 }
+					hl["@variable.member"] = { fg = c.blue1 }
+					hl["@markup.link"] = { fg = c.blue1 }
 				end,
 			})
 			-- Apply the chosen theme here, since this plugin loads first.

@@ -43,7 +43,7 @@ white   = "#c0c6d6"
 
 # Bright colors
 [colors.bright]
-black   = "#6b7091"
+black   = "#8a8fb0"
 red     = "#ebaab4"
 green   = "#b0d4b6"
 yellow  = "#ead5ad"
@@ -51,6 +51,19 @@ blue    = "#a9c6e3"
 magenta = "#d4bddc"
 cyan    = "#93c4ba"
 white   = "#dce1ec"
+
+# Dim colors: Alacritty's default 0.66 dimming, except white. Claude Code
+# (dark-ansi base) draws removed diff lines as dim white; keep it the normal
+# text white so removed lines read like added ones (the red background marks them).
+[colors.dim]
+black   = "#1d1e2e"
+red     = "#945860"
+green   = "#5e7e64"
+yellow  = "#917d57"
+blue    = "#54708a"
+magenta = "#7a6381"
+cyan    = "#467068"
+white   = "#c0c6d6"
 
 [keyboard]
 bindings = [
