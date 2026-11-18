@@ -19,7 +19,7 @@ return {
 
 		local markdownlint_cli2 = lint.linters["markdownlint-cli2"]
 		markdownlint_cli2.cmd = "markdownlint-cli2"
-		markdownlint_cli2.args = { "--config", HOME .. "/.markdownlint.json", "--" }
+		markdownlint_cli2.args = { "--config", HOME .. "/.config/markdownlint/config.markdownlint.yaml", "--" }
 
 		local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
 		vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost" }, {

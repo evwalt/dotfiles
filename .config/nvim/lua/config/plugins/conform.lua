@@ -35,8 +35,8 @@ return {
 				},
 				["markdownlint-cli2"] = {
 					command = "markdownlint-cli2",
-					-- prepend_args = { "--fix", "--config", HOME .. "/.markdownlint.json", "$FILENAME" },
-					prepend_args = { "--debug", "--fix", "--config", HOME .. "/.markdownlint.json", "%" },
+					-- prepend_args = { "--fix", "--config", HOME .. "/.config/markdownlint/config.markdownlint.yaml", "$FILENAME" },
+					prepend_args = { "--debug", "--fix", "--config", HOME .. "/.config/markdownlint/config.markdownlint.yaml", "%" },
 				},
 				prettier = {
 					command = "prettier",
