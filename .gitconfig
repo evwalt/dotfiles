@@ -25,7 +25,7 @@
 	# side-by-side = true
 	tab-width = 4
 	# Harbor Night: diff backgrounds match the Claude Code theme (~/.claude/themes/harbor-night.json)
-	syntax-theme = Nord
+	syntax-theme = Coldark-Dark
 	minus-style = syntax "#2a1720"
 	minus-emph-style = syntax "#6b3247"
 	plus-style = syntax "#16261f"
