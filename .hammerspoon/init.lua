@@ -13,12 +13,12 @@ end
 
 ---@diagnostic disable-next-line: lowercase-global
 myWatcher = hs.pathwatcher.new(os.getenv("HOME") .. "/.hammerspoon/", reloadConfig):start()
--- All alerts: same translucent dark panel, hairline border and rounding as the floating clock.
+-- All alerts (Harbor Night colors): same translucent dark panel, hairline border and rounding as the floating clock.
 hs.alert.defaultStyle.radius = 10
 hs.alert.defaultStyle.strokeWidth = 1
-hs.alert.defaultStyle.strokeColor = { white = 1, alpha = 0.15 }
-hs.alert.defaultStyle.fillColor = { white = 0.1, alpha = 0.8 } -- more opaque than the clock: alerts carry more text
-hs.alert.defaultStyle.textColor = { white = 1, alpha = 0.9 }
+hs.alert.defaultStyle.strokeColor = { hex = "#cdd3e2", alpha = 0.15 }
+hs.alert.defaultStyle.fillColor = { hex = "#0c0c16", alpha = 0.8 } -- more opaque than the clock: alerts carry more text
+hs.alert.defaultStyle.textColor = { hex = "#cdd3e2", alpha = 0.95 }
 hs.alert.defaultStyle.atScreenEdge = 1 -- all alerts: top of screen, centered horizontally
 hs.alert.defaultStyle.textFont = "Hack Nerd Font" -- all alerts: same font and size as the prompts
 hs.alert.defaultStyle.textSize = 17
@@ -141,13 +141,13 @@ local function confirmPrompt(title, message, fn)
 end
 
 --- Firefox Active Border ---
--- Pink border around the focused Firefox window, only when Firefox has more
+-- Periwinkle border around the focused Firefox window, only when Firefox has more
 -- than one window. Enabled state persists via hs.settings (default: on).
 local borderEnabled = hs.settings.get("firefoxBorder")
 if borderEnabled == nil then
 	borderEnabled = true
 end
-local borderWidth = 4
+local borderWidth = 3
 local borderCanvas
 local function refreshBorder()
 	local target
@@ -178,7 +178,7 @@ local function refreshBorder()
 		{
 			type = "rectangle",
 			action = "stroke",
-			strokeColor = { red = 1, green = 0.41, blue = 0.71, alpha = 1 },
+			strokeColor = { hex = "#b1b9f9", alpha = 1 }, -- Harbor Night periwinkle
 			strokeWidth = borderWidth,
 			frame = {
 				x = borderWidth / 2,
@@ -291,8 +291,8 @@ local function startClock()
 	clockCanvas:appendElements({
 		type = "rectangle",
 		action = "strokeAndFill",
-		fillColor = { white = 0.1, alpha = 0.65 },
-		strokeColor = { white = 1, alpha = 0.15 },
+		fillColor = { hex = "#0c0c16", alpha = 0.65 },
+		strokeColor = { hex = "#cdd3e2", alpha = 0.15 },
 		strokeWidth = 1,
 		roundedRectRadii = { xRadius = 8, yRadius = 8 },
 	}, {
@@ -300,7 +300,7 @@ local function startClock()
 		text = "",
 		textFont = clockFont,
 		textSize = clockSize,
-		textColor = { white = 1, alpha = 0.9 },
+		textColor = { hex = "#cdd3e2", alpha = 0.95 },
 		textAlignment = "center",
 		frame = { x = 0, y = CLOCK_PAD_Y, w = "100%", h = "100%" },
 	})
@@ -552,9 +552,9 @@ local SEARCH_TEXT_STYLE = {
 	color = hs.alert.defaultStyle.textColor,
 	paragraphStyle = PROMPT_STYLE.textStyle.paragraphStyle,
 }
-local SEARCH_MATCH_COLOR = { red = 1, green = 0.41, blue = 0.71, alpha = 1 } -- the Firefox border pink
+local SEARCH_MATCH_COLOR = { hex = "#b1b9f9", alpha = 1 } -- the Firefox border periwinkle
 local SEARCH_CURSOR_STYLE = { -- inverted cell, like Alacritty's default block cursor
-	color = { white = 0.1, alpha = 1 },
+	color = { hex = "#0c0c16", alpha = 1 },
 	backgroundColor = hs.alert.defaultStyle.textColor,
 }
 -- text: query chars; cursor: chars before it; killed: last killed text, for C-y.

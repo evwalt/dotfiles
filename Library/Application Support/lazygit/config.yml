@@ -1,11 +1,11 @@
 gui:
   theme:
     # Default is the terminal's blue, which washes out blue key labels.
-    # Use tokyonight-storm's visual-selection color (matches nvim) instead.
+    # Use Harbor Night's selection color (matches nvim and Claude Code) instead.
     selectedLineBgColor:
-      - "#2e3c64"
+      - "#252a48"
     inactiveViewSelectedLineBgColor:
-      - "#292e42"
+      - "#151626"
 git:
   diffRenderers:
     - command: delta --{{colorScheme}} --paging=never --line-numbers

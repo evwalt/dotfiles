@@ -24,6 +24,22 @@
 	# dark = true      # or light = true, or omit for auto-detection
 	# side-by-side = true
 	tab-width = 4
+	# Harbor Night: diff backgrounds match the Claude Code theme (~/.claude/themes/harbor-night.json)
+	syntax-theme = Nord
+	minus-style = syntax "#2a1720"
+	minus-emph-style = syntax "#6b3247"
+	plus-style = syntax "#16261f"
+	plus-emph-style = syntax "#2c5546"
+	# Brighter than delta's defaults so numbers and gutters stay readable
+	line-numbers-zero-style = "#8a8fb0"
+	line-numbers-minus-style = "#e08592"
+	line-numbers-plus-style = "#8fbf98"
+	line-numbers-left-style = "#4a4c70"
+	line-numbers-right-style = "#4a4c70"
+	file-style = "#b1b9f9" bold
+	file-decoration-style = "#4a4c70" ul
+	hunk-header-style = file line-number syntax
+	hunk-header-decoration-style = "#4a4c70" box
 
 [merge]
     conflictstyle = zdiff3
