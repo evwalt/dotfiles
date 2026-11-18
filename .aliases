@@ -193,7 +193,7 @@ wup() {
   nup                               || { echo 'npm failed'; failed=1; }
   rustup update                     || { echo 'rustup failed'; failed=1; }
   cargo binstall -y bob-nvim        || { echo 'bob self-update failed'; failed=1; }
-  bob update                      || { echo 'bob failed'; failed=1; }
+  bob update                        ||{ echo 'bob failed'; failed=1; }
   return $failed
 }
 # "weekly log"
