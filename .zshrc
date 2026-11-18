@@ -228,8 +228,8 @@ _prompt_context() {
 }
 
 _prompt_dir() {
-  # Harbor Night coral (Claude's accent color); was blue
-  _prompt_segment '#d9a184' black '%~'
+  # Harbor Night: periwinkle text on slate, like Claude Code's accent
+  _prompt_segment '#252a48' '#b1b9f9' '%~'
 }
 
 _prompt_git() {
@@ -241,10 +241,11 @@ _prompt_git() {
     ref=$(command git symbolic-ref HEAD 2>/dev/null) || \
       ref="→ $(command git rev-parse --short HEAD 2>/dev/null)"
 
+    # Darker slate block; dirty/clean shows in the text color
     if [[ -n $dirty ]]; then
-      _prompt_segment yellow black
+      _prompt_segment '#181a2c' yellow
     else
-      _prompt_segment green black
+      _prompt_segment '#181a2c' green
     fi
 
     local ahead behind
@@ -269,9 +270,9 @@ _prompt_yadm_segment() {
   local dirty=$3
 
   if [[ -n "$dirty" ]]; then
-    _prompt_segment yellow black
+    _prompt_segment '#181a2c' yellow
   else
-    _prompt_segment green black
+    _prompt_segment '#181a2c' green
   fi
 
   print -n "$label $branch"

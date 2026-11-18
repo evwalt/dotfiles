@@ -27,9 +27,10 @@ return {
 					c.comment = "#757a9e"
 					c.terminal_black = "#33344f"
 
-					c.blue = "#7fa9d1"
+					-- Periwinkle is Claude Code's accent (inline code, links); used as the main accent here
+					c.blue = "#b1b9f9"
 					c.blue0 = "#34406a"
-					c.blue1 = "#8cbdd8"
+					c.blue1 = "#7fa9d1"
 					c.blue2 = "#6aaa9e"
 					c.blue5 = "#a9c6e3"
 					c.blue6 = "#c6dcef"
@@ -39,9 +40,9 @@ return {
 					c.green1 = "#6aaa9e"
 					c.green2 = "#4f8f84"
 					c.teal = "#6aaa9e"
-					c.magenta = "#b996c4"
+					c.magenta = "#b9aef0"
 					c.magenta2 = "#c98aa6"
-					c.purple = "#9d8bc9"
+					c.purple = "#a59fe6"
 					c.orange = "#d9a184"
 					c.yellow = "#dbbd84"
 					c.red = "#e08592"
@@ -62,9 +63,9 @@ return {
 					c.fg_sidebar = c.fg_dark
 					c.fg_float = c.fg
 					c.error = c.red
-					c.todo = c.blue
+					c.todo = "#7fa9d1"
 					c.warning = c.yellow
-					c.info = c.blue
+					c.info = "#7fa9d1"
 					c.hint = c.teal
 					c.rainbow = { c.blue, c.yellow, c.green, c.teal, c.magenta, c.purple, c.orange, c.red }
 					-- :terminal palette, same as alacritty.toml
@@ -87,11 +88,23 @@ return {
 						white_bright = "#eef1f7",
 					}
 				end,
-				on_highlights = function(hl)
+				on_highlights = function(hl, c)
 					-- Set the groups directly: c.fg_gutter is also used for backgrounds (folds, popup selection)
 					for _, group in ipairs({ "LineNr", "LineNrAbove", "LineNrBelow" }) do
-						hl[group] = { fg = "#4e5275" }
+						hl[group] = { fg = "#5f6485" }
 					end
+					hl.CursorLineNr = { fg = c.blue, bold = true }
+
+					-- Markdown, Claude Code style: neutral heading bars, bright bold text, periwinkle H1 only
+					for i = 1, 6 do
+						local fg = i == 1 and c.blue or "#e4e9f5"
+						hl["@markup.heading." .. i .. ".markdown"] = { fg = fg, bg = "#151626", bold = true }
+						hl["RenderMarkdownH" .. i .. "Bg"] = { bg = "#151626" }
+					end
+					hl["@markup.raw.markdown_inline"] = { fg = c.blue, bg = "#191b30" }
+					hl["@markup.link.label.markdown_inline"] = { fg = c.blue }
+					hl["@markup.link.url.markdown_inline"] = { fg = c.dark5, underline = true }
+					hl.RenderMarkdownDash = { fg = "#33344f" }
 				end,
 			})
 			-- Apply the chosen theme here, since this plugin loads first.
