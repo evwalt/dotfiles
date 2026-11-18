@@ -112,6 +112,8 @@ return {
 					hl["@property"] = { fg = c.blue1 }
 					hl["@variable.member"] = { fg = c.blue1 }
 					hl["@markup.link"] = { fg = c.blue1 }
+					-- Fenced code blocks without a language would otherwise use the sage String color
+					hl["@markup.raw.block.markdown"] = { fg = c.blue1 }
 				end,
 			})
 			-- Apply the chosen theme here, since this plugin loads first.
