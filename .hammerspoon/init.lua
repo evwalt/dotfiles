@@ -291,7 +291,7 @@ local function startClock()
 	clockCanvas:appendElements({
 		type = "rectangle",
 		action = "strokeAndFill",
-		fillColor = { hex = "#0c0c16", alpha = 0.75 },
+		fillColor = { hex = "#0c0c16", alpha = 0.65 },
 		strokeColor = { hex = "#cdd3e2", alpha = 0.15 },
 		strokeWidth = 1,
 		roundedRectRadii = { xRadius = 8, yRadius = 8 },
