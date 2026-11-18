@@ -19,7 +19,12 @@ decorations = "None"
 # Default colors
 [colors.primary]
 background = "#0c0c16"
-foreground = "#cdd3e2"
+foreground = "#c0c6d6"
+
+# Periwinkle block cursor: softer than the default reversed text color
+[colors.cursor]
+cursor = "#b1b9f9"
+text = "#0c0c16"
 
 [colors.selection]
 background = "#252a48"
@@ -34,7 +39,7 @@ yellow  = "#dbbd84"
 blue    = "#7fa9d1"
 magenta = "#b996c4"
 cyan    = "#6aaa9e"
-white   = "#cdd3e2"
+white   = "#c0c6d6"
 
 # Bright colors
 [colors.bright]
@@ -45,7 +50,7 @@ yellow  = "#ead5ad"
 blue    = "#a9c6e3"
 magenta = "#d4bddc"
 cyan    = "#93c4ba"
-white   = "#eef1f7"
+white   = "#dce1ec"
 
 [keyboard]
 bindings = [

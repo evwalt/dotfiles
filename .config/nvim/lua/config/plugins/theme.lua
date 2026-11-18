@@ -18,7 +18,7 @@ return {
 					c.bg_dark = "#09090f"
 					c.bg_dark1 = "#07070c"
 					c.bg_highlight = "#151626"
-					c.fg = "#cdd3e2"
+					c.fg = "#c0c6d6"
 					c.fg_dark = "#a8aec4"
 					c.fg_gutter = "#2c2d45"
 					c.dark3 = "#4a4c70"
@@ -84,8 +84,8 @@ return {
 						magenta_bright = "#d4bddc",
 						cyan = "#6aaa9e",
 						cyan_bright = "#93c4ba",
-						white = "#cdd3e2",
-						white_bright = "#eef1f7",
+						white = "#c0c6d6",
+						white_bright = "#dce1ec",
 					}
 				end,
 				on_highlights = function(hl, c)
@@ -96,7 +96,7 @@ return {
 					hl.CursorLineNr = { fg = c.blue, bold = true }
 
 					-- Markdown: neutral heading bars, one color per level; favorite colors on the most-used levels (H2/H3)
-					local heading_fg = { "#eef1f7", c.blue, c.cyan, c.blue1, c.green, c.yellow }
+					local heading_fg = { "#dce1ec", c.blue, c.cyan, c.blue1, c.green, c.yellow }
 					for i = 1, 6 do
 						local fg = heading_fg[i]
 						hl["@markup.heading." .. i .. ".markdown"] = { fg = fg, bg = "#151626", bold = true }
