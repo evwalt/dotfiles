@@ -45,8 +45,10 @@ return {
 					pcall(vim.treesitter.start, args.buf)
 				end
 				-- Replaces legacy `additional_vim_regex_highlighting = true`:
-				-- starting Tree-sitter clears 'syntax', so turn it back on
-				if vim.treesitter.highlighter.active[args.buf] then
+				-- starting Tree-sitter clears 'syntax', so turn it back on.
+				-- Not for markdown: regex syntax reads `- [ ] (text)` as a link and
+				-- underlines it beneath render-markdown's checkbox icon.
+				if vim.treesitter.highlighter.active[args.buf] and vim.bo[args.buf].filetype ~= "markdown" then
 					vim.bo[args.buf].syntax = "ON"
 				end
 			end,
