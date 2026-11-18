@@ -58,11 +58,6 @@ alias bdl="less ~/brew-leaves.txt && less ~/brew-list.txt && less ~/brew-list-ca
 # --- java ---
 alias jr="javac -Xlint:unchecked Main.java && java Main"
 
-# --- macports ---
-alias mps="sudo port selfupdate"
-alias mpu="sudo port upgrade outdated && sudo port uninstall inactive"
-alias mpl="port installed > ports.txt"
-
 # --- neovim ---
 alias n="nvim"
 alias nu="nvim --headless '+Lazy! sync' +qa && yadm-public add ~/.config/nvim/lazy-lock.json && (yadm-public diff --cached --quiet || (yadm-public commit -m 'chore(nvim): bump deps' && yadm-public push))"
@@ -92,9 +87,6 @@ alias ngdl="less ~/global-npm-packages.txt"
 alias nrd="npm run dev"
 alias nrb="npm run build"
 alias nt="npm test"
-
-# --- opencode ---
-alias ohs="opencode-history-sync"
 
 # --- pipx ---
 alias pxu="pipx upgrade-all"
@@ -163,22 +155,8 @@ alias l="ls -laF"
 alias rz='tmux list-panes -a -F '\''#{pane_id} #{pane_current_command}'\'' | awk '\''$2=="zsh"{print $1}'\'' | xargs -I{} tmux send-keys -t {} '\''exec zsh'\'' C-m'
 alias rsh='tmux list-panes -a -F '\''#{pane_id} #{pane_current_command}'\'' | awk '\''$2=="zsh"{print $1}'\'' | xargs -I{} tmux send-keys -t {} '\''exec $SHELL'\'' C-m'
 
-# --- time ---
-# ck: live 24-hour time (HHMM) until <C-c>; `ck -s` adds seconds (HHMMSS)
-ck() {
-	local fmt='%H%M'
-	[[ $1 == -s ]] && fmt='%H%M%S'
-	while true; do
-		printf '\r%s' "$(date +$fmt)"
-		sleep 1
-	done
-}
-
 # --- weekly combos ---
-# Just sync lazy.nvim plugins and then run `wua` regularly (every day, week, or two weeks)
-# "npm update, checked": npm 12+ skips dependency install scripts unless allowlisted
-# (allow-scripts in ~/.npmrc), which leaves packages without their binaries while still
-# exiting 0. Fail on that warning or on a broken global tree instead of passing silently.
+# npm -g update, but fail when npm 12+ skips install scripts (exits 0 anyway) or the global tree is broken
 nup() {
   local log rc
   log=$(mktemp) || return 1
@@ -193,7 +171,7 @@ nup() {
   npm -g ls --depth=0 >/dev/null || { echo 'nup: global npm tree is broken (npm -g ls)'; rc=1; }
   return $rc
 }
-# "weekly update"
+# weekly update
 wup() {
   local failed=0
   nvim --headless '+Lazy! sync' +qa || { echo 'Lazy sync failed'; failed=1; }
@@ -204,17 +182,16 @@ wup() {
   bob update                        || { echo 'bob failed'; failed=1; }
   return $failed
 }
-# "weekly log"
+# weekly log
 wl() {
   local failed=0
-  pxl || { echo 'pxl failed'; failed=1; }
-  ngl || { echo 'ngl failed'; failed=1; }
-  rl  || { echo 'rl failed'; failed=1; }
+  pxl  || { echo 'pxl failed'; failed=1; }
+  ngl  || { echo 'ngl failed'; failed=1; }
+  rl   || { echo 'rl failed'; failed=1; }
   bobl || { echo 'bobl failed'; failed=1; }
   return $failed
 }
-# "yadm-public track all"
-# alias wuta="yadm-public add ~/.config/nvim/lazy-lock.json ~/pipx-packages.txt ~/global-npm-packages.txt ~/rust-version.txt ~/brew-leaves.txt ~/brew-list.txt ~/brew-list-cask.txt && yadm-public commit -m 'chore: update deps' && yadm-public push"
+# yadm-public track all
 wuta() {
   local -a files=(
     "$HOME/.config/nvim/lazy-lock.json"
@@ -223,7 +200,6 @@ wuta() {
     "$HOME/rust-toolchains.txt"
     "$HOME/cargo-packages.txt"
     "$HOME/bob-versions.txt"
-    "$HOME/ports.txt"
   )
   yadm-public add -- "${files[@]}" || return 1
   if yadm-public diff --cached --quiet -- "${files[@]}"; then
@@ -232,8 +208,7 @@ wuta() {
   fi
   yadm-public commit --only -m 'chore(env): update deps' -- "${files[@]}" && yadm-public push
 }
-# "daily update, log, yadm track all, and claude history sync"
-# alias wua="wup && wl && wuta && bd"
+# weekly update, log, yadm track all, and claude history sync
 wua() {
   local failed=0
   wup  || failed=1
