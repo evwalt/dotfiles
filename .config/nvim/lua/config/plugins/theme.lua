@@ -96,7 +96,7 @@ return {
 					hl.CursorLineNr = { fg = c.blue, bold = true }
 
 					-- Markdown: neutral heading bars, one color per level; favorite colors on the most-used levels (H2/H3)
-					local heading_fg = { c.magenta, c.blue, c.cyan, c.blue1, c.green, c.yellow }
+					local heading_fg = { "#eef1f7", c.blue, c.cyan, c.blue1, c.green, c.yellow }
 					for i = 1, 6 do
 						local fg = heading_fg[i]
 						hl["@markup.heading." .. i .. ".markdown"] = { fg = fg, bg = "#151626", bold = true }
