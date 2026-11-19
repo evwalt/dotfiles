@@ -1,6 +1,6 @@
 #!/bin/sh
 # Prefix+l / prefix+j / prefix+k with sidecar-aware targets. Usage: pane-nav.sh r|d|u WINDOW_ID PANE_ID
-#  r: from a regular pane, go to the tallest @sidecar pane (the big claude pane).
+#  r: from a regular pane, go to the sidecar pane focused last (else the tallest).
 #  d: from a sidecar pane, go to the leftmost sidecar pane directly below it.
 #  u: no sidecar target; only the un-expand/un-zoom step below, then select-pane -U.
 # Anything else falls back to plain select-pane -R / -D / -U.
@@ -26,7 +26,10 @@ fi
 panes=$(tmux list-panes -t "$win" -F '#{pane_id} #{@sidecar} #{pane_left} #{pane_top} #{pane_width} #{pane_height}')
 p=
 if [ "$dir" = r ] && [ "$cur_sc" != 1 ]; then
-  p=$(echo "$panes" | awk '$2==1{print $6, $1}' | sort -nr | head -1 | cut -d' ' -f2)
+  # The sidecar pane focused last, if it's still in this window; else the tallest.
+  last=$(tmux show -gv @sidecar_last 2>/dev/null)
+  p=$(echo "$panes" | awk -v l="$last" '$2==1 && $1==l {print $1}')
+  [ -n "$p" ] || p=$(echo "$panes" | awk '$2==1{print $6, $1}' | sort -nr | head -1 | cut -d' ' -f2)
 elif [ "$dir" = d ] && [ "$cur_sc" = 1 ]; then
   p=$(echo "$panes" | awk -v c="$cur" '
     $1==c {cl=$3; cr=$3+$5; below=$4+$6+1}
