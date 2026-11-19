@@ -220,7 +220,7 @@ _prompt_context() {
 }
 
 _prompt_dir() {
-  # Harbor Night: periwinkle text on slate, like Claude Code's accent
+  # Harbor Night: periwinkle text (Claude Code's accent) on the terminal background
   _prompt_segment '#252a48' '#b1b9f9' '%~'
 }
 
