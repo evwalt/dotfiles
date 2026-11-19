@@ -68,6 +68,7 @@ end
 local EXTRA_KEYS = { { "space", "SPC" }, { "delete", "DEL" } } -- unmirrored slots, hint name
 local SEARCH_KEY = "z"
 local searchAll -- defined after the Hyper keys below
+local commandMode -- the : prompt, defined after search below
 local function itemAction(label, action)
 	return action or function()
 		hs.application.launchOrFocus(label)
@@ -264,6 +265,7 @@ local clockDate = hs.settings.get("clockDate") or false
 local clockFont, clockSize = ".AppleSystemUIFont", 15
 local CLOCK_PAD_X, CLOCK_PAD_Y, CLOCK_INSET = 8, 3, 0
 local clockCanvas, clockTimer
+local updateCt -- the ct slot left of the clock; defined with command mode below
 
 local function clockText()
 	return os.date((clockDate and "%Y-%m-%d " or "") .. (clockSecs and "%H%M%S" or "%H%M"))
@@ -282,13 +284,17 @@ local function updateClock()
 	end
 	clockCanvas:frame(clockFrame())
 	clockCanvas[2].text = clockText()
+	if updateCt then
+		updateCt()
+	end
 end
 
-local function startClock()
-	clockCanvas = hs.canvas.new(clockFrame())
-	clockCanvas:level(hs.canvas.windowLevels.overlay)
-	clockCanvas:behavior({ "canJoinAllSpaces", "stationary" })
-	clockCanvas:appendElements({
+-- Clock-styled overlay panel: [1] background, [2] text. Also used by the ct slot.
+local function newOverlay(frame)
+	local canvas = hs.canvas.new(frame)
+	canvas:level(hs.canvas.windowLevels.overlay)
+	canvas:behavior({ "canJoinAllSpaces", "stationary" })
+	canvas:appendElements({
 		type = "rectangle",
 		action = "strokeAndFill",
 		fillColor = { hex = "#0c0c16", alpha = 0.65 },
@@ -304,6 +310,11 @@ local function startClock()
 		textAlignment = "center",
 		frame = { x = 0, y = CLOCK_PAD_Y, w = "100%", h = "100%" },
 	})
+	return canvas
+end
+
+local function startClock()
+	clockCanvas = newOverlay(clockFrame())
 	updateClock()
 	clockCanvas:show()
 	clockTimer = hs.timer.doEvery(1, updateClock)
@@ -327,6 +338,9 @@ local function setClock(on)
 		startClock()
 	elseif not on then
 		stopClock()
+	end
+	if updateCt then
+		updateCt()
 	end
 end
 
@@ -451,6 +465,7 @@ local picker2Items = {
 	{ "v", "Quit App (s-q)", keyStroker({ "cmd" }, "q"), front = true },
 	{ "s", "Select All (s-a)", keyStroker({ "cmd" }, "a"), front = true },
 	{ "n", "Sleep", confirmPrompt("Sleep (H-f n)", "Sleep the computer?", hs.caffeinate.systemSleep) },
+	{ "b", "System Settings" },
 }
 hs.hotkey.bind(hyper, "F", actionPicker("Picker 2 (H-f)", picker2Items))
 -- Top-level Hyper keys. Each is { key, label, action, front = bool }; no action launches the app named by
@@ -471,7 +486,13 @@ local hyperKeys = {
 	{ "b", "Messages" },
 	{ "m", "Firefox" },
 	{ "v", "Alacritty" },
-	{ "z", "System Settings" },
+	{
+		"z",
+		"Command Mode",
+		function()
+			commandMode()
+		end,
+	},
 	{ "i", "Google Chrome" },
 	{ "j", "zoom.us" },
 }
@@ -731,14 +752,14 @@ local function spaceWordBackward(t, i) -- C-w: back to the previous whitespace, 
 	end
 	return i
 end
--- Readline-style editing. Returns "text" if the query changed, "cursor" if only the cursor moved,
+-- Readline-style editing of state.text/cursor/killed (search and the : prompt). Returns "text" if the query changed, "cursor" if only the cursor moved,
 -- nil if the key isn't an editing key.
 --   C-a/Home, C-e/End     start, end          C-f/Right, C-b/Left   char forward, back
 --   M-f, M-b              word forward, back  DEL/C-h, C-d/Fwd Del  delete char back, forward
 --   M-DEL, C-w            kill word back      M-d                   kill word forward
 --   C-k, C-u              kill to end, start  C-y                   yank last kill
-local function searchEdit(event, key, flags)
-	local t, c = search.text, search.cursor
+local function lineEdit(state, event, key, flags)
+	local t, c = state.text, state.cursor
 	local ctrl = flags.ctrl and not (flags.cmd or flags.alt)
 	local meta = flags.alt and not (flags.cmd or flags.ctrl)
 	local plain = not (flags.cmd or flags.ctrl or flags.alt)
@@ -747,33 +768,33 @@ local function searchEdit(event, key, flags)
 			return "cursor"
 		end
 		if keep then
-			search.killed = table.concat(t, "", from + 1, to)
+			state.killed = table.concat(t, "", from + 1, to)
 		end
 		for _ = from + 1, to do
 			table.remove(t, from + 1)
 		end
-		search.cursor = from
+		state.cursor = from
 		return "text"
 	end
 	local function insert(str)
 		for _, code in utf8.codes(str) do
-			search.cursor = search.cursor + 1
-			table.insert(t, search.cursor, utf8.char(code))
+			state.cursor = state.cursor + 1
+			table.insert(t, state.cursor, utf8.char(code))
 		end
 		return str ~= "" and "text" or "cursor"
 	end
 	if (ctrl and key == "a") or (plain and key == "home") then
-		search.cursor = 0
+		state.cursor = 0
 	elseif (ctrl and key == "e") or (plain and key == "end") then
-		search.cursor = #t
+		state.cursor = #t
 	elseif (ctrl and key == "f") or (plain and key == "right") then
-		search.cursor = math.min(#t, c + 1)
+		state.cursor = math.min(#t, c + 1)
 	elseif (ctrl and key == "b") or (plain and key == "left") then
-		search.cursor = math.max(0, c - 1)
+		state.cursor = math.max(0, c - 1)
 	elseif meta and key == "f" then
-		search.cursor = wordForward(t, c)
+		state.cursor = wordForward(t, c)
 	elseif meta and key == "b" then
-		search.cursor = wordBackward(t, c)
+		state.cursor = wordBackward(t, c)
 	elseif (plain and key == "delete") or (ctrl and key == "h") then
 		return remove(math.max(0, c - 1), c)
 	elseif (plain and key == "forwarddelete") or (ctrl and key == "d") then
@@ -789,7 +810,7 @@ local function searchEdit(event, key, flags)
 	elseif ctrl and key == "u" then
 		return remove(0, c, true)
 	elseif ctrl and key == "y" then
-		return insert(search.killed)
+		return insert(state.killed)
 	elseif plain then
 		local typed = event:getCharacters()
 		if typed == "" or typed:find("%c") then
@@ -821,7 +842,7 @@ searchTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(event)
 		end
 		searchRender()
 	else
-		local edit = searchEdit(event, key, flags)
+		local edit = lineEdit(search, event, key, flags)
 		if edit == "text" then
 			search.query = table.concat(search.text)
 			searchFilter()
@@ -837,6 +858,289 @@ searchAll = function()
 	searchFilter()
 	searchTap:start()
 	searchRender()
+end
+
+--- Command mode (H-z/;) ---
+-- A vim-style : prompt drawn like search. Enter runs the command, Esc cancels, and editing is
+-- the same as in search (lineEdit). An error shows under the prompt and keeps the text.
+--   ct <duration> [-m label] [-e end message]   ct 30m -m DSA, ct 1h 30m, ct 90s, ct 5 (minutes)
+--   ct -t <HHMM|HHMMSS> [-m label] [-e msg]     until a clock time, tomorrow if already past
+--   q                                           cancel the timer, or clear it and stop the alarm
+-- ct ports ~/scripts/countdown.zsh: the countdown shows left of the clock; at zero the end message
+-- replaces it and Hero repeats until :q. Quote multi-word values: ct 30m -m "Deep work".
+-- The timer persists via hs.settings, so it survives config reloads.
+local CT_GAP = 6 -- px between the ct slot and the clock
+local ct = hs.settings.get("ct") -- { endTime, label, endMsg } or nil
+local ctCanvas, ctTimer, ctAlarm
+local ctSound = hs.sound.getByFile("/System/Library/Sounds/Hero.aiff")
+
+local function ctText()
+	local left = ct.endTime - os.time()
+	if left <= 0 then
+		return ct.endMsg
+	end
+	local h, m, s = left // 3600, left % 3600 // 60, left % 60
+	local t = h > 0 and string.format("%d:%02d:%02d", h, m, s) or string.format("%02d:%02d", m, s)
+	return ct.label and (ct.label .. " " .. t) or t
+end
+
+local function ctFrame(text)
+	local size = hs.drawing.getTextDrawingSize(text, { font = clockFont, size = clockSize })
+	local w, h = math.ceil(size.w) + 2 * CLOCK_PAD_X, math.ceil(size.h) + 2 * CLOCK_PAD_Y
+	local right, y
+	if clockCanvas then
+		local c = clockCanvas:frame()
+		right, y = c.x - CT_GAP, c.y
+	else
+		local f = hs.screen.mainScreen():frame()
+		right, y = f.x + f.w - CLOCK_INSET, f.y + CLOCK_INSET
+	end
+	return { x = right - w, y = y, w = w, h = h }
+end
+
+local function ctStopAlarm()
+	if ctAlarm then
+		ctAlarm:stop()
+		ctAlarm = nil
+	end
+	ctSound:stop()
+end
+
+local function ctStartAlarm()
+	if ctAlarm then
+		return
+	end
+	local function ring()
+		ctSound:stop()
+		ctSound:play()
+	end
+	ring()
+	ctAlarm = hs.timer.doEvery(ctSound:duration() + 0.5, ring) -- like the script's afplay; sleep 0.5
+end
+
+-- Recomputed from the wall clock each tick, so it stays right across sleep.
+updateCt = function()
+	if not ct then
+		return
+	end
+	local text = ctText()
+	if not ctCanvas then
+		ctCanvas = newOverlay(ctFrame(text))
+		ctCanvas:show()
+	end
+	ctCanvas:frame(ctFrame(text))
+	ctCanvas[2].text = text
+	if ct.endTime <= os.time() then
+		ctStartAlarm()
+	end
+end
+
+local function ctClear()
+	ctStopAlarm()
+	if ctTimer then
+		ctTimer:stop()
+		ctTimer = nil
+	end
+	if ctCanvas then
+		ctCanvas:delete()
+		ctCanvas = nil
+	end
+	ct = nil
+	hs.settings.clear("ct")
+end
+
+local function ctRun(state)
+	ctClear()
+	ct = state
+	hs.settings.set("ct", ct)
+	updateCt()
+	ctTimer = hs.timer.doEvery(1, updateCt)
+end
+
+-- Returns { endTime, label, endMsg }, or nil and an error message.
+local function ctParse(args)
+	local label, endMsg, target, durations = nil, "Countdown complete!", nil, {}
+	local i = 1
+	while i <= #args do
+		local a = args[i]
+		local opt = ({ ["-m"] = "m", ["--message"] = "m", ["-e"] = "e", ["--end"] = "e", ["-t"] = "t", ["--time"] = "t" })[a]
+		if opt then
+			local v = args[i + 1]
+			if not v then
+				return nil, a .. " needs a value"
+			end
+			if opt == "m" then
+				label = v
+			elseif opt == "e" then
+				endMsg = v
+			else
+				target = v
+			end
+			i = i + 2
+		else
+			table.insert(durations, a)
+			i = i + 1
+		end
+	end
+	if #durations == 0 and not target then
+		return nil, "Usage: ct <time> [-m label] [-e end message]  |  ct -t <HHMM|HHMMSS> ..."
+	end
+	if target and #durations > 0 then
+		return nil, "Use either a duration or -t, not both."
+	end
+	local now, endTime = os.time(), nil
+	if target then
+		local h, m, s = target:match("^(%d%d)(%d%d)(%d?%d?)$")
+		if not h or #s == 1 then
+			return nil, "Invalid target time '" .. target .. "'. Use HHMM or HHMMSS, e.g. 1100 or 110030."
+		end
+		h, m, s = tonumber(h), tonumber(m), tonumber(s) or 0
+		if h > 23 or m > 59 or s > 59 then
+			return nil, "Invalid target time '" .. target .. "'."
+		end
+		local d = os.date("*t", now)
+		d.hour, d.min, d.sec, d.isdst = h, m, s, nil
+		endTime = os.time(d)
+		if endTime <= now then -- already passed today: tomorrow (os.time normalizes day + 1)
+			d.day = d.day + 1
+			endTime = os.time(d)
+		end
+	else
+		local total = 0
+		for _, a in ipairs(durations) do
+			local n, unit = a:match("^(%d+)([hms]?)$")
+			if not n then
+				return nil, "Invalid time '" .. a .. "'. Use e.g. 1h 30m 45s or 5 (minutes)."
+			end
+			total = total + tonumber(n) * ({ h = 3600, m = 60, s = 1, [""] = 60 })[unit]
+		end
+		if total <= 0 then
+			return nil, "Time must be > 0."
+		end
+		endTime = now + total
+	end
+	return { endTime = endTime, label = label, endMsg = endMsg }
+end
+
+-- Whitespace-separated words; "double" or 'single' quotes group words.
+local function tokenize(line)
+	local tokens, i = {}, 1
+	while true do
+		i = select(2, line:find("^%s*", i)) + 1
+		if i > #line then
+			return tokens
+		end
+		local q = line:sub(i, i)
+		if q == '"' or q == "'" then
+			local close = line:find(q, i + 1, true)
+			if not close then
+				return nil, "Unclosed quote"
+			end
+			table.insert(tokens, line:sub(i + 1, close - 1))
+			i = close + 1
+		else
+			local e = select(2, line:find("^%S+", i))
+			table.insert(tokens, line:sub(i, e))
+			i = e + 1
+		end
+	end
+end
+
+-- Each command validates its args and returns the action to run, or nil and an error.
+local commands = {
+	ct = function(args)
+		local state, err = ctParse(args)
+		if not state then
+			return nil, err
+		end
+		return function()
+			ctRun(state)
+			local fmt = os.date("%S", state.endTime) == "00" and "%H%M" or "%H%M%S"
+			hs.alert.show((state.label or "Timer") .. " until " .. os.date(fmt, state.endTime), 2)
+		end
+	end,
+	q = function()
+		return ctClear
+	end,
+}
+
+local cmd = { text = {}, cursor = 0, killed = "", error = nil }
+local cmdTap, cmdAlert
+local CMD_MIN_WIDTH = 40 -- chars; keeps the prompt from jumping in width while typing
+local function cmdRender()
+	local lines = { ":" .. table.concat(cmd.text) .. " " } -- trailing space holds the cursor at the end
+	if cmd.error then
+		table.insert(lines, "")
+		table.insert(lines, cmd.error)
+	end
+	local width = CMD_MIN_WIDTH
+	for _, line in ipairs(lines) do
+		width = math.max(width, utf8.len(line))
+	end
+	for i, line in ipairs(lines) do
+		lines[i] = line .. string.rep(" ", width - utf8.len(line))
+	end
+	local text = hs.styledtext.new(table.concat(lines, "\n"), SEARCH_TEXT_STYLE)
+	text = text:setStyle(SEARCH_CURSOR_STYLE, cmd.cursor + 2, cmd.cursor + 2) -- +1 for ":", +1 for 1-based
+	if cmdAlert then
+		hs.alert.closeSpecific(cmdAlert, 0)
+	end
+	cmdAlert = hs.alert.show(text, SEARCH_STYLE, hs.screen.mainScreen(), true)
+end
+local function cmdClose()
+	cmdTap:stop()
+	if cmdAlert then
+		hs.alert.closeSpecific(cmdAlert, 0)
+		cmdAlert = nil
+	end
+end
+cmdTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(event)
+	local key, flags = hs.keycodes.map[event:getKeyCode()], event:getFlags()
+	if key == "escape" then
+		cmdClose()
+	elseif key == "return" or key == "padenter" then
+		local tokens, err = tokenize(table.concat(cmd.text))
+		local action
+		if tokens and #tokens == 0 then
+			cmdClose()
+			return true
+		elseif tokens then
+			local name = table.remove(tokens, 1)
+			if commands[name] then
+				action, err = commands[name](tokens)
+			else
+				err = "Not a command: " .. name
+			end
+		end
+		if action then
+			cmdClose()
+			hs.timer.doAfter(0, action) -- outside the tap callback
+		else
+			cmd.error = err
+			cmdRender()
+		end
+	else
+		local edit = lineEdit(cmd, event, key, flags)
+		if edit == "text" then
+			cmd.error = nil
+		end
+		if edit then
+			cmdRender()
+		end
+	end
+	return true -- every key press stays out of the front app while the prompt is open
+end)
+commandMode = function()
+	cmd.text, cmd.cursor, cmd.error = {}, 0, nil
+	hs.alert.closeAll()
+	cmdTap:start()
+	cmdRender()
+end
+hs.hotkey.bind(hyper, ";", commandMode) -- H-z is bound with the Hyper keys above
+
+if ct then -- restore a timer that was running before a reload
+	updateCt()
+	ctTimer = hs.timer.doEvery(1, updateCt)
 end
 
 --- Firefox Quit, Raindrop Save Tabs Warning ---
