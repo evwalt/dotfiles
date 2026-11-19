@@ -79,7 +79,7 @@ return {
 						yellow = "#dbbd84",
 						yellow_bright = "#ead5ad",
 						blue = "#7fa9d1",
-						blue_bright = "#a9c6e3",
+						blue_bright = "#b1b9f9", -- periwinkle, matches Alacritty
 						magenta = "#b996c4",
 						magenta_bright = "#d4bddc",
 						cyan = "#6aaa9e",
