@@ -103,6 +103,10 @@ return {
 			-- capabilities = capabilities,
 			-- Cap the JVM heap so ltex can't balloon
 			cmd_env = { JAVA_OPTS = "-Xmx1g" },
+			-- Loose/strict spelling modes; toggle with <space><space>ts
+			handlers = {
+				["textDocument/publishDiagnostics"] = require("config.ltex-filter").handler,
+			},
 			filetypes = {
 				"bib",
 				"context",

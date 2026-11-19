@@ -64,6 +64,9 @@ end, { desc = "Add word to dictionaries (lowercase + cased)" })
 vim.keymap.set("n", "<space><space>A", function()
 	require("config.dict-add").add(true)
 end, { desc = "Add word to dictionaries (exact spelling)" })
+vim.keymap.set("n", "<space><space>ts", function()
+	require("config.ltex-filter").toggle()
+end, { desc = "Toggle ltex spelling loose/strict for buffer" })
 
 --- Edit Specific Files ---
 local prod_personal_path = "~/Library/CloudStorage/Dropbox/docs/notes/productivity-personal/"
