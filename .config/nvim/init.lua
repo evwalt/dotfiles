@@ -7,6 +7,8 @@ vim.hl = vim.highlight
 
 --- Settings ---
 require("config.set")
+-- Registers the query directive markdown_inline injections need (before any parse)
+require("config.md-math")
 
 --- Keymaps ---
 require("config.keymaps")
