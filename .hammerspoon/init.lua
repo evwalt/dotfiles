@@ -266,6 +266,7 @@ local clockFont, clockSize = ".AppleSystemUIFont", 15
 local CLOCK_PAD_X, CLOCK_PAD_Y, CLOCK_INSET = 8, 3, 0
 local clockCanvas, clockTimer
 local updateCt -- the ct slot left of the clock; defined with command mode below
+local toggleCt -- show/hide that slot (the timer and alarm keep running)
 
 local function clockText()
 	return os.date((clockDate and "%Y-%m-%d " or "") .. (clockSecs and "%H%M%S" or "%H%M"))
@@ -431,6 +432,13 @@ local picker1Items = {
 	{ "m", "Toggle Clock Date", toggleClockDate },
 	{ "w", "Cursor Beacon", cursorBeacon, front = true },
 	{ "v", "Paste (s-v)", keyStroker({ "cmd" }, "v"), front = true },
+	{
+		"delete",
+		"Toggle Countdown",
+		function()
+			toggleCt()
+		end,
+	},
 }
 hs.hotkey.bind(hyper, "G", actionPicker("Picker 1 (H-g)", picker1Items))
 local picker2Items = {
@@ -871,6 +879,7 @@ end
 -- The timer persists via hs.settings, so it survives config reloads.
 local CT_GAP = 6 -- px between the ct slot and the clock
 local ct = hs.settings.get("ct") -- { endTime, label, endMsg } or nil
+local ctHidden = hs.settings.get("ctHidden") or false -- display only; the alarm still rings
 local ctCanvas, ctTimer, ctAlarm
 local ctSound = hs.sound.getByFile("/System/Library/Sounds/Hero.aiff")
 
@@ -924,12 +933,19 @@ updateCt = function()
 		return
 	end
 	local text = ctText()
-	if not ctCanvas then
-		ctCanvas = newOverlay(ctFrame(text))
-		ctCanvas:show()
+	if ctHidden then
+		if ctCanvas then
+			ctCanvas:delete()
+			ctCanvas = nil
+		end
+	else
+		if not ctCanvas then
+			ctCanvas = newOverlay(ctFrame(text))
+			ctCanvas:show()
+		end
+		ctCanvas:frame(ctFrame(text))
+		ctCanvas[2].text = text
 	end
-	ctCanvas:frame(ctFrame(text))
-	ctCanvas[2].text = text
 	if ct.endTime <= os.time() then
 		ctStartAlarm()
 	end
@@ -947,6 +963,13 @@ local function ctClear()
 	end
 	ct = nil
 	hs.settings.clear("ct")
+end
+
+toggleCt = function()
+	ctHidden = not ctHidden
+	hs.settings.set("ctHidden", ctHidden)
+	updateCt()
+	hs.alert.show("Countdown " .. (ctHidden and "hidden" or "shown"), 1)
 end
 
 local function ctRun(state)
