@@ -9,6 +9,11 @@ return {
 		bufferline.setup({
 			options = {
 				numbers = "ordinal",
+				-- No divider glyphs or active-tab bar; tabs are split by spaces only
+				separator_style = { "", "" },
+				indicator = { style = "none" },
+				left_trunc_marker = "",
+				right_trunc_marker = "",
 				auto_toggle_bufferline = false, -- otherwise bufferline resets showtabline on every redraw
 			},
 		})
