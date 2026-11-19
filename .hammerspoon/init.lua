@@ -766,11 +766,13 @@ end
 --   M-f, M-b              word forward, back  DEL/C-h, C-d/Fwd Del  delete char back, forward
 --   M-DEL, C-w            kill word back      M-d                   kill word forward
 --   C-k, C-u              kill to end, start  C-y                   yank last kill
+--   s-v                   paste the clipboard as one line
 local function lineEdit(state, event, key, flags)
 	local t, c = state.text, state.cursor
 	local ctrl = flags.ctrl and not (flags.cmd or flags.alt)
 	local meta = flags.alt and not (flags.cmd or flags.ctrl)
 	local plain = not (flags.cmd or flags.ctrl or flags.alt)
+	local cmdOnly = flags.cmd and not (flags.ctrl or flags.alt)
 	local function remove(from, to, keep) -- chars from+1..to
 		if to <= from then
 			return "cursor"
@@ -819,6 +821,10 @@ local function lineEdit(state, event, key, flags)
 		return remove(0, c, true)
 	elseif ctrl and key == "y" then
 		return insert(state.killed)
+	elseif cmdOnly and key == "v" then
+		-- one line: newlines and tabs become spaces, other control chars are dropped
+		local clip = (hs.pasteboard.getContents() or ""):gsub("[\r\n\t]+", " "):gsub("%c", "")
+		return insert(clip)
 	elseif plain then
 		local typed = event:getCharacters()
 		if typed == "" or typed:find("%c") then
