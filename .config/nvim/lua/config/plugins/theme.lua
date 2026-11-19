@@ -1,5 +1,5 @@
 -- Change this to switch themes; open nvim instances pick it up on restart.
--- Options: tokyonight-{storm,night,moon,day}
+-- Options: tokyonight-night (the Harbor Night overrides below assume it)
 local colorscheme = "tokyonight-night"
 
 return {
