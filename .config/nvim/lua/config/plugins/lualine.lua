@@ -5,12 +5,15 @@ return {
 	dependencies = { "nvim-tree/nvim-web-devicons" },
 
 	config = function()
+		-- Left padding only, so neighbors are one space apart
+		local pad = { left = 1, right = 0 }
 		require("lualine").setup({
 			options = {
 				icons_enabled = true,
 				theme = "auto",
-				component_separators = { left = "", right = "" },
-				section_separators = { left = "", right = "" },
+				-- No separator glyphs; components are split by one space (see `pad`)
+				component_separators = "",
+				section_separators = "",
 				disabled_filetypes = {
 					statusline = {},
 					winbar = {},
@@ -39,11 +42,15 @@ return {
 				},
 			},
 			sections = {
-				lualine_a = { "mode" },
-				lualine_b = { "branch", "diff", "diagnostics" },
+				lualine_a = { { "mode", padding = 0 } },
+				lualine_b = {
+					{ "branch", padding = pad },
+					{ "diff", padding = pad },
+					{ "diagnostics", padding = pad },
+				},
 				-- lualine_c = { "filename" },
 				lualine_c = {
-					{ "filename", path = 3 },
+					{ "filename", path = 3, padding = pad },
 				},
 				-- lualine_x = { "encoding", "fileformat", "filetype" },
 				lualine_x = {
@@ -65,6 +72,7 @@ return {
 							local fg = vim.api.nvim_get_hl(0, { name = "DiagnosticWarn", link = false }).fg
 							return fg and { fg = string.format("#%06x", fg) } or nil
 						end,
+						padding = pad,
 					},
 					{
 						function()
@@ -78,18 +86,26 @@ return {
 							end
 							return ""
 						end,
+						padding = pad,
 					},
 					{
-						-- ltex spelling mode (<space><space>ts), only where ltex is attached
+						-- Two independent toggles: ltex spelling mode (<space><space>ts) where
+						-- ltex is attached, and Tree-sitter math highlighting (<space><space>tm)
+						-- in markdown buffers, e.g. "ltex:loose md:nomath"
 						function()
-							return "ltex:" .. (require("config.ltex-filter").mode())
+							local parts = {}
+							if #vim.lsp.get_clients({ bufnr = 0, name = "ltex_plus" }) > 0 then
+								table.insert(parts, "ltex:" .. (require("config.ltex-filter").mode()))
+							end
+							if vim.bo.filetype == "markdown" then
+								table.insert(parts, "md:" .. (require("config.md-math").enabled() and "math" or "nomath"))
+							end
+							return table.concat(parts, " ")
 						end,
-						cond = function()
-							return #vim.lsp.get_clients({ bufnr = 0, name = "ltex_plus" }) > 0
-						end,
+						padding = pad,
 					},
-					"encoding",
-					"filetype",
+					{ "encoding", padding = pad },
+					{ "filetype", padding = pad },
 				},
 				-- lualine_x = {
 				-- 	{
@@ -98,8 +114,18 @@ return {
 				-- 		color = { fg = "#ff9e64" },
 				-- 	},
 				-- },
-				lualine_y = { "progress" },
-				lualine_z = { "location" },
+				lualine_y = { { "progress", padding = pad } },
+				lualine_z = {
+					{
+						-- line:column with the line padded to the file's longest line number,
+						-- so the right edge stays put without trailing spaces
+						function()
+							local width = #tostring(vim.fn.line("$"))
+							return string.format("%" .. width .. "d:%d", vim.fn.line("."), vim.fn.virtcol("."))
+						end,
+						padding = pad,
+					},
+				},
 			},
 			inactive_sections = {
 				lualine_a = {},
