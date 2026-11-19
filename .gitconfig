@@ -29,11 +29,11 @@
 	minus-style = syntax "#2a1720"
 	minus-emph-style = syntax "#6b3247"
 	plus-style = syntax "#16261f"
-	plus-emph-style = syntax "#2c5546"
+	plus-emph-style = syntax "#2c5540"
 	# Brighter than delta's defaults so numbers and gutters stay readable
 	line-numbers-zero-style = "#8a8fb0"
 	line-numbers-minus-style = "#e08592"
-	line-numbers-plus-style = "#8fbf98"
+	line-numbers-plus-style = "#88c9a4"
 	line-numbers-left-style = "#4a4c70"
 	line-numbers-right-style = "#4a4c70"
 	file-style = "#b1b9f9" bold
