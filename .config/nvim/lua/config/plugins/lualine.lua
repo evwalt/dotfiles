@@ -7,10 +7,29 @@ return {
 	config = function()
 		-- Left padding only, so neighbors are one space apart
 		local pad = { left = 1, right = 0 }
-		require("lualine").setup({
+
+		-- Text colors only: take the colorscheme's lualine theme, drop every section
+		-- background, and show the mode color (section a, mirrored in y/z) as text.
+		local function fg_only_theme()
+			package.loaded["lualine.themes.auto"] = nil
+			local theme = vim.deepcopy(require("lualine.themes.auto"))
+			local bg = vim.api.nvim_get_hl(0, { name = "StatusLine", link = false }).bg
+			bg = bg and string.format("#%06x", bg) or "NONE"
+			for _, mode in pairs(theme) do
+				for name, hl in pairs(mode) do
+					if name == "a" or name == "z" then
+						hl.fg = hl.bg
+					end
+					hl.bg = bg
+				end
+			end
+			return theme
+		end
+
+		local opts = {
 			options = {
 				icons_enabled = true,
-				theme = "auto",
+				theme = fg_only_theme(),
 				-- No separator glyphs; components are split by one space (see `pad`)
 				component_separators = "",
 				section_separators = "",
@@ -139,6 +158,14 @@ return {
 			winbar = {},
 			inactive_winbar = {},
 			extensions = {},
+		}
+		require("lualine").setup(opts)
+		vim.api.nvim_create_autocmd("ColorScheme", {
+			group = vim.api.nvim_create_augroup("lualine_fg_only", { clear = true }),
+			callback = function()
+				opts.options.theme = fg_only_theme()
+				require("lualine").setup(opts)
+			end,
 		})
 
 		-- Statusline (mode, file, position, encoding...) is hidden by default; <space>ts toggles it.
