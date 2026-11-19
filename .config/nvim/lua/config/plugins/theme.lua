@@ -36,7 +36,7 @@ return {
 					c.blue6 = "#c6dcef"
 					c.blue7 = "#2a3352"
 					c.cyan = "#93c4ba"
-					c.green = "#8fbf98"
+					c.green = "#86b3a8"
 					c.green1 = "#6aaa9e"
 					c.green2 = "#4f8f84"
 					c.teal = "#6aaa9e"
@@ -96,8 +96,8 @@ return {
 					hl.CursorLineNr = { fg = c.blue, bold = true }
 
 					-- Markdown: neutral heading bars, one color per level; favorite colors on the most-used levels (H2/H3)
-					-- (H3 is the steel blue #7fa9d1; teal moved down to H4)
-					local heading_fg = { "#dce1ec", c.blue, c.blue1, c.cyan, c.green, c.yellow }
+					-- (H3 is the steel blue #7fa9d1; teal moved down to H4; H5 is orange so it does not echo the seafoam string green)
+					local heading_fg = { "#dce1ec", c.blue, c.blue1, c.cyan, c.orange, c.yellow }
 					for i = 1, 6 do
 						local fg = heading_fg[i]
 						hl["@markup.heading." .. i .. ".markdown"] = { fg = fg, bg = "#151626", bold = true }
