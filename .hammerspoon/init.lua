@@ -410,13 +410,7 @@ local picker1Items = {
 	{ "l", "Notes" },
 	{ "d", "Toggle Clock Seconds", toggleClockSecs },
 	{ "h", "Handy" },
-	{
-		"t",
-		"Toggle Clock",
-		function()
-			setClock(not clockOn)
-		end,
-	},
+	{ "t", "Cursor Beacon", cursorBeacon, front = true },
 	{ "n", "Spotify" },
 	{
 		"s",
@@ -430,7 +424,13 @@ local picker1Items = {
 	},
 	{ "b", "Cut (s-x)", keyStroker({ "cmd" }, "x"), front = true },
 	{ "m", "Toggle Clock Date", toggleClockDate },
-	{ "w", "Cursor Beacon", cursorBeacon, front = true },
+	{
+		"w",
+		"Toggle Clock",
+		function()
+			setClock(not clockOn)
+		end,
+	},
 	{ "v", "Paste (s-v)", keyStroker({ "cmd" }, "v"), front = true },
 	{
 		"delete",
