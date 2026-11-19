@@ -177,26 +177,18 @@ _SEGMENT_SEPARATOR=''
 _PL_BRANCH_CHAR=''
 
 _prompt_segment() {
-  local bg fg
-  [[ -n $1 ]] && bg="%K{$1}" || bg="%k"
+  # Background arg is ignored: segments use the terminal background and are
+  # distinguished by text color only, separated by a space.
+  local fg
   [[ -n $2 ]] && fg="%F{$2}" || fg="%f"
-  if [[ $_CURRENT_BG != 'NONE' && $1 != $_CURRENT_BG ]]; then
-    print -n " %{$bg%F{$_CURRENT_BG}%}$_SEGMENT_SEPARATOR%{$fg%}"
-  else
-    print -n "%{$bg%}%{$fg%}"
-  fi
+  [[ $_CURRENT_BG != 'NONE' ]] && print -n " "
+  print -n "%{%k$fg%}"
   _CURRENT_BG=$1
   [[ -n $3 ]] && print -n $3
 }
 
 _prompt_end() {
-  if [[ -n $_CURRENT_BG ]]; then
-    # reset bg first so the trailing space is black, not the last segment's color
-    print -n "%{%k%F{$_CURRENT_BG}%}$_SEGMENT_SEPARATOR "
-  else
-    print -n "%{%k%}"
-  fi
-  print -n "%{%f%}"
+  print -n "%{%k%f%} "
   _CURRENT_BG=''
 }
 
@@ -209,15 +201,15 @@ _prompt_status() {
 }
 
 _prompt_virtualenv() {
-  [[ -n "$CONDA_DEFAULT_ENV" ]] && _prompt_segment magenta black "🐍 $CONDA_DEFAULT_ENV"
-  [[ -n "$VIRTUAL_ENV" ]] && _prompt_segment blue black "(${VIRTUAL_ENV:t})"
+  [[ -n "$CONDA_DEFAULT_ENV" ]] && _prompt_segment magenta magenta "🐍 $CONDA_DEFAULT_ENV"
+  [[ -n "$VIRTUAL_ENV" ]] && _prompt_segment blue blue "(${VIRTUAL_ENV:t})"
 }
 
 _prompt_aws() {
   [[ -z "$AWS_PROFILE" ]] && return
   case "$AWS_PROFILE" in
-    *-prod|*production*) _prompt_segment red yellow "AWS: $AWS_PROFILE" ;;
-    *) _prompt_segment green black "AWS: $AWS_PROFILE" ;;
+    *-prod|*production*) _prompt_segment red red "AWS: $AWS_PROFILE" ;;
+    *) _prompt_segment green green "AWS: $AWS_PROFILE" ;;
   esac
 }
 
