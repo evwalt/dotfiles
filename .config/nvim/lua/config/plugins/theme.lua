@@ -35,7 +35,7 @@ return {
 					c.blue5 = "#a9c6e3"
 					c.blue6 = "#c6dcef"
 					c.blue7 = "#2a3352"
-					c.cyan = "#93c4ba"
+					c.cyan = "#92c2c8"
 					c.green = "#86b3a8"
 					c.green1 = "#6aaa9e"
 					c.green2 = "#4f8f84"
