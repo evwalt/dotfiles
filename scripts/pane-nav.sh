@@ -21,8 +21,8 @@ if [ -n "$pzoom" ]; then
     ~/scripts/sidecar pzoom "$win"
   fi
 fi
-# Prefix j keeps full/hide: only one side is visible, so the move stays on it.
-[ -n "$full" ] && [ "$dir" != d ] && ~/scripts/sidecar full "$win"
+# Prefix j/k keep full/hide: only one side is visible, so the move stays on it.
+[ -n "$full" ] && [ "$dir" = r ] && ~/scripts/sidecar full "$win"
 panes=$(tmux list-panes -t "$win" -F '#{pane_id} #{@sidecar} #{pane_left} #{pane_top} #{pane_width} #{pane_height}')
 p=
 if [ "$dir" = r ] && [ "$cur_sc" != 1 ]; then
