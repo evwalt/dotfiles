@@ -877,7 +877,7 @@ end
 -- ct ports ~/scripts/countdown.zsh: the countdown shows left of the clock; at zero the end message
 -- replaces it and Hero repeats until :q. Quote multi-word values: ct 30m -m "Deep work".
 -- The timer persists via hs.settings, so it survives config reloads.
-local CT_GAP = 6 -- px between the ct slot and the clock
+local CT_GAP = 0 -- px between the ct slot and the clock: flush, separate panels
 local ct = hs.settings.get("ct") -- { endTime, label, endMsg } or nil
 local ctHidden = hs.settings.get("ctHidden") or false -- display only; the alarm still rings
 local ctCanvas, ctTimer, ctAlarm
@@ -893,9 +893,16 @@ local function ctText()
 	return ct.label and (ct.label .. " " .. t) or t
 end
 
-local function ctFrame(text)
+-- While counting, the width only grows (the first, widest reading sets it), so the panel stays put
+-- as digits and the h: field drop away. At zero it fits the end message.
+local ctWidth
+local function ctFrame(text, ended)
 	local size = hs.drawing.getTextDrawingSize(text, { font = clockFont, size = clockSize })
 	local w, h = math.ceil(size.w) + 2 * CLOCK_PAD_X, math.ceil(size.h) + 2 * CLOCK_PAD_Y
+	if not ended then
+		ctWidth = math.max(ctWidth or 0, w)
+		w = ctWidth
+	end
 	local right, y
 	if clockCanvas then
 		local c = clockCanvas:frame()
@@ -933,6 +940,7 @@ updateCt = function()
 		return
 	end
 	local text = ctText()
+	local ended = ct.endTime <= os.time()
 	if ctHidden then
 		if ctCanvas then
 			ctCanvas:delete()
@@ -940,13 +948,15 @@ updateCt = function()
 		end
 	else
 		if not ctCanvas then
-			ctCanvas = newOverlay(ctFrame(text))
+			ctCanvas = newOverlay(ctFrame(text, ended))
+			ctCanvas[2].textAlignment = "left" -- digits drop away on the right, not both sides
+			ctCanvas[2].frame = { x = CLOCK_PAD_X, y = CLOCK_PAD_Y, w = "100%", h = "100%" }
 			ctCanvas:show()
 		end
-		ctCanvas:frame(ctFrame(text))
+		ctCanvas:frame(ctFrame(text, ended))
 		ctCanvas[2].text = text
 	end
-	if ct.endTime <= os.time() then
+	if ended then
 		ctStartAlarm()
 	end
 end
@@ -961,7 +971,7 @@ local function ctClear()
 		ctCanvas:delete()
 		ctCanvas = nil
 	end
-	ct = nil
+	ct, ctWidth = nil, nil
 	hs.settings.clear("ct")
 end
 
