@@ -57,6 +57,14 @@ vim.keymap.set("n", "<space><space>btd", function()
 	vim.notify("Diagnostics: " .. (enabled and "OFF" or "ON") .. " for this buffer")
 end, { desc = "Toggle diagnostics for current buffer" })
 
+--- Spell-check Dictionaries (ltex + codebook) ---
+vim.keymap.set("n", "<space><space>a", function()
+	require("config.dict-add").add(false)
+end, { desc = "Add word to dictionaries (lowercase + cased)" })
+vim.keymap.set("n", "<space><space>A", function()
+	require("config.dict-add").add(true)
+end, { desc = "Add word to dictionaries (exact spelling)" })
+
 --- Edit Specific Files ---
 local prod_personal_path = "~/Library/CloudStorage/Dropbox/docs/notes/productivity-personal/"
 local function in_dropbox_dir()
