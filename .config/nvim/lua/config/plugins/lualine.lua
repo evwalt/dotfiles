@@ -79,6 +79,15 @@ return {
 							return ""
 						end,
 					},
+					{
+						-- ltex spelling mode (<space><space>ts), only where ltex is attached
+						function()
+							return "ltex:" .. (require("config.ltex-filter").mode())
+						end,
+						cond = function()
+							return #vim.lsp.get_clients({ bufnr = 0, name = "ltex_plus" }) > 0
+						end,
+					},
 					"encoding",
 					"filetype",
 				},

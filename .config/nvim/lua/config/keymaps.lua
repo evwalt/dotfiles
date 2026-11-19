@@ -67,6 +67,10 @@ end, { desc = "Add word to dictionaries (exact spelling)" })
 vim.keymap.set("n", "<space><space>ts", function()
 	require("config.ltex-filter").toggle()
 end, { desc = "Toggle ltex spelling loose/strict for buffer" })
+vim.api.nvim_create_user_command("LtexMode", function()
+	local mode, why = require("config.ltex-filter").mode()
+	vim.notify("ltex spelling: " .. mode .. " (" .. why .. ")")
+end, { desc = "Show ltex spelling mode for buffer" })
 
 --- Edit Specific Files ---
 local prod_personal_path = "~/Library/CloudStorage/Dropbox/docs/notes/productivity-personal/"

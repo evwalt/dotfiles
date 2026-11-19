@@ -77,12 +77,27 @@ function M.handler(err, result, ctx)
 	return default_handler(err, result, ctx)
 end
 
+-- Returns "loose"/"strict" and why: "toggled", "notes folder" or "default".
+function M.mode(bufnr)
+	bufnr = bufnr or vim.api.nvim_get_current_buf()
+	if vim.b[bufnr].ltex_mode then
+		return vim.b[bufnr].ltex_mode, "toggled"
+	end
+	if is_loose(bufnr) then
+		return "loose", "notes folder"
+	end
+	return "strict", "default"
+end
+
 function M.toggle()
 	local bufnr = vim.api.nvim_get_current_buf()
 	vim.b[bufnr].ltex_mode = is_loose(bufnr) and "strict" or "loose"
 	if last[bufnr] then
 		M.handler(unpack(last[bufnr]))
 	end
+	pcall(function()
+		require("lualine").refresh()
+	end)
 	vim.notify("ltex spelling: " .. vim.b[bufnr].ltex_mode .. " for this buffer")
 end
 
