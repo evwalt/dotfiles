@@ -10,10 +10,10 @@
     "promptBorder": "#33344f",
     "promptBorderShimmer": "#4a4c70",
 
-    "claude": "#d9a184",
+    "claude": "#cdbda2",
     "claudeShimmer": "#ebc2aa",
-    "clawd_body": "#d9a184",
-    "briefLabelClaude": "#d9a184",
+    "clawd_body": "#cdbda2",
+    "briefLabelClaude": "#cdbda2",
     "briefLabelYou": "#659dce",
 
     "claudeBlue_FOR_SYSTEM_SPINNER": "#7fa9d1",

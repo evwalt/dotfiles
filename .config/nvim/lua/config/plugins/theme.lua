@@ -43,7 +43,7 @@ return {
 					c.magenta = "#b9aef0"
 					c.magenta2 = "#c98aa6"
 					c.purple = "#a59fe6"
-					c.orange = "#d9a184"
+					c.orange = "#cdbda2"
 					c.yellow = "#dbbd84"
 					c.red = "#e08592"
 					c.red1 = "#c96a78"
