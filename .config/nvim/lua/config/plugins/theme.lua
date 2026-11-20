@@ -58,7 +58,7 @@ return {
 					c.bg_statusline = c.bg_dark
 					c.bg_sidebar = c.bg_dark
 					c.bg_float = c.bg_dark
-					c.bg_visual = "#252a48"
+					c.bg_visual = "#3a4380" -- periwinkle-tinted; brighter than search (#34406a) so selections stand out
 					c.bg_search = c.blue0
 					c.fg_sidebar = c.fg_dark
 					c.fg_float = c.fg
