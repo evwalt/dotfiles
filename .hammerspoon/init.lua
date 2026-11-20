@@ -32,7 +32,7 @@ local hyper = { "ctrl", "alt", "cmd", "shift" }
 -- to the mirror key on the left hand (same finger and row, Dvorak), shown after a slash. The hint
 -- lists every key in right-hand keyboard order, one block per row, free keys shown as "—".
 -- Press the hyper combo, then a sub-key. Esc cancels. The hint stays up until either.
--- z/; opens a search over every picker and Hyper key (see searchAll). "space" and "delete"
+-- s/a opens a search over every picker and Hyper key (see searchAll). "space" and "delete"
 -- (Backspace) are extra slots with no mirror, listed below the grid as SPC and DEL.
 -- An item with `front = true` acts on the front app; from search it asks to confirm first.
 local MIRROR_ROWS = { -- Dvorak right-hand keys and their left-hand mirrors, row by row
@@ -66,7 +66,7 @@ local function hintText(labels)
 	return table.concat(lines, "\n")
 end
 local EXTRA_KEYS = { { "space", "SPC" }, { "delete", "DEL" } } -- unmirrored slots, hint name
-local SEARCH_KEY = "z"
+local SEARCH_KEY = "s"
 local searchAll -- defined after the Hyper keys below
 local commandMode -- the : prompt, defined after search below
 local function itemAction(label, action)
@@ -408,12 +408,8 @@ local picker1Items = {
 	},
 	{ "c", "Copy (s-c)", keyStroker({ "cmd" }, "c"), front = true },
 	{ "l", "Notes" },
-	{ "d", "Toggle Clock Seconds", toggleClockSecs },
-	{ "h", "Handy" },
-	{ "t", "Cursor Beacon", cursorBeacon, front = true },
-	{ "n", "Spotify" },
 	{
-		"s",
+		"d",
 		"Screenshot Window to ~/Downloads",
 		function()
 			screenshotWindow(
@@ -422,6 +418,9 @@ local picker1Items = {
 		end,
 		front = true,
 	},
+	{ "h", "Handy" },
+	{ "t", "Cursor Beacon", cursorBeacon, front = true },
+	{ "n", "Spotify" },
 	{ "b", "Cut (s-x)", keyStroker({ "cmd" }, "x"), front = true },
 	{ "m", "Toggle Clock Date", toggleClockDate },
 	{
@@ -432,6 +431,7 @@ local picker1Items = {
 		end,
 	},
 	{ "v", "Paste (s-v)", keyStroker({ "cmd" }, "v"), front = true },
+	{ "z", "Toggle Clock Seconds", toggleClockSecs },
 	{
 		"delete",
 		"Toggle Countdown",
@@ -471,7 +471,7 @@ local picker2Items = {
 		confirmPrompt("Restart (H-f t)", "Restart the computer?", hs.caffeinate.restartSystem),
 	},
 	{ "v", "Quit App (s-q)", keyStroker({ "cmd" }, "q"), front = true },
-	{ "s", "Select All (s-a)", keyStroker({ "cmd" }, "a"), front = true },
+	{ "z", "Select All (s-a)", keyStroker({ "cmd" }, "a"), front = true }, -- provisional: s is search
 	{ "n", "Sleep", confirmPrompt("Sleep (H-f n)", "Sleep the computer?", hs.caffeinate.systemSleep) },
 	{ "b", "System Settings" },
 }
@@ -489,7 +489,9 @@ local hyperKeys = {
 		front = true,
 	},
 	{ "d", "(Homerow)" },
-	{ "h", "(Enter)" },
+	{ "h", "(Enter)" }, -- h/t/n and mirrors u/e/o: keyboard firmware
+	{ "t", "(Mouse Mode)" },
+	{ "n", "(Arrows Mode)" },
 	{ "s", "Activity Monitor" },
 	{ "b", "Messages" },
 	{ "m", "Firefox" },
@@ -533,7 +535,7 @@ showHyperHints = function()
 	hyperHintModal:enter()
 end
 
---- Search every picker item and Hyper key (z/; in a picker) ---
+--- Search every picker item and Hyper key (s/a in a picker) ---
 -- Drawn as an alert like the pickers, growing with the matches and scrolling only past the screen
 -- bottom. While open, a key tap reads every key press and keeps it from the front app: type to
 -- filter, C-n/Down and C-p/Up to move, Enter to run, Esc to cancel. The query edits like a
