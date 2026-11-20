@@ -900,6 +900,7 @@ end
 --- Command mode (H-z/;) ---
 -- A vim-style : prompt drawn like search. Enter runs the command, Esc cancels, and editing is
 -- the same as in search (lineEdit). An error shows under the prompt and keeps the text.
+-- C-p/Up and C-n/Down step through past commands, like vim's : history (kept via hs.settings).
 --   ct <duration> [-m label] [-e end message]   ct 30m -m DSA, ct 1h 30m, ct 90s, ct 5 (minutes)
 --   ct -t <HHMM|HHMMSS> [-m label] [-e msg]     until a clock time, tomorrow if already past
 --   q [all | <n> | <label>]                     cancel or dismiss timers (see below)
@@ -1212,6 +1213,44 @@ local commands = {
 }
 
 local cmd = { text = {}, cursor = 0, killed = "", error = nil }
+local CMD_HISTORY_MAX = 100
+local cmdHistory = hs.settings.get("cmdHistory") or {} -- oldest first
+local cmdHistoryPos, cmdDraft -- index into cmdHistory while browsing (nil = the line being typed)
+local function cmdRemember(line)
+	for i = #cmdHistory, 1, -1 do -- one copy, moved to newest, like vim
+		if cmdHistory[i] == line then
+			table.remove(cmdHistory, i)
+		end
+	end
+	table.insert(cmdHistory, line)
+	while #cmdHistory > CMD_HISTORY_MAX do
+		table.remove(cmdHistory, 1)
+	end
+	hs.settings.set("cmdHistory", cmdHistory)
+end
+local function cmdSetLine(line)
+	cmd.text, cmd.error = {}, nil
+	for _, code in utf8.codes(line) do
+		table.insert(cmd.text, utf8.char(code))
+	end
+	cmd.cursor = #cmd.text
+end
+-- step -1 = older, 1 = newer; past the newest returns to the line being typed.
+local function cmdHistoryStep(step)
+	if #cmdHistory == 0 then
+		return false
+	end
+	local pos = (cmdHistoryPos or #cmdHistory + 1) + step
+	if pos < 1 or pos > #cmdHistory + 1 then
+		return false
+	end
+	if not cmdHistoryPos then
+		cmdDraft = table.concat(cmd.text)
+	end
+	cmdHistoryPos = pos <= #cmdHistory and pos or nil
+	cmdSetLine(cmdHistoryPos and cmdHistory[pos] or cmdDraft)
+	return true
+end
 local cmdTap, cmdAlert
 local CMD_MIN_WIDTH = 40 -- chars; keeps the prompt from jumping in width while typing
 local function cmdRender()
@@ -1243,10 +1282,18 @@ local function cmdClose()
 end
 cmdTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(event)
 	local key, flags = hs.keycodes.map[event:getKeyCode()], event:getFlags()
+	local ctrlOnly = flags.ctrl and not (flags.cmd or flags.alt)
+	local older = key == "up" or (ctrlOnly and key == "p")
+	local newer = key == "down" or (ctrlOnly and key == "n")
 	if key == "escape" then
 		cmdClose()
+	elseif older or newer then
+		if cmdHistoryStep(older and -1 or 1) then
+			cmdRender()
+		end
 	elseif key == "return" or key == "padenter" then
-		local tokens, err = tokenize(table.concat(cmd.text))
+		local line = table.concat(cmd.text)
+		local tokens, err = tokenize(line)
 		local action
 		if tokens and #tokens == 0 then
 			cmdClose()
@@ -1261,6 +1308,7 @@ cmdTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(event)
 		end
 		if action then
 			cmdClose()
+			cmdRemember(line)
 			hs.timer.doAfter(0, action) -- outside the tap callback
 		else
 			cmd.error = err
@@ -1269,7 +1317,7 @@ cmdTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(event)
 	else
 		local edit = lineEdit(cmd, event, key, flags)
 		if edit == "text" then
-			cmd.error = nil
+			cmd.error, cmdHistoryPos = nil, nil -- an edited recall becomes the new draft
 		end
 		if edit then
 			cmdRender()
@@ -1279,6 +1327,7 @@ cmdTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(event)
 end)
 commandMode = function()
 	cmd.text, cmd.cursor, cmd.error = {}, 0, nil
+	cmdHistoryPos, cmdDraft = nil, nil
 	hs.alert.closeAll()
 	cmdTap:start()
 	cmdRender()
