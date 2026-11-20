@@ -19,6 +19,7 @@ alias cdb="cd ~/Library/CloudStorage/Dropbox/bk/"
 
 # --- firefox history ---
 alias fhd="~/scripts/firefox-history-dump.zsh"
+alias sidecar-build="rustc -O -o ~/scripts/sidecar ~/scripts/sidecar.rs"
 
 # --- git ---
 # git develop and main, or git deploy
