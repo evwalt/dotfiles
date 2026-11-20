@@ -542,6 +542,8 @@ end
 -- readline prompt (see searchEdit), with a block cursor like Alacritty's. A front-app
 -- item asks to confirm first. Matching is fuzzy over the label and the keys (see fuzzyMatch), with
 -- smartcase. Rows keep their table order; the best match is selected and matched chars are pink.
+-- A query found as plain text in a group name ("picker 1", "hyper") also lists that whole group,
+-- ranked below label and key matches.
 local searchEntries = {} -- { group, label, keys, run }
 local function addSearchEntry(group, label, keys, action, front, shortKeys)
 	local run = itemAction(label, action)
@@ -649,12 +651,21 @@ local function searchFilter()
 	for _, entry in ipairs(searchEntries) do
 		local labelScore, labelPositions = fuzzyMatch(entry.label, search.query, caseSensitive)
 		local keysScore, keysPositions = fuzzyMatch(entry.keys, search.query, caseSensitive)
-		if labelScore or keysScore then
+		local groupHit = search.query ~= ""
+			and (caseSensitive and entry.group or entry.group:lower()):find(
+					caseSensitive and search.query or search.query:lower(),
+					1,
+					true
+				)
+				~= nil
+		if labelScore or keysScore or groupHit then
 			local match = { entry = entry }
 			if keysScore and (not labelScore or keysScore > labelScore) then
 				match.score, match.keysPositions = keysScore, keysPositions
-			else
+			elseif labelScore then
 				match.score, match.labelPositions = labelScore, labelPositions
+			else
+				match.score = -math.huge -- group-only: listed, never preselected over a real match
 			end
 			table.insert(search.matches, match)
 			if not bestScore or match.score > bestScore then
@@ -691,6 +702,16 @@ local function searchRender()
 			group = entry.group
 			table.insert(lines, "")
 			table.insert(lines, group)
+			local caseSensitive = search.query:find("%u") ~= nil
+			local at = search.query ~= ""
+				and (caseSensitive and group or group:lower()):find(
+					caseSensitive and search.query or search.query:lower(),
+					1,
+					true
+				)
+			for pos = at or 1, at and at + utf8.len(search.query) - 1 or 0 do
+				table.insert(highlights, { #lines, pos })
+			end
 		end
 		local mark = i == search.selected and ">" or " "
 		table.insert(lines, string.format("%s %-" .. keysWidth .. "s  %s", mark, entry.keys, entry.label))
