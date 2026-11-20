@@ -34,7 +34,7 @@ Where it's defined:
 
 ## Dependency tracking
 
-Installed tools are recorded in plain-text lockfiles at the repo root (`pipx-packages.txt`, `global-npm-packages.txt`, `cargo-packages.txt`, `rust-toolchains.txt`, `bob-versions.txt`), plus `lazy-lock.json` for Neovim plugins, so diffs show exactly what changed and when. The `brew-*.txt` files are older snapshots of Homebrew packages.
+Installed tools are recorded in plain-text lockfiles at the repo root (`pipx-packages.txt`, `global-npm-packages.txt`, `cargo-packages.txt`, `rust-toolchains.txt`, `bob-versions.txt`), plus `lazy-lock.json` for Neovim plugins, so diffs show exactly what changed and when. Homebrew no longer supports macOS 13, so newer tools come from pipx, npm, cargo, or direct binary downloads; the `brew-*.txt` files are older snapshots.
 
 Weekly maintenance is one command, `wua`, defined in [`.aliases`](.aliases):
 
