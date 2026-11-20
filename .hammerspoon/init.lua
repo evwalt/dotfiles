@@ -879,45 +879,47 @@ end
 -- the same as in search (lineEdit). An error shows under the prompt and keeps the text.
 --   ct <duration> [-m label] [-e end message]   ct 30m -m DSA, ct 1h 30m, ct 90s, ct 5 (minutes)
 --   ct -t <HHMM|HHMMSS> [-m label] [-e msg]     until a clock time, tomorrow if already past
---   q                                           cancel the timer, or clear it and stop the alarm
--- ct ports ~/scripts/countdown.zsh: the countdown shows left of the clock; at zero the end message
--- replaces it and Hero repeats until :q. Quote multi-word values: ct 30m -m "Deep work".
--- The timer persists via hs.settings, so it survives config reloads.
-local CT_GAP = 0 -- px between the ct slot and the clock: flush, separate panels
-local ct = hs.settings.get("ct") -- { endTime, label, endMsg } or nil
+--   q [all | <n> | <label>]                     cancel or dismiss timers (see below)
+-- ct ports ~/scripts/countdown.zsh. Each ct adds a timer; several can run at once. They show left
+-- of the clock in end-time order, soonest nearest the clock (that one is n = 0). At zero a timer's
+-- end message replaces it and Hero repeats until it is dismissed. Bare q dismisses every ended
+-- timer; with none ended, it cancels the only timer, and with several it asks for all, n or a label.
+-- Quote multi-word values: ct 30m -m "Deep work". Timers persist via hs.settings across reloads.
+local CT_GAP = 0 -- px between ct slots and the clock: flush, separate panels
+local cts = hs.settings.get("cts") or {} -- { { endTime, label, endMsg }, ... } sorted by endTime
+if hs.settings.get("ct") then -- migrate the single-timer setting
+	table.insert(cts, hs.settings.get("ct"))
+	hs.settings.clear("ct")
+	hs.settings.set("cts", cts)
+end
+table.sort(cts, function(a, b)
+	return a.endTime < b.endTime
+end)
 local ctHidden = hs.settings.get("ctHidden") or false -- display only; the alarm still rings
-local ctCanvas, ctTimer, ctAlarm
+local ctCanvases, ctWidths = {}, {} -- keyed by timer table; runtime only
+local ctTimer, ctAlarm
 local ctSound = hs.sound.getByFile("/System/Library/Sounds/Hero.aiff")
 
-local function ctText()
-	local left = ct.endTime - os.time()
+local function ctText(t, now)
+	local left = t.endTime - now
 	if left <= 0 then
-		return ct.endMsg
+		return t.endMsg
 	end
 	local h, m, s = left // 3600, left % 3600 // 60, left % 60
-	local t = h > 0 and string.format("%d:%02d:%02d", h, m, s) or string.format("%02d:%02d", m, s)
-	return ct.label and (ct.label .. " " .. t) or t
+	local text = h > 0 and string.format("%d:%02d:%02d", h, m, s) or string.format("%02d:%02d", m, s)
+	return t.label and (t.label .. " " .. text) or text
 end
 
--- While counting, the width only grows (the first, widest reading sets it), so the panel stays put
+-- While counting, a slot's width only grows (the first, widest reading sets it), so it stays put
 -- as digits and the h: field drop away. At zero it fits the end message.
-local ctWidth
-local function ctFrame(text, ended)
+local function ctSize(t, text, ended)
 	local size = hs.drawing.getTextDrawingSize(text, { font = clockFont, size = clockSize })
 	local w, h = math.ceil(size.w) + 2 * CLOCK_PAD_X, math.ceil(size.h) + 2 * CLOCK_PAD_Y
 	if not ended then
-		ctWidth = math.max(ctWidth or 0, w)
-		w = ctWidth
+		ctWidths[t] = math.max(ctWidths[t] or 0, w)
+		w = ctWidths[t]
 	end
-	local right, y
-	if clockCanvas then
-		local c = clockCanvas:frame()
-		right, y = c.x - CT_GAP, c.y
-	else
-		local f = hs.screen.mainScreen():frame()
-		right, y = f.x + f.w - CLOCK_INSET, f.y + CLOCK_INSET
-	end
-	return { x = right - w, y = y, w = w, h = h }
+	return w, h
 end
 
 local function ctStopAlarm()
@@ -940,45 +942,85 @@ local function ctStartAlarm()
 	ctAlarm = hs.timer.doEvery(ctSound:duration() + 0.5, ring) -- like the script's afplay; sleep 0.5
 end
 
--- Recomputed from the wall clock each tick, so it stays right across sleep.
-updateCt = function()
-	if not ct then
-		return
-	end
-	local text = ctText()
-	local ended = ct.endTime <= os.time()
-	if ctHidden then
-		if ctCanvas then
-			ctCanvas:delete()
-			ctCanvas = nil
-		end
-	else
-		if not ctCanvas then
-			ctCanvas = newOverlay(ctFrame(text, ended))
-			ctCanvas[2].textAlignment = "left" -- digits drop away on the right, not both sides
-			ctCanvas[2].frame = { x = CLOCK_PAD_X, y = CLOCK_PAD_Y, w = "100%", h = "100%" }
-			ctCanvas:show()
-		end
-		ctCanvas:frame(ctFrame(text, ended))
-		ctCanvas[2].text = text
-	end
-	if ended then
-		ctStartAlarm()
+local function ctDeleteCanvas(t)
+	if ctCanvases[t] then
+		ctCanvases[t]:delete()
+		ctCanvases[t] = nil
 	end
 end
 
-local function ctClear()
-	ctStopAlarm()
-	if ctTimer then
+-- Recomputed from the wall clock each tick, so it stays right across sleep.
+updateCt = function()
+	local now, anyEnded = os.time(), false
+	local right, y
+	if clockCanvas then
+		local c = clockCanvas:frame()
+		right, y = c.x - CT_GAP, c.y
+	else
+		local f = hs.screen.mainScreen():frame()
+		right, y = f.x + f.w - CLOCK_INSET, f.y + CLOCK_INSET
+	end
+	for _, t in ipairs(cts) do
+		local text, ended = ctText(t, now), t.endTime <= now
+		anyEnded = anyEnded or ended
+		if ctHidden then
+			ctDeleteCanvas(t)
+		else
+			local w, h = ctSize(t, text, ended)
+			local frame = { x = right - w, y = y, w = w, h = h }
+			right = frame.x - CT_GAP
+			local canvas = ctCanvases[t]
+			if not canvas then
+				canvas = newOverlay(frame)
+				canvas[2].textAlignment = "left" -- digits drop away on the right, not both sides
+				canvas[2].frame = { x = CLOCK_PAD_X, y = CLOCK_PAD_Y, w = "100%", h = "100%" }
+				canvas:show()
+				ctCanvases[t] = canvas
+			end
+			canvas:frame(frame)
+			canvas[2].text = text
+		end
+	end
+	if anyEnded then
+		ctStartAlarm()
+	elseif ctAlarm then
+		ctStopAlarm()
+	end
+end
+
+local function ctSave()
+	if #cts > 0 then
+		hs.settings.set("cts", cts)
+	else
+		hs.settings.clear("cts")
+	end
+end
+
+local function ctStart()
+	if not ctTimer then
+		ctTimer = hs.timer.doEvery(1, updateCt)
+	end
+	updateCt()
+end
+
+-- Removes the timers for which remove(t, i) is true (i = 1 is nearest the clock; q shows it as 0).
+local function ctRemove(remove)
+	local kept = {}
+	for i, t in ipairs(cts) do
+		if remove(t, i) then
+			ctDeleteCanvas(t)
+			ctWidths[t] = nil
+		else
+			table.insert(kept, t)
+		end
+	end
+	cts = kept
+	ctSave()
+	if #cts == 0 and ctTimer then
 		ctTimer:stop()
 		ctTimer = nil
 	end
-	if ctCanvas then
-		ctCanvas:delete()
-		ctCanvas = nil
-	end
-	ct, ctWidth = nil, nil
-	hs.settings.clear("ct")
+	updateCt()
 end
 
 toggleCt = function()
@@ -988,12 +1030,13 @@ toggleCt = function()
 	hs.alert.show("Countdown " .. (ctHidden and "hidden" or "shown"), 1)
 end
 
-local function ctRun(state)
-	ctClear()
-	ct = state
-	hs.settings.set("ct", ct)
-	updateCt()
-	ctTimer = hs.timer.doEvery(1, updateCt)
+local function ctAdd(state)
+	table.insert(cts, state)
+	table.sort(cts, function(a, b)
+		return a.endTime < b.endTime
+	end)
+	ctSave()
+	ctStart()
 end
 
 -- Returns { endTime, label, endMsg }, or nil and an error message.
@@ -1093,13 +1136,55 @@ local commands = {
 			return nil, err
 		end
 		return function()
-			ctRun(state)
+			ctAdd(state)
 			local fmt = os.date("%S", state.endTime) == "00" and "%H%M" or "%H%M%S"
 			hs.alert.show((state.label or "Timer") .. " until " .. os.date(fmt, state.endTime), 2)
 		end
 	end,
-	q = function()
-		return ctClear
+	q = function(args)
+		local target = table.concat(args, " ")
+		local now, ended = os.time(), 0
+		for _, t in ipairs(cts) do
+			if t.endTime <= now then
+				ended = ended + 1
+			end
+		end
+		local remove
+		if #cts == 0 then
+			return function() end
+		elseif target == "" and ended > 0 then
+			remove = function(t)
+				return t.endTime <= os.time()
+			end
+		elseif target == "all" or (target == "" and #cts == 1) then
+			remove = function()
+				return true
+			end
+		elseif target == "" then
+			return nil, #cts .. " timers: q all, q <n> (0 = nearest the clock) or q <label>"
+		elseif target:match("^%d+$") then
+			local n = tonumber(target)
+			if n > #cts - 1 then
+				return nil, "No timer " .. n .. " (0-" .. #cts - 1 .. ")"
+			end
+			remove = function(_, i)
+				return i == n + 1
+			end
+		else
+			local want, found = target:lower(), false
+			for _, t in ipairs(cts) do
+				found = found or (t.label and t.label:lower() == want)
+			end
+			if not found then
+				return nil, "No timer labeled '" .. target .. "'"
+			end
+			remove = function(t)
+				return t.label and t.label:lower() == want
+			end
+		end
+		return function()
+			ctRemove(remove)
+		end
 	end,
 }
 
@@ -1177,9 +1262,8 @@ commandMode = function()
 end
 hs.hotkey.bind(hyper, ";", commandMode) -- H-z is bound with the Hyper keys above
 
-if ct then -- restore a timer that was running before a reload
-	updateCt()
-	ctTimer = hs.timer.doEvery(1, updateCt)
+if #cts > 0 then -- restore timers that were running before a reload
+	ctStart()
 end
 
 --- Firefox Quit, Raindrop Save Tabs Warning ---
