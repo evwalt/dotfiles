@@ -1,0 +1,236 @@
+#!/usr/bin/python3
+"""Read macOS Messages with contact names instead of raw handles. Read-only."""
+import argparse
+import glob
+import os
+import re
+import sqlite3
+import sys
+from datetime import datetime, timedelta
+
+HOME = os.path.expanduser("~")
+CHAT_DB = os.path.join(HOME, "Library/Messages/chat.db")
+AB_GLOB = [
+    os.path.join(HOME, "Library/Application Support/AddressBook/Sources/*/AddressBook-v22.abcddb"),
+    os.path.join(HOME, "Library/Application Support/AddressBook/AddressBook-v22.abcddb"),
+]
+APPLE_EPOCH = 978307200  # 2001-01-01 in Unix time
+
+
+def ro(path):
+    return sqlite3.connect("file:%s?mode=ro" % path, uri=True)
+
+
+def key(handle):
+    """Normalize a phone number or email to a lookup key."""
+    if handle is None:
+        return ""
+    h = handle.strip().lower()
+    if "@" in h:
+        return h
+    digits = re.sub(r"\D", "", h)
+    return digits[-10:] if len(digits) >= 10 else digits
+
+
+def load_contacts():
+    names = {}
+    for pattern in AB_GLOB:
+        for path in glob.glob(pattern):
+            db = ro(path)
+            q = """select %s, r.ZFIRSTNAME, r.ZLASTNAME, r.ZORGANIZATION, r.ZNICKNAME
+                   from %s x join ZABCDRECORD r on x.ZOWNER = r.Z_PK"""
+            rows = db.execute(q % ("x.ZFULLNUMBER", "ZABCDPHONENUMBER")).fetchall()
+            rows += db.execute(q % ("x.ZADDRESS", "ZABCDEMAILADDRESS")).fetchall()
+            for h, first, last, org, nick in rows:
+                name = " ".join(p for p in (first, last) if p) or org or nick
+                k = key(h)
+                if name and k:
+                    names.setdefault(k, name)
+            db.close()
+    return names
+
+
+def decode_body(blob):
+    """Extract plain text from an NSAttributedString typedstream blob."""
+    if not blob:
+        return None
+    i = blob.find(b"NSString")
+    if i < 0:
+        return None
+    i += len(b"NSString") + 5  # skip class info bytes up to the length marker
+    if i >= len(blob):
+        return None
+    n = blob[i]
+    if n == 0x81:
+        n = int.from_bytes(blob[i + 1:i + 3], "little")
+        i += 3
+    elif n == 0x82:
+        n = int.from_bytes(blob[i + 1:i + 5], "little")
+        i += 5
+    else:
+        i += 1
+    try:
+        return blob[i:i + n].decode("utf-8")
+    except UnicodeDecodeError:
+        return blob[i:i + n].decode("utf-8", "replace")
+
+
+def fmt_time(apple_ns):
+    if not apple_ns:
+        return "?"
+    secs = apple_ns / 1e9 if apple_ns > 1e12 else apple_ns
+    return datetime.fromtimestamp(secs + APPLE_EPOCH).strftime("%Y-%m-%d %H%M")
+
+
+def parse_since(s):
+    """'7d', '12h', or 'YYYY-MM-DD' -> Apple-epoch nanoseconds."""
+    if not s:
+        return 0
+    m = re.fullmatch(r"(\d+)([dh])", s)
+    if m:
+        delta = timedelta(days=int(m[1])) if m[2] == "d" else timedelta(hours=int(m[1]))
+        dt = datetime.now() - delta
+    else:
+        dt = datetime.strptime(s, "%Y-%m-%d")
+    return int((dt.timestamp() - APPLE_EPOCH) * 1e9)
+
+
+class Msgs:
+    def __init__(self):
+        try:
+            self.db = ro(CHAT_DB)
+            self.db.execute("select 1 from message limit 1")
+        except sqlite3.Error as e:
+            sys.exit("msgs: cannot read %s (%s). Check Full Disk Access for your terminal." % (CHAT_DB, e))
+        self.names = load_contacts()
+        self.handles = dict(self.db.execute("select ROWID, id from handle"))
+        self.members = {}
+        for chat_id, hid in self.db.execute("select chat_id, handle_id from chat_handle_join"):
+            self.members.setdefault(chat_id, []).append(hid)
+        self.chat_names = {r: d for r, d in self.db.execute("select ROWID, display_name from chat") if d}
+
+    def name(self, handle):
+        return self.names.get(key(handle), handle)
+
+    def handle_name(self, hid):
+        h = self.handles.get(hid)
+        return self.name(h) if h else "?"
+
+    def chat_label(self, chat_id):
+        if chat_id in self.chat_names:
+            return self.chat_names[chat_id]
+        return ", ".join(self.handle_name(h) for h in self.members.get(chat_id, [])) or "?"
+
+    def body(self, text, blob, has_attach):
+        t = text if text else decode_body(blob)
+        t = (t or "").replace("￼", "").strip()  # drop attachment placeholder char
+        if not t:
+            return "[attachment]" if has_attach else "[unreadable]"
+        return t
+
+    def rows(self, where, params, limit, order="desc", sort="cmj.message_date"):
+        sql = """select m.date, m.is_from_me, m.handle_id, m.text, m.attributedBody,
+                        m.cache_has_attachments, cmj.chat_id
+                 from message m join chat_message_join cmj on cmj.message_id = m.ROWID
+                 where m.associated_message_type = 0 and m.item_type = 0 and %s
+                 order by %s %s limit ?""" % (where, sort, order)
+        return self.db.execute(sql, params + [limit]).fetchall()
+
+    def line(self, r, show_chat):
+        date, me, hid, text, blob, att, chat_id = r
+        who = "Me" if me else self.handle_name(hid)
+        prefix = "[%s] " % self.chat_label(chat_id) if show_chat else ""
+        return "%s  %s%s: %s" % (fmt_time(date), prefix, who, self.body(text, blob, att))
+
+
+def cmd_recent(m, a):
+    # Walk newest messages via the date index until we have n distinct chats.
+    seen = []
+    for r in m.db.execute("""select m.date, m.is_from_me, m.handle_id, m.text, m.attributedBody,
+                                    m.cache_has_attachments, cmj.chat_id
+                             from message m join chat_message_join cmj on cmj.message_id = m.ROWID
+                             where m.associated_message_type = 0 and m.item_type = 0
+                             order by m.date desc"""):
+        if r[6] in seen:
+            continue
+        seen.append(r[6])
+        date, me, hid, text, blob, att, chat_id = r
+        who = "Me" if me else m.handle_name(hid)
+        preview = m.body(text, blob, att).replace("\n", " ")[:60]
+        print("%s  %s  (%s: %s)" % (fmt_time(date), m.chat_label(chat_id), who, preview))
+        if len(seen) >= a.n:
+            break
+
+
+def match_chats(m, query):
+    """Chats whose label or member names/handles match query (substring, case-insensitive)."""
+    q = query.lower()
+    qk = key(query) if re.search(r"\d{4}", query) else None
+    hits = []
+    for chat_id in set(m.members) | set(m.chat_names):
+        label = m.chat_label(chat_id)
+        handles = [m.handles.get(h, "") for h in m.members.get(chat_id, [])]
+        if q in label.lower() or (qk and any(key(h) == qk for h in handles)):
+            hits.append(chat_id)
+    return hits
+
+
+def cmd_with(m, a):
+    chats = match_chats(m, a.who)
+    if not chats:
+        sys.exit("msgs: no chats match %r" % a.who)
+    labels = {c: m.chat_label(c) for c in chats}
+    exact = [c for c, l in labels.items() if l.lower() == a.who.lower()]
+    if exact and not a.all:
+        chats, labels = exact, {c: labels[c] for c in exact}
+    people = {l for l in labels.values() if "," not in l}
+    if len(people) > 1 and not a.all:
+        print("Multiple matches; refine the name or pass --all:")
+        for l in sorted(people):
+            print("  " + l)
+        sys.exit(1)
+    ph = ",".join("?" * len(chats))
+    rows = m.rows("cmj.chat_id in (%s) and m.date >= ?" % ph, chats + [parse_since(a.since)], a.n)
+    for r in reversed(rows):
+        print(m.line(r, show_chat=len(chats) > 1))
+
+
+def cmd_search(m, a):
+    term = a.term.lower()
+    # attributedBody can't be searched in SQL, so filter decoded text in Python.
+    rows = m.rows("m.date >= ?", [parse_since(a.since)], 10 ** 9, sort="m.date")
+    hits = [r for r in rows if term in m.body(r[3], r[4], r[5]).lower()][: a.n]
+    for r in reversed(hits):
+        print(m.line(r, show_chat=True))
+
+
+def cmd_who(m, a):
+    print(m.names.get(key(a.handle), "(no contact)"))
+
+
+def main():
+    p = argparse.ArgumentParser(prog="msgs", description="Read Messages with contact names (read-only).")
+    sub = p.add_subparsers(dest="cmd", required=True)
+    s = sub.add_parser("recent", help="latest chats")
+    s.add_argument("-n", type=int, default=20)
+    s = sub.add_parser("with", help="messages with a person or group (name or number)")
+    s.add_argument("who")
+    s.add_argument("--since", help="7d, 12h, or YYYY-MM-DD")
+    s.add_argument("-n", type=int, default=200)
+    s.add_argument("--all", action="store_true", help="include all matching people")
+    s = sub.add_parser("search", help="search message text")
+    s.add_argument("term")
+    s.add_argument("--since", default="90d", help="7d, 12h, or YYYY-MM-DD (default 90d)")
+    s.add_argument("-n", type=int, default=50)
+    s = sub.add_parser("who", help="contact name for a number or email")
+    s.add_argument("handle")
+    a = p.parse_args()
+    m = Msgs()
+    {"recent": cmd_recent, "with": cmd_with, "search": cmd_search, "who": cmd_who}[a.cmd](m, a)
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except BrokenPipeError:
+        pass
