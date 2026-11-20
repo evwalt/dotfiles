@@ -75,51 +75,8 @@ vim.api.nvim_create_user_command("LtexMode", function()
 	vim.notify("ltex spelling: " .. mode .. " (" .. why .. ")")
 end, { desc = "Show ltex spelling mode for buffer" })
 
---- Edit Specific Files ---
-local prod_personal_path = "~/Library/CloudStorage/Dropbox/docs/notes/productivity-personal/"
-local function in_dropbox_dir()
-	local cwd = vim.loop and vim.loop.cwd() or vim.fn.getcwd()
-	local dropbox_root = vim.fn.expand("~/Library/CloudStorage/Dropbox/")
-	if dropbox_root:sub(-1) ~= "/" then
-		dropbox_root = dropbox_root .. "/"
-	end
-	return cwd ~= nil and vim.startswith(cwd, dropbox_root)
-end
-
-local function open_prod_personal(file)
-	if not in_dropbox_dir() then
-		vim.notify("prod_personal_path shortcuts only work inside Dropbox", vim.log.levels.WARN)
-		return
-	end
-	vim.cmd("e " .. prod_personal_path .. file)
-end
-vim.keymap.set("n", "<space><space>d", function()
-	open_prod_personal("jots-claude.md")
-end)
-vim.keymap.set("n", "<space><space>c", function()
-	open_prod_personal("jots.md")
-end, { desc = "Open jots" })
-vim.keymap.set("n", "<space><space>r", function()
-	open_prod_personal("notes-recent-brainstorming.md")
-end, { desc = "Open daily-planning-recent" })
-vim.keymap.set("n", "<space><space>l", function()
-	-- open_prod_personal("jots.md")
-end)
-vim.keymap.set("n", "<space><space>s", function()
-	open_prod_personal("archive/complete-to-do-items.md")
-end, { desc = "Open complete-to-do-items" })
-vim.keymap.set("n", "<space><space>i", function()
-	open_prod_personal("daily-planning.md")
-end, { desc = "Open daily-planning" })
-vim.keymap.set("n", "<space><space>.", function()
-	open_prod_personal("../notes-generic.md")
-end, { desc = "Open notes-generic" })
-vim.keymap.set("n", "<space><space>,", function()
-	open_prod_personal("plan-overview-to-do-items.md")
-end, { desc = "Open plan-overview-to-do-items" })
-vim.keymap.set("n", "<space><space>'", function()
-	open_prod_personal("jots.md")
-end, { desc = "Open jots" })
+--- Edit Specific Files (private, tracked in yadm-private) ---
+pcall(require, "config.private.files")
 
 --- Comments ---
 vim.api.nvim_set_keymap("n", "<space>gc", "gcc", { noremap = false, silent = true })
