@@ -1,12 +1,12 @@
 # Dotfiles
 
-My macOS setup, built around Neovim, Zsh, tmux and a Dvorak keyboard, managed with [yadm](https://yadm.io) so every file stays at its normal path under `$HOME`.
+My macOS setup, built around Neovim, Zsh, tmux, and a Dvorak keyboard, managed with [yadm](https://yadm.io) so every file stays at its normal path under `$HOME`.
 
 It's a personal config, not a framework. Borrow whatever's useful; the pieces below are the ones most worth a look.
 
 ## Theme: Harbor Night
 
-A custom low-glare dark palette with a periwinkle accent and muted accent colors, applied across Alacritty, Neovim, tmux, Zsh, delta, lazygit, Hammerspoon and Claude Code.
+A custom low-glare dark palette with a periwinkle accent and muted accent colors, applied across Alacritty, Neovim, tmux, Zsh, delta, lazygit, Hammerspoon, and Claude Code.
 
 ![Harbor Night in Neovim](.github/assets/harbor-night-nvim.png)
 
@@ -20,7 +20,7 @@ Where it's defined:
 
 ## Highlights
 
-**Neovim** ([`.config/nvim`](.config/nvim)): lazy.nvim, LSP with blink.cmp, Telescope, Treesitter, conform and nvim-lint. Prose gets grammar and spell checking through ltex, with a loose mode for notes that hides warnings on likely proper nouns ([`ltex-filter.lua`](.config/nvim/lua/config/ltex-filter.lua)).
+**Neovim** ([`.config/nvim`](.config/nvim)): lazy.nvim, LSP with blink.cmp, Telescope, Treesitter, conform, and nvim-lint. Prose gets grammar and spell checking through ltex, with a loose mode for notes that hides warnings on likely proper nouns ([`ltex-filter.lua`](.config/nvim/lua/config/ltex-filter.lua)).
 
 **tmux sidecar** ([`scripts/sidecar.rs`](scripts/sidecar.rs)): a group of panes that follows you from window to window and keeps its layout, with toggles to maximize either side. Written in Rust, wired up in [`tmux.conf`](.config/tmux/tmux.conf).
 
@@ -30,7 +30,7 @@ Where it's defined:
 - A floating 24-hour clock with an optional countdown slot
 - A focus border for Firefox when more than one window is open
 
-**Scripts** ([`scripts/`](scripts), [`.local/bin/`](.local/bin)): small tools such as `ct` (terminal countdown timer), `msgs` (read iMessages with contact names, read-only) and `ytt` (save a YouTube transcript).
+**Scripts** ([`scripts/`](scripts), [`.local/bin/`](.local/bin)): small tools such as `ct` (terminal countdown timer), `msgs` (read iMessages with contact names, read-only), and `ytt` (save a YouTube transcript).
 
 ## Dependency tracking
 
@@ -38,7 +38,7 @@ Installed tools are recorded in plain-text lockfiles at the repo root (`pipx-pac
 
 Weekly maintenance is one command, `wua`, defined in [`.aliases`](.aliases):
 
-- `wup` updates lazy.nvim plugins, pipx, global npm packages, rustup and bob
+- `wup` updates lazy.nvim plugins, pipx, global npm packages, rustup, and bob
 - `wl` regenerates the lockfiles
 - `wuta` commits and pushes any lockfile changes
 
