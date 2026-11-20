@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="868" viewBox="0 0 900 868" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">
+<rect width="900" height="868" rx="16" fill="#0c0c16"/>
+<text x="32" y="44" fill="#dce1ec" font-size="22" font-weight="600">Harbor Night</text>
+<text x="32" y="80" fill="#8a8fb0" font-size="13">ROLE</text><text x="300" y="80" fill="#8a8fb0" font-size="13">HEX</text><text x="420" y="80" fill="#8a8fb0" font-size="13">HSL</text><text x="640" y="80" fill="#8a8fb0" font-size="13">USE</text>
+<rect x="16" y="96" width="868" height="44" rx="6" fill="#11121e"/>
+<circle cx="44" cy="118.0" r="10" fill="#0c0c16" stroke="#33344f"/>
+<text x="66" y="123.0" fill="#c0c6d6" font-size="15">Base</text>
+<text x="300" y="123.0" fill="#c0c6d6" font-size="15">#0c0c16</text>
+<text x="420" y="123.0" fill="#c0c6d6" font-size="14">hsl(240 29% 7%)</text>
+<text x="640" y="123.0" fill="#8a8fb0" font-size="13">background</text>
+<circle cx="44" cy="162.0" r="10" fill="#151626" stroke="#33344f"/>
+<text x="66" y="167.0" fill="#c0c6d6" font-size="15">Surface</text>
+<text x="300" y="167.0" fill="#c0c6d6" font-size="15">#151626</text>
+<text x="420" y="167.0" fill="#c0c6d6" font-size="14">hsl(236 29% 12%)</text>
+<text x="640" y="167.0" fill="#8a8fb0" font-size="13">floats, message bg</text>
+<rect x="16" y="184" width="868" height="44" rx="6" fill="#11121e"/>
+<circle cx="44" cy="206.0" r="10" fill="#252a48" stroke="#33344f"/>
+<text x="66" y="211.0" fill="#c0c6d6" font-size="15">Overlay</text>
+<text x="300" y="211.0" fill="#c0c6d6" font-size="15">#252a48</text>
+<text x="420" y="211.0" fill="#c0c6d6" font-size="14">hsl(231 32% 21%)</text>
+<text x="640" y="211.0" fill="#8a8fb0" font-size="13">selection</text>
+<circle cx="44" cy="250.0" r="10" fill="#33344f" stroke="#33344f"/>
+<text x="66" y="255.0" fill="#c0c6d6" font-size="15">Border</text>
+<text x="300" y="255.0" fill="#c0c6d6" font-size="15">#33344f</text>
+<text x="420" y="255.0" fill="#c0c6d6" font-size="14">hsl(238 22% 25%)</text>
+<text x="640" y="255.0" fill="#8a8fb0" font-size="13">borders, splits</text>
+<rect x="16" y="272" width="868" height="44" rx="6" fill="#11121e"/>
+<circle cx="44" cy="294.0" r="10" fill="#8a8fb0" stroke="#33344f"/>
+<text x="66" y="299.0" fill="#c0c6d6" font-size="15">Muted</text>
+<text x="300" y="299.0" fill="#8a8fb0" font-size="15">#8a8fb0</text>
+<text x="420" y="299.0" fill="#c0c6d6" font-size="14">hsl(232 19% 62%)</text>
+<text x="640" y="299.0" fill="#8a8fb0" font-size="13">comments, bright black</text>
+<circle cx="44" cy="338.0" r="10" fill="#c0c6d6" stroke="#33344f"/>
+<text x="66" y="343.0" fill="#c0c6d6" font-size="15">Text</text>
+<text x="300" y="343.0" fill="#c0c6d6" font-size="15">#c0c6d6</text>
+<text x="420" y="343.0" fill="#c0c6d6" font-size="14">hsl(224 21% 80%)</text>
+<text x="640" y="343.0" fill="#8a8fb0" font-size="13">foreground</text>
+<rect x="16" y="360" width="868" height="44" rx="6" fill="#11121e"/>
+<circle cx="44" cy="382.0" r="10" fill="#dce1ec" stroke="#33344f"/>
+<text x="66" y="387.0" fill="#c0c6d6" font-size="15">Bright</text>
+<text x="300" y="387.0" fill="#dce1ec" font-size="15">#dce1ec</text>
+<text x="420" y="387.0" fill="#c0c6d6" font-size="14">hsl(221 30% 89%)</text>
+<text x="640" y="387.0" fill="#8a8fb0" font-size="13">H1, emphasis</text>
+<circle cx="44" cy="426.0" r="10" fill="#b1b9f9" stroke="#33344f"/>
+<text x="66" y="431.0" fill="#c0c6d6" font-size="15">Periwinkle</text>
+<text x="300" y="431.0" fill="#b1b9f9" font-size="15">#b1b9f9</text>
+<text x="420" y="431.0" fill="#c0c6d6" font-size="14">hsl(233 86% 84%)</text>
+<text x="640" y="431.0" fill="#8a8fb0" font-size="13">main accent, cursor</text>
+<rect x="16" y="448" width="868" height="44" rx="6" fill="#11121e"/>
+<circle cx="44" cy="470.0" r="10" fill="#7fa9d1" stroke="#33344f"/>
+<text x="66" y="475.0" fill="#c0c6d6" font-size="15">Steel</text>
+<text x="300" y="475.0" fill="#7fa9d1" font-size="15">#7fa9d1</text>
+<text x="420" y="475.0" fill="#c0c6d6" font-size="14">hsl(209 47% 66%)</text>
+<text x="640" y="475.0" fill="#8a8fb0" font-size="13">blue, H3, links</text>
+<circle cx="44" cy="514.0" r="10" fill="#92c2c8" stroke="#33344f"/>
+<text x="66" y="519.0" fill="#c0c6d6" font-size="15">Cyan</text>
+<text x="300" y="519.0" fill="#92c2c8" font-size="15">#92c2c8</text>
+<text x="420" y="519.0" fill="#c0c6d6" font-size="14">hsl(187 33% 68%)</text>
+<text x="640" y="519.0" fill="#8a8fb0" font-size="13">keywords, H4</text>
+<rect x="16" y="536" width="868" height="44" rx="6" fill="#11121e"/>
+<circle cx="44" cy="558.0" r="10" fill="#6aaa9e" stroke="#33344f"/>
+<text x="66" y="563.0" fill="#c0c6d6" font-size="15">Teal</text>
+<text x="300" y="563.0" fill="#6aaa9e" font-size="15">#6aaa9e</text>
+<text x="420" y="563.0" fill="#c0c6d6" font-size="14">hsl(169 27% 54%)</text>
+<text x="640" y="563.0" fill="#8a8fb0" font-size="13">ANSI cyan</text>
+<circle cx="44" cy="602.0" r="10" fill="#86b3a8" stroke="#33344f"/>
+<text x="66" y="607.0" fill="#c0c6d6" font-size="15">Seafoam</text>
+<text x="300" y="607.0" fill="#86b3a8" font-size="15">#86b3a8</text>
+<text x="420" y="607.0" fill="#c0c6d6" font-size="14">hsl(165 23% 61%)</text>
+<text x="640" y="607.0" fill="#8a8fb0" font-size="13">strings</text>
+<rect x="16" y="624" width="868" height="44" rx="6" fill="#11121e"/>
+<circle cx="44" cy="646.0" r="10" fill="#88c9a4" stroke="#33344f"/>
+<text x="66" y="651.0" fill="#c0c6d6" font-size="15">Mint</text>
+<text x="300" y="651.0" fill="#88c9a4" font-size="15">#88c9a4</text>
+<text x="420" y="651.0" fill="#c0c6d6" font-size="14">hsl(146 38% 66%)</text>
+<text x="640" y="651.0" fill="#8a8fb0" font-size="13">ANSI green, success</text>
+<circle cx="44" cy="690.0" r="10" fill="#cdbda2" stroke="#33344f"/>
+<text x="66" y="695.0" fill="#c0c6d6" font-size="15">Champagne</text>
+<text x="300" y="695.0" fill="#cdbda2" font-size="15">#cdbda2</text>
+<text x="420" y="695.0" fill="#c0c6d6" font-size="14">hsl(38 30% 72%)</text>
+<text x="640" y="695.0" fill="#8a8fb0" font-size="13">warm accent, constants</text>
+<rect x="16" y="712" width="868" height="44" rx="6" fill="#11121e"/>
+<circle cx="44" cy="734.0" r="10" fill="#dbbd84" stroke="#33344f"/>
+<text x="66" y="739.0" fill="#c0c6d6" font-size="15">Sand</text>
+<text x="300" y="739.0" fill="#dbbd84" font-size="15">#dbbd84</text>
+<text x="420" y="739.0" fill="#c0c6d6" font-size="14">hsl(39 55% 69%)</text>
+<text x="640" y="739.0" fill="#8a8fb0" font-size="13">ANSI yellow, warnings</text>
+<circle cx="44" cy="778.0" r="10" fill="#e08592" stroke="#33344f"/>
+<text x="66" y="783.0" fill="#c0c6d6" font-size="15">Rose</text>
+<text x="300" y="783.0" fill="#e08592" font-size="15">#e08592</text>
+<text x="420" y="783.0" fill="#c0c6d6" font-size="14">hsl(351 59% 70%)</text>
+<text x="640" y="783.0" fill="#8a8fb0" font-size="13">ANSI red, errors</text>
+<rect x="16" y="800" width="868" height="44" rx="6" fill="#11121e"/>
+<circle cx="44" cy="822.0" r="10" fill="#b996c4" stroke="#33344f"/>
+<text x="66" y="827.0" fill="#c0c6d6" font-size="15">Mauve</text>
+<text x="300" y="827.0" fill="#b996c4" font-size="15">#b996c4</text>
+<text x="420" y="827.0" fill="#c0c6d6" font-size="14">hsl(286 28% 68%)</text>
+<text x="640" y="827.0" fill="#8a8fb0" font-size="13">ANSI magenta</text>
+</svg>
