@@ -30,7 +30,7 @@ local hyper = { "ctrl", "alt", "cmd", "shift" }
 -- Usage: hs.hotkey.bind(hyper, "G", actionPicker("Title", { { "m", "Skim" }, { "w", "Label", fn } }))
 -- Each item is { rightKey, appName } or { rightKey, label, action }. Every action is also bound
 -- to the mirror key on the left hand (same finger and row, Dvorak), shown after a slash. The hint
--- lists every key in right-hand keyboard order, one block per row, free keys shown as "—".
+-- lists every key in right-hand keyboard order, one block per row, free keys shown as "(free)".
 -- Press the hyper combo, then a sub-key. Esc cancels. The hint stays up until either.
 -- s/a opens a search over every picker and Hyper key (see searchAll). "space" and "delete"
 -- (Backspace) are extra slots with no mirror, listed below the grid as SPC and DEL.
@@ -52,6 +52,7 @@ local PROMPT_STYLE = {
 }
 hs.alert.show("Config loaded", PROMPT_STYLE)
 -- Every key in keyboard order, unused ones shown as free slots.
+local FREE_LABEL = "(free)" -- unused slot, in the hints and in search
 local function hintText(labels)
 	local lines = {}
 	for row, keys in ipairs(MIRROR_ROWS) do
@@ -60,7 +61,7 @@ local function hintText(labels)
 		end
 		for col = 1, #keys[1] do
 			local right = keys[1]:sub(col, col)
-			table.insert(lines, string.format("%s/%s  %s", right, MIRROR[right], labels[right] or "—"))
+			table.insert(lines, string.format("%s/%s  %s", right, MIRROR[right], labels[right] or FREE_LABEL))
 		end
 	end
 	return table.concat(lines, "\n")
@@ -102,7 +103,7 @@ local function actionPicker(title, items)
 	end)
 	local extras = {}
 	for _, extra in ipairs(EXTRA_KEYS) do
-		table.insert(extras, string.format("%-5s%s", extra[2], labels[extra[1]] or "—"))
+		table.insert(extras, string.format("%-5s%s", extra[2], labels[extra[1]] or FREE_LABEL))
 	end
 	local hint = title .. "\n\n" .. hintText(labels) .. "\n\n" .. table.concat(extras, "\n")
 	function m:entered()
@@ -453,8 +454,8 @@ local picker2Items = {
 	{ "c", "Toggle Firefox Border", toggleBorder },
 	{ "r", "Skim" },
 	{
-		"d",
-		"Hyper Keys",
+		"delete",
+		"Show Hyper Keys", -- reference view only; search (s) runs them
 		function()
 			showHyperHints()
 		end,
@@ -489,9 +490,10 @@ local hyperKeys = {
 		front = true,
 	},
 	{ "d", "(Homerow)" },
-	{ "h", "(Enter)" }, -- h/t/n and mirrors u/e/o: keyboard firmware
+	{ "h", "(Enter)" }, -- h/t/n/w and mirrors u/e/o: keyboard firmware
 	{ "t", "(Mouse Mode)" },
 	{ "n", "(Arrows Mode)" },
+	{ "w", "(Volume Mode)" },
 	{ "s", "Activity Monitor" },
 	{ "b", "Messages" },
 	{ "m", "Firefox" },
@@ -504,7 +506,7 @@ local hyperKeys = {
 		end,
 	},
 	{ "i", "Google Chrome" },
-	{ "j", "zoom.us" },
+	{ "j", "zoom.us" }, -- firmware sends H-j from the thumb + Backspace position
 }
 local hyperLabels = { f = "Picker 2", g = "Picker 1" }
 local extraHints = {} -- keys outside the mirrored grid
@@ -521,7 +523,7 @@ for _, item in ipairs(hyperKeys) do
 		table.insert(extraHints, key .. "      " .. label)
 	end
 end
-local hyperHint = "Hyper Keys (H-f d)\n\n" .. hintText(hyperLabels) .. "\n\n" .. table.concat(extraHints, "\n")
+local hyperHint = "Hyper Keys (H-f DEL)\n\n" .. hintText(hyperLabels) .. "\n\n" .. table.concat(extraHints, "\n")
 local hyperHintModal = hs.hotkey.modal.new()
 hyperHintModal:bind({}, "escape", function()
 	hs.alert.closeAll()
@@ -552,6 +554,30 @@ local function addSearchEntry(group, label, keys, action, front, shortKeys)
 	end
 	table.insert(searchEntries, { group = group, label = label, keys = keys, run = run })
 end
+-- Unused slots are listed as FREE_LABEL, so searching "free" shows every open key. Enter on one
+-- just names it.
+local function addFreeEntries(group, prefix, used, withExtras)
+	local function add(keys)
+		addSearchEntry(group, FREE_LABEL, keys, function()
+			hs.alert.show(keys .. " is free", PROMPT_STYLE)
+		end)
+	end
+	for _, row in ipairs(MIRROR_ROWS) do
+		for col = 1, #row[1] do
+			local right = row[1]:sub(col, col)
+			if not used[right] then
+				add(prefix .. right .. "/" .. MIRROR[right])
+			end
+		end
+	end
+	if withExtras then
+		for _, extra in ipairs(EXTRA_KEYS) do
+			if not used[extra[1]] then
+				add(prefix .. extra[2])
+			end
+		end
+	end
+end
 for _, picker in ipairs({ { "H-g", picker1Items, "Picker 1 (H-g)" }, { "H-f", picker2Items, "Picker 2 (H-f)" } }) do
 	for _, item in ipairs(picker[2]) do
 		local key = item[1]
@@ -565,12 +591,23 @@ for _, picker in ipairs({ { "H-g", picker1Items, "Picker 1 (H-g)" }, { "H-f", pi
 		local keys = MIRROR[key] and string.format("%s/%s", shortKeys, MIRROR[key]) or shortKeys
 		addSearchEntry(picker[3], item[2], keys, item[3], item.front, shortKeys)
 	end
+	local used = { [SEARCH_KEY] = true }
+	for _, item in ipairs(picker[2]) do
+		used[item[1]] = true
+	end
+	addFreeEntries(picker[3], picker[1] .. " ", used, true)
 end
 for _, item in ipairs(hyperKeys) do
-	if item[2]:sub(1, 1) ~= "(" then
-		addSearchEntry("Hyper Keys", item[2], "H-" .. item[1], item[3], item.front)
+	local action = item[3]
+	if item[2]:sub(1, 1) == "(" then
+		-- Handled outside Hammerspoon (firmware, Homerow), so listed for reference: Enter just names the chord.
+		action = function()
+			hs.alert.show(item[2]:sub(2, -2) .. ": press H-" .. item[1], PROMPT_STYLE)
+		end
 	end
+	addSearchEntry("Hyper Keys", item[2], "H-" .. item[1], action, item.front)
 end
+addFreeEntries("Hyper Keys", "H-", hyperLabels, false)
 local keysWidth, labelWidth = 0, 0
 for _, entry in ipairs(searchEntries) do
 	keysWidth = math.max(keysWidth, #entry.keys)
