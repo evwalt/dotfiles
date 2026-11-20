@@ -16,12 +16,29 @@ myWatcher = hs.pathwatcher.new(os.getenv("HOME") .. "/.hammerspoon/", reloadConf
 -- All alerts (Harbor Night colors): same translucent dark panel, hairline border and rounding as the floating clock.
 hs.alert.defaultStyle.radius = 10
 hs.alert.defaultStyle.strokeWidth = 1
-hs.alert.defaultStyle.strokeColor = { hex = "#cdd3e2", alpha = 0.15 }
+hs.alert.defaultStyle.strokeColor = { hex = "#c0c6d6", alpha = 0.15 }
 hs.alert.defaultStyle.fillColor = { hex = "#0c0c16", alpha = 0.9 } -- more opaque than the clock: alerts carry more text
-hs.alert.defaultStyle.textColor = { hex = "#cdd3e2", alpha = 0.95 }
+hs.alert.defaultStyle.textColor = { hex = "#c0c6d6", alpha = 0.95 }
 hs.alert.defaultStyle.atScreenEdge = 1 -- all alerts: top of screen, centered horizontally
 hs.alert.defaultStyle.textFont = "Hack Nerd Font" -- all alerts: same font and size as the prompts
 hs.alert.defaultStyle.textSize = 17
+-- hs.alert has no offset option for atScreenEdge = 1, so nudge each alert's drawings down after
+-- it is shown. Covers prompts and search pickers, which are all alerts.
+local ALERT_TOP_OFFSET = 20
+local alertShow = hs.alert.show
+hs.alert.show = function(...)
+	local uuid = alertShow(...)
+	for _, entry in ipairs(hs.alert._visibleAlerts) do
+		if entry.UUID == uuid then
+			for _, d in ipairs(entry.drawings) do
+				local f = d:frame()
+				d:setTopLeft({ x = f.x, y = f.y + ALERT_TOP_OFFSET })
+			end
+			entry.frame.y = entry.frame.y + ALERT_TOP_OFFSET
+		end
+	end
+	return uuid
+end
 print(os.getenv("HOME") .. "/.hammerspoon/")
 
 --- Multi-action Keys ---
@@ -300,7 +317,7 @@ local function newOverlay(frame)
 		type = "rectangle",
 		action = "strokeAndFill",
 		fillColor = { hex = "#0c0c16", alpha = 0.65 },
-		strokeColor = { hex = "#cdd3e2", alpha = 0.15 },
+		strokeColor = { hex = "#c0c6d6", alpha = 0.15 },
 		strokeWidth = 1,
 		roundedRectRadii = { xRadius = 8, yRadius = 8 },
 	}, {
@@ -308,7 +325,7 @@ local function newOverlay(frame)
 		text = "",
 		textFont = clockFont,
 		textSize = clockSize,
-		textColor = { hex = "#cdd3e2", alpha = 0.95 },
+		textColor = { hex = "#c0c6d6", alpha = 0.95 },
 		textAlignment = "center",
 		frame = { x = 0, y = CLOCK_PAD_Y, w = "100%", h = "100%" },
 	})
@@ -720,7 +737,7 @@ local function searchRender()
 	}).h
 	-- Rows that fit on screen, less the title and query (3 lines), a blank and header per group
 	-- (6 lines) and 2 lines of padding.
-	local fit = math.max(1, math.floor(hs.screen.mainScreen():frame().h / lineHeight) - 11)
+	local fit = math.max(1, math.floor((hs.screen.mainScreen():frame().h - ALERT_TOP_OFFSET) / lineHeight) - 11)
 	local n = #search.matches
 	if n > fit then
 		fit = fit - 1 -- room for the position line
