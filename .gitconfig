@@ -33,7 +33,7 @@
 	# Brighter than delta's defaults so numbers and gutters stay readable
 	line-numbers-zero-style = "#8a8fb0"
 	line-numbers-minus-style = "#e08592"
-	line-numbers-plus-style = "#88c9a4"
+	line-numbers-plus-style = "#acd38a"
 	line-numbers-left-style = "#4a4c70"
 	line-numbers-right-style = "#4a4c70"
 	file-style = "#b1b9f9" bold

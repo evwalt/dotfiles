@@ -36,7 +36,7 @@ return {
 					c.blue6 = "#c6dcef"
 					c.blue7 = "#2a3352"
 					c.cyan = "#92c2c8"
-					c.green = "#86b3a8"
+					c.green = "#acd38a"
 					c.green1 = "#6aaa9e"
 					c.green2 = "#4f8f84"
 					c.teal = "#6aaa9e"
@@ -47,7 +47,7 @@ return {
 					c.yellow = "#dbbd84"
 					c.red = "#e08592"
 					c.red1 = "#c96a78"
-					c.git = { add = "#5f9e86", change = "#6a8cbf", delete = "#b56473", ignore = c.dark3 }
+					c.git = { add = "#8fb070", change = "#6a8cbf", delete = "#b56473", ignore = c.dark3 }
 
 					-- Derived colors
 					c.diff = { add = "#16261f", delete = "#2a1720", change = "#151a2e", text = "#24304f" }
@@ -74,8 +74,8 @@ return {
 						black_bright = "#8a8fb0",
 						red = "#e08592",
 						red_bright = "#ebaab4",
-						green = "#88c9a4",
-						green_bright = "#b3e0c3",
+						green = "#acd38a",
+						green_bright = "#cde6b4",
 						yellow = "#dbbd84",
 						yellow_bright = "#ead5ad",
 						blue = "#7fa9d1",
@@ -96,7 +96,7 @@ return {
 					hl.CursorLineNr = { fg = c.blue, bold = true }
 
 					-- Markdown: neutral heading bars, one color per level; favorite colors on the most-used levels (H2/H3)
-					-- (H3 is the steel blue #7fa9d1; teal moved down to H4; H5 is orange so it does not echo the seafoam string green)
+					-- (H3 is the steel blue #7fa9d1; teal moved down to H4; H5 is orange so it does not echo the lime string green)
 					local heading_fg = { "#dce1ec", c.blue, c.blue1, c.cyan, c.orange, c.yellow }
 					for i = 1, 6 do
 						local fg = heading_fg[i]
@@ -112,7 +112,7 @@ return {
 					hl["@property"] = { fg = c.blue1 }
 					hl["@variable.member"] = { fg = c.blue1 }
 					hl["@markup.link"] = { fg = c.blue1 }
-					-- Fenced code blocks without a language would otherwise use the sage String color
+					-- Fenced code blocks without a language would otherwise use the lime String color
 					hl["@markup.raw.block.markdown"] = { fg = c.blue1 }
 				end,
 			})

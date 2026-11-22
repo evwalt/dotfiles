@@ -34,7 +34,7 @@ text = "CellForeground"
 [colors.normal]
 black   = "#2c2d45"
 red     = "#e08592"
-green   = "#88c9a4"
+green   = "#acd38a"
 yellow  = "#dbbd84"
 blue    = "#7fa9d1"
 magenta = "#b996c4"
@@ -45,7 +45,7 @@ white   = "#c0c6d6"
 [colors.bright]
 black   = "#8a8fb0"
 red     = "#ebaab4"
-green   = "#b3e0c3"
+green   = "#cde6b4"
 yellow  = "#ead5ad"
 # Periwinkle, Claude Code's accent: its dark-ansi base draws inline code in bright blue
 blue    = "#b1b9f9"

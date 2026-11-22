@@ -33,7 +33,7 @@
     "effortUltra": "#b996c4",
     "bashBorder": "#c98aa6",
 
-    "success": "#88c9a4",
+    "success": "#acd38a",
     "error": "#e08592",
     "warning": "#dbbd84",
     "warningShimmer": "#ead5ad",
@@ -45,8 +45,8 @@
     "diffAddedWord": "#24453a",
     "diffRemovedWord": "#5a2a3a",
 
-    "userMessageBackground": "#151626",
-    "userMessageBackgroundHover": "#1c1f36",
+    "userMessageBackground": "#2f2a22",
+    "userMessageBackgroundHover": "#38322a",
     "composerSidebarBackground": "#0c0c16",
     "selectionBg": "#252a48",
     "bashMessageBackgroundColor": "#0c0c16",
