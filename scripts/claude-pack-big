@@ -1,0 +1,19 @@
+#!/bin/sh
+# Claude transcripts over GitHub's 100 MB file limit can't be pushed to dotfiles-private.
+# For each one, keep an xz copy beside it (tracked, ~1/5 the size) and exclude the raw file.
+# Restore with: xz -dk <file>.jsonl.xz
+set -eu
+repo="$HOME/.local/share/yadm-private/repo.git"
+exclude="$repo/info/exclude"
+yp() { yadm --yadm-dir "$HOME/.config/yadm-private" --yadm-data "$HOME/.local/share/yadm-private" "$@"; }
+
+find "$HOME/.claude/projects" -name '*.jsonl' -size +90M | while IFS= read -r f; do
+  if [ ! -e "$f.xz" ] || [ "$f" -nt "$f.xz" ]; then
+    echo "claude-pack-big: compressing ${f#$HOME/}"
+    xz -9 -T0 -k -f "$f"
+  fi
+  rel="/${f#"$HOME"/}"
+  grep -qxF "$rel" "$exclude" 2>/dev/null || printf '%s\n' "$rel" >> "$exclude"
+  # a transcript that grew past the limit after being tracked
+  if yp ls-files --error-unmatch "$f" >/dev/null 2>&1; then yp rm -q --cached "$f"; fi
+done

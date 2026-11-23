@@ -2,7 +2,7 @@
 alias ca="claude"
 alias cac="claude -c" # --continue
 alias car="claude -r" # --resume
-alias chs="yadm-private add ~/.claude/settings.json ~/.claude/projects ~/.claude/history.jsonl"
+alias chs="claude-pack-big && yadm-private add ~/.claude/settings.json ~/.claude/projects ~/.claude/history.jsonl"
 alias chc="yadm-private commit -m 'chore(claude): sync settings, session history, and project transcripts'"
 alias chap="chs && chc && yadm-private push"
 
