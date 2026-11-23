@@ -1,5 +1,5 @@
 --- Key Help ---
--- Minimal which-key replacement: <space>? lists every normal-mode <space> mapping
+-- Minimal which-key replacement: <space><space>? lists every normal-mode <space> mapping
 -- (global and buffer-local), sorted alphabetically, in a float. q or <Esc> closes it.
 
 local function show()
@@ -7,7 +7,7 @@ local function show()
 	local function add(maps)
 		for _, m in ipairs(maps) do
 			local lhs = m.lhs:gsub(" ", "<space>")
-			if lhs:sub(1, 7) == "<space>" and lhs ~= "<space>?" and not seen[lhs] then
+			if lhs:sub(1, 7) == "<space>" and not seen[lhs] then
 				seen[lhs] = true
 				table.insert(rows, { lhs = lhs, desc = m.desc or m.rhs or "" })
 			end
@@ -48,4 +48,4 @@ local function show()
 	end
 end
 
-vim.keymap.set("n", "<space>?", show, { desc = "List <space> keymaps" })
+vim.keymap.set("n", "<space><space>?", show, { desc = "List <space> keymaps" })
