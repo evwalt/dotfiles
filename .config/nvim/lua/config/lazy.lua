@@ -21,6 +21,11 @@ vim.opt.rtp:prepend(lazypath)
 -- vim.g.mapleader = " "
 -- vim.g.maplocalleader = " "
 
+-- Headless runs (`nvim --headless "+Lazy! sync"`) print plugin names in hardcoded
+-- ANSI magenta, which reads purple in Harbor Night; use the lime green instead.
+local term = require("lazy.terminal")
+term.magenta = term.green
+
 -- Setup lazy.nvim
 require("lazy").setup({
 	spec = {
