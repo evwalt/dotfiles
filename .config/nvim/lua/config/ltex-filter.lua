@@ -1,9 +1,16 @@
 -- Loose/strict modes for ltex spelling warnings.
--- Loose (default under the notes folder) hides spelling warnings for likely
+-- Loose (default anywhere under the notes folder) hides spelling warnings for likely
 -- proper nouns: words with an inner capital (PortSwigger) or a leading capital
 -- mid-sentence (Gumroad). A capital at the start of a sentence or line says
--- nothing about the word, so those stay flagged. Strict shows everything.
+-- nothing about the word, so those stay flagged. Loose also hides the grammar
+-- rules in LOOSE_RULES, which misfire on terse notes. Strict shows everything.
 local M = {}
+
+-- Rule IDs come from ltex's diagnostic code (or `ltex-cli-plus file.md`).
+local LOOSE_RULES = {
+	CD_NN = true, -- "1015 plan": reads a clock time as a count, wants "plans"
+	AUXILIARY_DO_WITH_INCORRECT_VERB_FORM = true, -- "do dishes" -> "do dish"
+}
 
 local LOOSE_DIRS = {
 	os.getenv("HOME") .. "/Library/CloudStorage/Dropbox/docs/notes/",
@@ -43,6 +50,9 @@ local function at_sentence_start(prefix)
 end
 
 local function hide(bufnr, d)
+	if LOOSE_RULES[d.code] then
+		return true
+	end
 	if not (type(d.code) == "string" and d.code:match("^MORFOLOGIK_RULE")) then
 		return false
 	end
