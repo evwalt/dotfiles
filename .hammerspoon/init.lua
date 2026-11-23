@@ -379,15 +379,13 @@ if clockOn then
 	startClock()
 end
 
--- Cursor beacon: arm tmux's one-shot @beacon_once flag, then fire its client-focus-in hook
--- (fading block at the cursor). The hook ignores plain focus changes without the flag.
--- If Alacritty isn't frontmost, focusing it fires the hook by itself.
+-- Cursor beacon: a fading block at the tmux cursor. If Alacritty is frontmost, run the
+-- beacon script directly (it targets the active client). Otherwise arm tmux's one-shot
+-- @beacon_once flag and focus Alacritty; its client-focus-in hook then runs the script.
 local function cursorBeacon()
 	local front = hs.application.frontmostApplication()
 	if front and front:name() == "Alacritty" then
-		hs.task
-			.new("/usr/local/bin/tmux", nil, { "set", "-g", "@beacon_once", "1", ";", "set-hook", "-R", "client-focus-in" })
-			:start()
+		hs.task.new(os.getenv("HOME") .. "/scripts/cursor-beacon-fire.sh", nil, {}):start()
 	else
 		hs.task
 			.new("/usr/local/bin/tmux", function()
