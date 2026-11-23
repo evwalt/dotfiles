@@ -71,6 +71,10 @@ local PROMPT_STYLE = {
 hs.alert.show("Config loaded", PROMPT_STYLE)
 -- Every key in keyboard order, unused ones shown as free slots.
 local FREE_LABEL = "(free)" -- unused slot, in the hints and in search
+-- A label as pickers and search show it: with the item's current status, if it has one.
+local function shownLabel(label, status)
+	return status and string.format("%s [%s]", label, status()) or label
+end
 local function hintText(labels)
 	local lines = {}
 	for row, keys in ipairs(MIRROR_ROWS) do
@@ -124,7 +128,7 @@ local function actionPicker(title, items)
 	local function hint()
 		local shown = {}
 		for key, label in pairs(labels) do
-			shown[key] = statuses[key] and string.format("%s [%s]", label, statuses[key]()) or label
+			shown[key] = shownLabel(label, statuses[key])
 		end
 		local extras = {}
 		for _, extra in ipairs(EXTRA_KEYS) do
@@ -232,7 +236,7 @@ local function toggleBorder()
 	borderEnabled = not borderEnabled
 	hs.settings.set("firefoxBorder", borderEnabled)
 	refreshBorder()
-	hs.alert.show("Firefox border: " .. (borderEnabled and "on" or "off"))
+	hs.alert.show("Firefox border " .. (borderEnabled and "shown" or "hidden"))
 end
 
 -- Debounced: window moves fire many events while dragging. A second, later
@@ -452,7 +456,7 @@ local picker1Items = {
 		"Toggle Clock Date",
 		toggleClockDate,
 		status = function()
-			return (clockDate) and "on" or "off"
+			return clockDate and "shown" or "hidden"
 		end,
 	},
 	{
@@ -462,7 +466,7 @@ local picker1Items = {
 			setClock(not clockOn)
 		end,
 		status = function()
-			return (clockOn) and "on" or "off"
+			return clockOn and "shown" or "hidden"
 		end,
 	},
 	{ "v", "Paste (s-v)", keyStroker({ "cmd" }, "v"), front = true },
@@ -471,7 +475,7 @@ local picker1Items = {
 		"Toggle Clock Seconds",
 		toggleClockSecs,
 		status = function()
-			return (clockSecs) and "on" or "off"
+			return clockSecs and "shown" or "hidden"
 		end,
 	},
 	{
@@ -503,7 +507,7 @@ local picker2Items = {
 		"Toggle Firefox Border",
 		toggleBorder,
 		status = function()
-			return (borderEnabled) and "on" or "off"
+			return borderEnabled and "shown" or "hidden"
 		end,
 	},
 	{ "r", "Skim" },
@@ -533,6 +537,7 @@ local picker2Items = {
 hs.hotkey.bind(hyper, "F", actionPicker("Picker 2 (H-f)", picker2Items))
 -- Top-level Hyper keys. Each is { key, label, action, front = bool }; no action launches the app named by
 -- label. Labels in parens are handled outside Hammerspoon and only listed in the hint.
+-- `status = fn` works as in pickers (shown in search; the Hyper hint is built once at load).
 local hyperKeys = {
 	{ "c", "Handy Dictate", handyDictate },
 	{
@@ -614,12 +619,22 @@ for _, extra in ipairs(EXTRA_KEYS) do
 	table.insert(KEY_SLOT, extra[1])
 	KEY_SLOT[extra[1]] = #KEY_SLOT
 end
-local function addSearchEntry(group, label, keys, action, front, shortKeys, key)
+-- opts: front (confirm first), shortKeys (keys in the confirm title), key (hint slot), status.
+local function addSearchEntry(group, label, keys, action, opts)
+	opts = opts or {}
 	local run = itemAction(label, action)
-	if front then
-		run = confirmPrompt(label .. " (" .. (shortKeys or keys) .. ")", "Run in the front app?", run)
+	if opts.front then
+		run = confirmPrompt(label .. " (" .. (opts.shortKeys or keys) .. ")", "Run in the front app?", run)
 	end
-	table.insert(searchEntries, { group = group, label = label, keys = keys, run = run, key = key })
+	table.insert(searchEntries, {
+		group = group,
+		label = label,
+		shown = label, -- label plus status, refreshed each time search opens
+		keys = keys,
+		run = run,
+		key = opts.key,
+		status = opts.status,
+	})
 end
 -- Unused slots are listed as FREE_LABEL, so searching "free" shows every open key. Enter on one
 -- just names it.
@@ -627,7 +642,7 @@ local function addFreeEntries(group, prefix, used, withExtras)
 	local function add(keys, key)
 		addSearchEntry(group, FREE_LABEL, keys, function()
 			hs.alert.show(keys .. " is free", PROMPT_STYLE)
-		end, nil, nil, key)
+		end, { key = key })
 	end
 	for _, row in ipairs(MIRROR_ROWS) do
 		for col = 1, #row[1] do
@@ -656,7 +671,12 @@ for _, picker in ipairs({ { "H-g", picker1Items, "Picker 1 (H-g)" }, { "H-f", pi
 		end
 		local shortKeys = picker[1] .. " " .. keyName -- confirm title, like "Shut Down (H-f h)"
 		local keys = MIRROR[key] and string.format("%s/%s", shortKeys, MIRROR[key]) or shortKeys
-		addSearchEntry(picker[3], item[2], keys, item[3], item.front, shortKeys, key)
+		addSearchEntry(picker[3], item[2], keys, item[3], {
+			front = item.front,
+			shortKeys = shortKeys,
+			key = key,
+			status = item.status,
+		})
 	end
 	local used = { [SEARCH_KEY] = true }
 	for _, item in ipairs(picker[2]) do
@@ -672,7 +692,11 @@ for _, item in ipairs(hyperKeys) do
 			hs.alert.show(item[2]:sub(2, -2) .. ": press H-" .. item[1], PROMPT_STYLE)
 		end
 	end
-	addSearchEntry("Hyper Keys", item[2], "H-" .. item[1], action, item.front, nil, item[1])
+	addSearchEntry("Hyper Keys", item[2], "H-" .. item[1], action, {
+		front = item.front,
+		key = item[1],
+		status = item.status,
+	})
 end
 addFreeEntries("Hyper Keys", "H-", hyperLabels, false)
 do -- stable sort: group order as added, then hint slot (unslotted keys last, in table order)
@@ -692,13 +716,18 @@ do -- stable sort: group order as added, then hint slot (unslotted keys last, in
 		return a.index < b.index
 	end)
 end
-local keysWidth, labelWidth = 0, 0
-for _, entry in ipairs(searchEntries) do
-	keysWidth = math.max(keysWidth, #entry.keys)
-	labelWidth = math.max(labelWidth, utf8.len(entry.label))
-end
+local keysWidth, searchWidth
 -- Every line is padded to the widest row, so the alert keeps its width and position while typing.
-local searchWidth = 2 + keysWidth + 2 + labelWidth
+local function refreshSearchLabels()
+	local labelWidth = 0
+	keysWidth = 0
+	for _, entry in ipairs(searchEntries) do
+		entry.shown = shownLabel(entry.label, entry.status)
+		keysWidth = math.max(keysWidth, #entry.keys)
+		labelWidth = math.max(labelWidth, utf8.len(entry.shown))
+	end
+	searchWidth = 2 + keysWidth + 2 + labelWidth
+end
 -- No fades: the alert is redrawn on every key press.
 local SEARCH_STYLE = { textStyle = PROMPT_STYLE.textStyle, fadeInDuration = 0, fadeOutDuration = 0 }
 local SEARCH_TEXT_STYLE = {
@@ -770,7 +799,7 @@ local function searchFilter()
 	search.matches = {}
 	local bestScore
 	for _, entry in ipairs(searchEntries) do
-		local labelScore, labelPositions = fuzzyMatch(entry.label, search.query, caseSensitive)
+		local labelScore, labelPositions = fuzzyMatch(entry.shown, search.query, caseSensitive)
 		local keysScore, keysPositions = fuzzyMatch(entry.keys, search.query, caseSensitive)
 		local groupHit = search.query ~= ""
 			and (caseSensitive and entry.group or entry.group:lower()):find(
@@ -835,7 +864,7 @@ local function searchRender()
 			end
 		end
 		local mark = i == search.selected and ">" or " "
-		table.insert(lines, string.format("%s %-" .. keysWidth .. "s  %s", mark, entry.keys, entry.label))
+		table.insert(lines, string.format("%s %-" .. keysWidth .. "s  %s", mark, entry.keys, entry.shown))
 		for _, pos in ipairs(match.keysPositions or {}) do
 			table.insert(highlights, { #lines, 2 + pos })
 		end
@@ -1013,6 +1042,7 @@ searchTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(event)
 end)
 searchAll = function()
 	search.query, search.text, search.cursor = "", {}, 0
+	refreshSearchLabels()
 	searchFilter()
 	searchTap:start()
 	searchRender()
