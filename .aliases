@@ -46,16 +46,16 @@ alias gba="git branch -a"
 # run these inside a Go module
 alias goo="go list -m -u all"
 alias gou="go get -u ./... && go mod tidy"
-alias gol="go list -m all > ~/go-packages.txt"
+alias gol="go list -m all > ~/packages/go-packages.txt"
 
 # --- homebrew ---
 # "brew update"
 alias bu="brew update --verbose && brew upgrade --verbose && brew cleanup --verbose --prune=all"
 alias bd="brew doctor"
 # "brew log"
-alias bl="brew leaves > ~/brew-leaves.txt && brew list > ~/brew-list.txt && brew list --cask > ~/brew-list-cask.txt"
+alias bl="brew leaves > ~/packages/archive/brew-leaves.txt && brew list > ~/packages/archive/brew-list.txt && brew list --cask > ~/packages/archive/brew-list-cask.txt"
 # "brew display logs"
-alias bdl="less ~/brew-leaves.txt && less ~/brew-list.txt && less ~/brew-list-cask.txt"
+alias bdl="less ~/packages/archive/brew-leaves.txt && less ~/packages/archive/brew-list.txt && less ~/packages/archive/brew-list-cask.txt"
 
 # --- java ---
 alias jr="javac -Xlint:unchecked Main.java && java Main"
@@ -68,10 +68,10 @@ alias nuq="{ nu; } >/dev/null 2>&1 && echo 'nu: ok' || echo 'nu: failed (run nu 
 bobl() {
   local out
   out=$(bob list) || return 1
-  print -r -- "$out" | sed $'s/\e\\[[0-9;]*m//g' > ~/bob-versions.txt
+  print -r -- "$out" | sed $'s/\e\\[[0-9;]*m//g' > ~/packages/bob-versions.txt
 }
 # "bob display logs"
-alias bobdl="less ~/bob-versions.txt"
+alias bobdl="less ~/packages/bob-versions.txt"
 
 # --- nvm node ---
 # nvm update current
@@ -83,9 +83,9 @@ alias nvl="nvm install --lts --reinstall-packages-from=node && nvm alias default
 alias ngo="npm -g outdated"
 alias ngu="npm -g update"
 # "npm -g log"
-alias ngl="npm -g list > ~/global-npm-packages.txt"
+alias ngl="npm -g list > ~/packages/global-npm-packages.txt"
 # "npm -g display logs"
-alias ngdl="less ~/global-npm-packages.txt"
+alias ngdl="less ~/packages/global-npm-packages.txt"
 alias nrd="npm run dev"
 alias nrb="npm run build"
 alias nt="npm test"
@@ -93,9 +93,9 @@ alias nt="npm test"
 # --- pipx ---
 alias pxu="pipx upgrade-all"
 # "pipx log"
-alias pxl="pipx list > ~/pipx-packages.txt"
+alias pxl="pipx list > ~/packages/pipx-packages.txt"
 # "pipx display logs"
-alias pxdl="less ~/pipx-packages.txt"
+alias pxdl="less ~/packages/pipx-packages.txt"
 
 # --- postgres ---
 alias pgstart='pg_ctl -D ~/postgres-data -l ~/postgres-data/server.log start'
@@ -105,9 +105,9 @@ alias pgstatus='pg_ctl -D ~/postgres-data status'
 # --- rustup ---
 alias ru="rustup update"
 # "rustc log"
-alias rl="rustup toolchain list > ~/rust-toolchains.txt && cargo install --list > ~/cargo-packages.txt"
+alias rl="rustup toolchain list > ~/packages/rust-toolchains.txt && cargo install --list > ~/packages/cargo-packages.txt"
 # "rustc display logs"
-alias rdl="less ~/rust-toolchains.txt && less ~/cargo-packages.txt"
+alias rdl="less ~/packages/rust-toolchains.txt && less ~/packages/cargo-packages.txt"
 
 # --- tmuxinator ---
 alias tx="tmuxinator"
@@ -197,11 +197,11 @@ wl() {
 wuta() {
   local -a files=(
     "$HOME/.config/nvim/lazy-lock.json"
-    "$HOME/pipx-packages.txt"
-    "$HOME/global-npm-packages.txt"
-    "$HOME/rust-toolchains.txt"
-    "$HOME/cargo-packages.txt"
-    "$HOME/bob-versions.txt"
+    "$HOME/packages/pipx-packages.txt"
+    "$HOME/packages/global-npm-packages.txt"
+    "$HOME/packages/rust-toolchains.txt"
+    "$HOME/packages/cargo-packages.txt"
+    "$HOME/packages/bob-versions.txt"
   )
   yadm-public add -- "${files[@]}" || return 1
   if yadm-public diff --cached --quiet -- "${files[@]}"; then
