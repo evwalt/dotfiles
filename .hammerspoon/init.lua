@@ -52,6 +52,7 @@ local hyper = { "ctrl", "alt", "cmd", "shift" }
 -- s/a opens a search over every picker and Hyper key (see searchAll). "space" and "delete"
 -- (Backspace) are extra slots with no mirror, listed below the grid as SPC and DEL.
 -- An item with `front = true` acts on the front app; from search it asks to confirm first.
+-- An item with `status = fn` shows fn()'s text after its label in the hint, read each time it opens.
 local MIRROR_ROWS = { -- Dvorak right-hand keys and their left-hand mirrors, row by row
 	{ "fgcrl", "yp.,'" },
 	{ "dhtns", "iueoa" },
@@ -95,6 +96,7 @@ end
 local function actionPicker(title, items)
 	local m = hs.hotkey.modal.new()
 	local labels = { [SEARCH_KEY] = "Search" } -- right key -> label
+	local statuses = {} -- right key -> status fn
 	local function bindRun(keys, run)
 		for _, key in ipairs(keys) do
 			m:bind({}, key, function()
@@ -109,6 +111,7 @@ local function actionPicker(title, items)
 		assert(key ~= SEARCH_KEY, SEARCH_KEY .. " is reserved for search")
 		assert(MIRROR[key] or key == "space" or key == "delete", "no mirror key for " .. key)
 		labels[key] = label
+		statuses[key] = item.status
 		bindRun(MIRROR[key] and { key, MIRROR[key] } or { key }, itemAction(label, item[3]))
 	end
 	bindRun({ SEARCH_KEY, MIRROR[SEARCH_KEY] }, function()
@@ -118,14 +121,20 @@ local function actionPicker(title, items)
 		hs.alert.closeAll()
 		m:exit()
 	end)
-	local extras = {}
-	for _, extra in ipairs(EXTRA_KEYS) do
-		table.insert(extras, string.format("%-5s%s", extra[2], labels[extra[1]] or FREE_LABEL))
+	local function hint()
+		local shown = {}
+		for key, label in pairs(labels) do
+			shown[key] = statuses[key] and string.format("%s [%s]", label, statuses[key]()) or label
+		end
+		local extras = {}
+		for _, extra in ipairs(EXTRA_KEYS) do
+			table.insert(extras, string.format("%-5s%s", extra[2], shown[extra[1]] or FREE_LABEL))
+		end
+		return title .. "\n\n" .. hintText(shown) .. "\n\n" .. table.concat(extras, "\n")
 	end
-	local hint = title .. "\n\n" .. hintText(labels) .. "\n\n" .. table.concat(extras, "\n")
 	function m:entered()
 		hs.alert.closeAll()
-		hs.alert.show(hint, PROMPT_STYLE, hs.screen.mainScreen(), true) -- non-number duration: stays up until closed
+		hs.alert.show(hint(), PROMPT_STYLE, hs.screen.mainScreen(), true) -- non-number duration: stays up until closed
 	end
 	return function()
 		m:enter()
@@ -438,21 +447,41 @@ local picker1Items = {
 	{ "t", "Cursor Beacon", cursorBeacon, front = true },
 	{ "n", "Spotify" },
 	{ "b", "Cut (s-x)", keyStroker({ "cmd" }, "x"), front = true },
-	{ "m", "Toggle Clock Date", toggleClockDate },
+	{
+		"m",
+		"Toggle Clock Date",
+		toggleClockDate,
+		status = function()
+			return (clockDate) and "on" or "off"
+		end,
+	},
 	{
 		"w",
 		"Toggle Clock",
 		function()
 			setClock(not clockOn)
 		end,
+		status = function()
+			return (clockOn) and "on" or "off"
+		end,
 	},
 	{ "v", "Paste (s-v)", keyStroker({ "cmd" }, "v"), front = true },
-	{ "z", "Toggle Clock Seconds", toggleClockSecs },
+	{
+		"z",
+		"Toggle Clock Seconds",
+		toggleClockSecs,
+		status = function()
+			return (clockSecs) and "on" or "off"
+		end,
+	},
 	{
 		"delete",
 		"Toggle Countdown",
 		function()
 			toggleCt()
+		end,
+		status = function() -- ctHidden is defined further down; it is mirrored in settings
+			return hs.settings.get("ctHidden") and "hidden" or "shown"
 		end,
 	},
 }
@@ -465,8 +494,18 @@ local picker2Items = {
 		function()
 			hs.screen.setForceToGray(not hs.screen.getForceToGray())
 		end,
+		status = function()
+			return (hs.screen.getForceToGray()) and "on" or "off"
+		end,
 	},
-	{ "c", "Toggle Firefox Border", toggleBorder },
+	{
+		"c",
+		"Toggle Firefox Border",
+		toggleBorder,
+		status = function()
+			return (borderEnabled) and "on" or "off"
+		end,
+	},
 	{ "r", "Skim" },
 	{
 		"delete",
@@ -562,33 +601,46 @@ end
 -- A query found as plain text in a group name ("picker 1", "hyper") also lists that whole group,
 -- ranked below label and key matches.
 local searchEntries = {} -- { group, label, keys, run }
-local function addSearchEntry(group, label, keys, action, front, shortKeys)
+-- Rows are sorted like the hints (see sortSearchEntries): grid keys in Dvorak order, then extras,
+-- with free slots in place.
+local KEY_SLOT = {} -- key -> position in the hint
+for _, row in ipairs(MIRROR_ROWS) do
+	for col = 1, #row[1] do
+		table.insert(KEY_SLOT, row[1]:sub(col, col))
+		KEY_SLOT[row[1]:sub(col, col)] = #KEY_SLOT
+	end
+end
+for _, extra in ipairs(EXTRA_KEYS) do
+	table.insert(KEY_SLOT, extra[1])
+	KEY_SLOT[extra[1]] = #KEY_SLOT
+end
+local function addSearchEntry(group, label, keys, action, front, shortKeys, key)
 	local run = itemAction(label, action)
 	if front then
 		run = confirmPrompt(label .. " (" .. (shortKeys or keys) .. ")", "Run in the front app?", run)
 	end
-	table.insert(searchEntries, { group = group, label = label, keys = keys, run = run })
+	table.insert(searchEntries, { group = group, label = label, keys = keys, run = run, key = key })
 end
 -- Unused slots are listed as FREE_LABEL, so searching "free" shows every open key. Enter on one
 -- just names it.
 local function addFreeEntries(group, prefix, used, withExtras)
-	local function add(keys)
+	local function add(keys, key)
 		addSearchEntry(group, FREE_LABEL, keys, function()
 			hs.alert.show(keys .. " is free", PROMPT_STYLE)
-		end)
+		end, nil, nil, key)
 	end
 	for _, row in ipairs(MIRROR_ROWS) do
 		for col = 1, #row[1] do
 			local right = row[1]:sub(col, col)
 			if not used[right] then
-				add(prefix .. right .. "/" .. MIRROR[right])
+				add(prefix .. right .. "/" .. MIRROR[right], right)
 			end
 		end
 	end
 	if withExtras then
 		for _, extra in ipairs(EXTRA_KEYS) do
 			if not used[extra[1]] then
-				add(prefix .. extra[2])
+				add(prefix .. extra[2], extra[1])
 			end
 		end
 	end
@@ -604,7 +656,7 @@ for _, picker in ipairs({ { "H-g", picker1Items, "Picker 1 (H-g)" }, { "H-f", pi
 		end
 		local shortKeys = picker[1] .. " " .. keyName -- confirm title, like "Shut Down (H-f h)"
 		local keys = MIRROR[key] and string.format("%s/%s", shortKeys, MIRROR[key]) or shortKeys
-		addSearchEntry(picker[3], item[2], keys, item[3], item.front, shortKeys)
+		addSearchEntry(picker[3], item[2], keys, item[3], item.front, shortKeys, key)
 	end
 	local used = { [SEARCH_KEY] = true }
 	for _, item in ipairs(picker[2]) do
@@ -620,9 +672,26 @@ for _, item in ipairs(hyperKeys) do
 			hs.alert.show(item[2]:sub(2, -2) .. ": press H-" .. item[1], PROMPT_STYLE)
 		end
 	end
-	addSearchEntry("Hyper Keys", item[2], "H-" .. item[1], action, item.front)
+	addSearchEntry("Hyper Keys", item[2], "H-" .. item[1], action, item.front, nil, item[1])
 end
 addFreeEntries("Hyper Keys", "H-", hyperLabels, false)
+do -- stable sort: group order as added, then hint slot (unslotted keys last, in table order)
+	local groupOrder = {}
+	for i, entry in ipairs(searchEntries) do
+		groupOrder[entry.group] = groupOrder[entry.group] or i
+		entry.index = i
+	end
+	table.sort(searchEntries, function(a, b)
+		if a.group ~= b.group then
+			return groupOrder[a.group] < groupOrder[b.group]
+		end
+		local sa, sb = KEY_SLOT[a.key] or math.huge, KEY_SLOT[b.key] or math.huge
+		if sa ~= sb then
+			return sa < sb
+		end
+		return a.index < b.index
+	end)
+end
 local keysWidth, labelWidth = 0, 0
 for _, entry in ipairs(searchEntries) do
 	keysWidth = math.max(keysWidth, #entry.keys)
