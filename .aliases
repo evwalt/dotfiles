@@ -157,8 +157,16 @@ alias ytt='noglob ytt'
 
 # --- zsh ---
 alias l="ls -laF"
-alias rz='tmux list-panes -a -F '\''#{pane_id} #{pane_current_command}'\'' | awk '\''$2=="zsh"{print $1}'\'' | xargs -I{} tmux send-keys -t {} '\''exec zsh'\'' C-m'
-alias rsh='tmux list-panes -a -F '\''#{pane_id} #{pane_current_command}'\'' | awk '\''$2=="zsh"{print $1}'\'' | xargs -I{} tmux send-keys -t {} '\''exec $SHELL'\'' C-m'
+# Reload the shell in every idle zsh pane, then in this one. While it runs, this pane's
+# foreground command is the pipeline, not zsh, so it has to exec itself last.
+_reload_zsh_panes() {
+  tmux list-panes -a -F '#{pane_id} #{pane_current_command}' 2>/dev/null |
+    awk -v me="$TMUX_PANE" '$2 == "zsh" && $1 != me { print $1 }' |
+    xargs -I{} tmux send-keys -t {} "exec $1" C-m
+  exec "$1"
+}
+rz() { _reload_zsh_panes zsh }
+rsh() { _reload_zsh_panes "$SHELL" }
 
 # --- weekly combos ---
 # npm -g update, but fail when npm 12+ skips install scripts (exits 0 anyway) or the global tree is broken
