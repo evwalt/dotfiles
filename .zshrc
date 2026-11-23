@@ -1,19 +1,11 @@
 # ~/.zshrc
-# Minimal replacement for Oh My Zsh (omz)
-# Goal: same look/behavior as agnoster-themed omz setup
-# Ported piece-by-piece from
-# ~/.oh-my-zsh/lib/{history,directories,misc,completion,key-bindings}.zsh
-# and ~/.oh-my-zsh/themes/agnoster.zsh-theme.
-#
-# To test without touching your real setup:
-#   ZDOTDIR=$HOME/.zshrc.no-omz.test zsh   (see migration notes)
-# or simply:
-#   zsh -c 'source ~/.zshrc.no-omz; zsh'
+# Standalone config, no framework. Sections marked "from omz" were ported
+# from Oh My Zsh's lib/*.zsh and the agnoster theme, then trimmed.
+# Aliases live in ~/.aliases; PATH lives in ~/.zprofile.
 
-# Dedupe
-typeset -U path PATH
+typeset -U path PATH   # dedupe
 
-# --- .zprofile guard (same pattern as before, for non-login interactive shells) ---
+# --- .zprofile guard: non-login interactive shells (e.g. tmux panes) still get PATH ---
 if [ -z "$ZPROFILE_LOADED" ] && [ -f "$HOME/.zprofile" ]; then
   source "$HOME/.zprofile"
 fi
@@ -51,8 +43,7 @@ d() {
 alias lsa='ls -lah'
 alias ll='ls -lh'
 alias la='ls -lAh'
-# NOTE: `l` is intentionally left unset here — ~/.aliases defines
-# `alias l="ls -laF"` and sources later, exactly as it did before.
+# `l` is defined in ~/.aliases.
 
 # ls colors (from omz lib/theme-and-appearance.zsh): bold teal/cyan dirs,
 # default (white) regular files, on BSD ls.
@@ -98,8 +89,9 @@ zstyle ':completion:*' cache-path "${ZDOTDIR:-$HOME}/.zcompcache"
 
 autoload -Uz bashcompinit && bashcompinit
 
-# --- Key bindings (from omz lib/key-bindings.zsh) ---
-# Vi mode. Cursor is a beam in insert mode, a block in normal mode.
+# --- Key bindings: vi mode, plus omz lib/key-bindings.zsh extras ---
+# Cursor is a beam in insert mode and a block in normal mode and while
+# commands run, so programs like nvim start with a block.
 _cursor_beam()  { print -n '\e[6 q' }
 _cursor_block() { print -n '\e[2 q' }
 zle-keymap-select() { [[ $KEYMAP == vicmd ]] && _cursor_block || _cursor_beam }
@@ -117,6 +109,11 @@ zle -N zle-line-finish
 
 bindkey -v
 KEYTIMEOUT=1   # 10ms Esc delay instead of 400ms
+
+# Back to emacs mode: swap `bindkey -v` for `bindkey -e`, delete the cursor
+# hooks above (keep the smkx/rmkx pair), and uncomment this for a steady block:
+# echo -ne "\e[2 q"
+# trap 'echo -ne "\e[2 q"' EXIT
 
 # Keep common emacs keys in insert mode.
 bindkey '^a' beginning-of-line
@@ -177,8 +174,7 @@ _omz_like_precmd() { _title "%15<..<%~%<<" "%n@%m:%~" }
 autoload -Uz add-zsh-hook
 add-zsh-hook precmd _omz_like_precmd
 
-# --- Prompt: agnoster-style, recreated without the omz theme engine ---
-# --- Same segments/colors/separators as your current ZSH_THEME="agnoster" ---
+# --- Prompt: agnoster-derived segments in Harbor Night colors ---
 setopt promptsubst
 autoload -Uz vcs_info
 zstyle ':vcs_info:*' enable git
@@ -191,9 +187,7 @@ zstyle ':vcs_info:*' actionformats ' %u%c'
 
 # Plain-text friendly: no Powerline glyphs, so copy/paste stays clean.
 # Segments are separated by background color changes only.
-DEFAULT_USER=evan
-_SEGMENT_SEPARATOR=''
-_PL_BRANCH_CHAR=''
+DEFAULT_USER=evan   # user@host is shown only for other users or over SSH
 
 _prompt_segment() {
   # Background arg is ignored: segments use the terminal background and are
@@ -245,8 +239,7 @@ _prompt_dir() {
 
 _prompt_git() {
   (( $+commands[git] )) || return
-  [[ "$(command git config --get oh-my-zsh.hide-status 2>/dev/null)" = 1 ]] && return
-  local ref dirty branch_char=$_PL_BRANCH_CHAR
+  local ref dirty branch_char
   if [[ "$(command git rev-parse --is-inside-work-tree 2>/dev/null)" = "true" ]]; then
     dirty=$(command git status --porcelain --ignore-submodules 2>/dev/null)
     ref=$(command git symbolic-ref HEAD 2>/dev/null) || \
@@ -303,6 +296,7 @@ _prompt_yadm_public() {
   _prompt_yadm_segment u "$branch" "$dirty"
 }
 
+# Optional yadm segments (u = public, r = private); toggle with ypt/yptu/yptr.
 YADM_PROMPT_PUBLIC=false
 YADM_PROMPT_PRIVATE=false
 
@@ -356,7 +350,7 @@ build_prompt() {
 
 PROMPT='%{%f%b%k%}$(build_prompt)'
 
-# --- User configuration ---
+# --- yadm wrappers (aliases in ~/.aliases build on these) ---
 yadm-public() {
   command yadm "$@"
 }
@@ -371,9 +365,8 @@ yadm-private() {
 [ -r ~/.aliases ] && source ~/.aliases
 [ -r ~/dev/job-search/tool-job-search.zsh ] && source ~/dev/job-search/tool-job-search.zsh
 
-# --- Codex CLI proxy bypass ---
-# Canopy's system proxy (127.0.0.1:9134) breaks Codex's OpenAI token exchange; bypass it for OpenAI hosts only.
-export NO_PROXY="${NO_PROXY:+$NO_PROXY,}openai.com,chatgpt.com"
+# --- Private, machine-specific settings (tracked in the private yadm repo) ---
+[ -r ~/.config/zsh/private.zsh ] && source ~/.config/zsh/private.zsh
 
 # --- Node via nvm ---
 export NVM_DIR="$HOME/.nvm"
@@ -388,16 +381,5 @@ npm()  { unset -f nvm node npm npx; . "$NVM_DIR/nvm.sh"; npm "$@"; }
 npx()  { unset -f nvm node npm npx; . "$NVM_DIR/nvm.sh"; npx "$@"; }
 markdownlint-cli2() { unset -f nvm node npm npx markdownlint-cli2 2>/dev/null; . "$NVM_DIR/nvm.sh"; markdownlint-cli2 "$@"; }
 
-
-# --- Terminal cursor shape ---
-echo -ne "\e[2 q"
-trap 'echo -ne "\e[2 q"' EXIT
-
-# --- ghcup ---
+# --- ghcup (Haskell) ---
 [ -f "${HOME}/.ghcup/env" ] && source "${HOME}/.ghcup/env"
-
-# Kill orphaned ltex-ls-plus (LanguageTool) Java processes
-alias ltexkill='pkill -f LtexLanguageServerLauncher'
-
-# ytt takes unquoted URLs; noglob stops zsh expanding the "?" in them
-alias ytt='noglob ytt'

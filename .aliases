@@ -55,6 +55,10 @@ alias vim="nvim"
 # --- java ---
 alias jr="javac -Xlint:unchecked Main.java && java Main"
 
+# --- ltex ---
+# kill orphaned ltex-ls-plus (LanguageTool) Java processes
+alias ltexkill='pkill -f LtexLanguageServerLauncher'
+
 # --- neovim ---
 alias n="nvim"
 alias nu="nvim --headless '+Lazy! sync' +qa && yadm-public add ~/.config/nvim/lazy-lock.json && (yadm-public diff --cached --quiet || (yadm-public commit -m 'chore(nvim): bump deps' && yadm-public push))"
@@ -146,6 +150,10 @@ alias yrdc="yadm-private diff --color-words"
 alias yrps="yadm-private push"
 alias yrl="yadm-private log"
 alias yrlo="yadm-private log --oneline"
+
+# --- ytt ---
+# ytt takes unquoted URLs; noglob stops zsh expanding the "?" in them
+alias ytt='noglob ytt'
 
 # --- zsh ---
 alias l="ls -laF"
