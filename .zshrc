@@ -110,6 +110,17 @@ zle -N zle-line-finish
 bindkey -v
 KEYTIMEOUT=1   # 10ms Esc delay instead of 400ms
 
+# Share the vi register with the macOS clipboard, like nvim's unnamedplus:
+# yanks, deletes, and changes copy to it; p/P paste from it.
+_vi_clip_copy() { zle .$WIDGET; print -rn -- "$CUTBUFFER" | pbcopy }
+for w in vi-yank vi-yank-whole-line vi-yank-eol vi-delete vi-delete-char \
+         vi-backward-delete-char vi-kill-eol vi-change vi-change-eol vi-change-whole-line; do
+  zle -N $w _vi_clip_copy
+done
+_vi_clip_paste() { CUTBUFFER=$(pbpaste); zle .$WIDGET }
+zle -N vi-put-after _vi_clip_paste
+zle -N vi-put-before _vi_clip_paste
+
 # Back to emacs mode: swap `bindkey -v` for `bindkey -e`, delete the cursor
 # hooks above (keep the smkx/rmkx pair), and uncomment this for a steady block:
 # echo -ne "\e[2 q"
