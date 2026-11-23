@@ -4,8 +4,8 @@
   "overrides": {
     "text": "#c0c6d6",
     "inverseText": "#0c0c16",
-    "inactive": "#6b7091",
-    "inactiveShimmer": "#8a8fb0",
+    "inactive": "#8f94b4",
+    "inactiveShimmer": "#b0b5d0",
     "subtle": "#2c2d45",
     "promptBorder": "#33344f",
     "promptBorderShimmer": "#4a4c70",
