@@ -23,8 +23,11 @@ vim.opt.rtp:prepend(lazypath)
 
 -- Headless runs (`nvim --headless "+Lazy! sync"`) print plugin names in hardcoded
 -- ANSI magenta, which reads purple in Harbor Night; use the lime green instead.
-local term = require("lazy.terminal")
-term.magenta = term.green
+-- Guarded: lazy.terminal is internal, so a lazy update that renames it just skips this.
+local ok, term = pcall(require, "lazy.terminal")
+if ok and type(term) == "table" and term.green then
+	term.magenta = term.green
+end
 
 -- Setup lazy.nvim
 require("lazy").setup({
