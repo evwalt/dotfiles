@@ -208,6 +208,19 @@ def cmd_who(m, a):
     print(m.names.get(key(a.handle), "(no contact)"))
 
 
+def cmd_handle(m, a):
+    # most recently used number/email for an exact contact name (for scripts that address a message)
+    want = a.name.lower()
+    best = None
+    for h, last in m.db.execute(
+            "select h.id, max(m.date) from message m join handle h on h.ROWID = m.handle_id group by h.id"):
+        if m.name(h).lower() == want and (best is None or (last or 0) > best[1]):
+            best = (h, last or 0)
+    if not best:
+        sys.exit("msgs: no handle for %r" % a.name)
+    print(best[0])
+
+
 def main():
     p = argparse.ArgumentParser(prog="msgs", description="Read Messages with contact names (read-only).")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -224,9 +237,11 @@ def main():
     s.add_argument("-n", type=int, default=50)
     s = sub.add_parser("who", help="contact name for a number or email")
     s.add_argument("handle")
+    s = sub.add_parser("handle", help="most recent number or email for an exact contact name")
+    s.add_argument("name")
     a = p.parse_args()
     m = Msgs()
-    {"recent": cmd_recent, "with": cmd_with, "search": cmd_search, "who": cmd_who}[a.cmd](m, a)
+    {"recent": cmd_recent, "with": cmd_with, "search": cmd_search, "who": cmd_who, "handle": cmd_handle}[a.cmd](m, a)
 
 
 if __name__ == "__main__":
