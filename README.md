@@ -30,7 +30,7 @@ Where it's defined:
 - A floating 24-hour clock with an optional countdown slot
 - A focus border for Firefox when more than one window is open
 
-**Scripts** ([`scripts/`](scripts), [`.local/bin/`](.local/bin)): small tools such as `ct` (terminal countdown timer), `msgs` (read iMessages with contact names, read-only), and `ytt` (save a YouTube transcript).
+**Scripts** ([`scripts/`](scripts)): small tools such as `ct` (terminal countdown timer), `msgs` (read iMessages with contact names, read-only), and `ytt` (save a YouTube transcript).
 
 ## Dependency tracking
 

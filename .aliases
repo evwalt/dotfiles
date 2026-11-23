@@ -48,15 +48,6 @@ alias goo="go list -m -u all"
 alias gou="go get -u ./... && go mod tidy"
 alias gol="go list -m all > ~/packages/go-packages.txt"
 
-# --- homebrew ---
-# "brew update"
-alias bu="brew update --verbose && brew upgrade --verbose && brew cleanup --verbose --prune=all"
-alias bd="brew doctor"
-# "brew log"
-alias bl="brew leaves > ~/packages/archive/brew-leaves.txt && brew list > ~/packages/archive/brew-list.txt && brew list --cask > ~/packages/archive/brew-list-cask.txt"
-# "brew display logs"
-alias bdl="less ~/packages/archive/brew-leaves.txt && less ~/packages/archive/brew-list.txt && less ~/packages/archive/brew-list-cask.txt"
-
 # --- java ---
 alias jr="javac -Xlint:unchecked Main.java && java Main"
 
