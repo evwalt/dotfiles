@@ -99,14 +99,32 @@ zstyle ':completion:*' cache-path "${ZDOTDIR:-$HOME}/.zcompcache"
 autoload -Uz bashcompinit && bashcompinit
 
 # --- Key bindings (from omz lib/key-bindings.zsh) ---
-if (( ${+terminfo[smkx]} )) && (( ${+terminfo[rmkx]} )); then
-  zle-line-init() { echoti smkx }
-  zle-line-finish() { echoti rmkx }
-  zle -N zle-line-init
-  zle -N zle-line-finish
-fi
+# Vi mode. Cursor is a beam in insert mode, a block in normal mode.
+_cursor_beam()  { print -n '\e[6 q' }
+_cursor_block() { print -n '\e[2 q' }
+zle-keymap-select() { [[ $KEYMAP == vicmd ]] && _cursor_block || _cursor_beam }
+zle -N zle-keymap-select
 
-bindkey -e
+if (( ${+terminfo[smkx]} )) && (( ${+terminfo[rmkx]} )); then
+  zle-line-init() { echoti smkx; _cursor_beam }
+  zle-line-finish() { echoti rmkx; _cursor_block }
+else
+  zle-line-init() { _cursor_beam }
+  zle-line-finish() { _cursor_block }
+fi
+zle -N zle-line-init
+zle -N zle-line-finish
+
+bindkey -v
+KEYTIMEOUT=1   # 10ms Esc delay instead of 400ms
+
+# Keep common emacs keys in insert mode.
+bindkey '^a' beginning-of-line
+bindkey '^e' end-of-line
+bindkey '^k' kill-line
+bindkey '^w' backward-kill-word
+bindkey '^u' backward-kill-line
+bindkey '^h' backward-delete-char
 
 [[ -n "${terminfo[kpp]}" ]] && bindkey "${terminfo[kpp]}" up-line-or-history
 [[ -n "${terminfo[knp]}" ]] && bindkey "${terminfo[knp]}" down-line-or-history
@@ -143,6 +161,7 @@ bindkey ' ' magic-space
 autoload -U edit-command-line
 zle -N edit-command-line
 bindkey '\C-x\C-e' edit-command-line
+bindkey -M vicmd v edit-command-line
 bindkey '^[m' copy-prev-shell-word
 
 # --- Terminal title (from omz lib/termsupport.zsh) — cheap, tmux/iTerm aware ---
