@@ -15,6 +15,7 @@
 # --- git-delta ---
 [core]
     pager = delta
+    editor = ~/.local/share/bob/nvim-bin/nvim
 
 [interactive]
     diffFilter = delta --color-only

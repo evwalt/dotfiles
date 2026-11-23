@@ -48,6 +48,10 @@ alias goo="go list -m -u all"
 alias gou="go get -u ./... && go mod tidy"
 alias gol="go list -m all > ~/packages/go-packages.txt"
 
+# --- editor ---
+alias vi="nvim"
+alias vim="nvim"
+
 # --- java ---
 alias jr="javac -Xlint:unchecked Main.java && java Main"
 
