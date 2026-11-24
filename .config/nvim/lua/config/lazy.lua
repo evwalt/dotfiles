@@ -21,12 +21,17 @@ vim.opt.rtp:prepend(lazypath)
 -- vim.g.mapleader = " "
 -- vim.g.maplocalleader = " "
 
--- Headless runs (`nvim --headless "+Lazy! sync"`) print plugin names in hardcoded
--- ANSI magenta, which reads purple in Harbor Night; use the lime green instead.
+-- Headless runs (`nvim --headless "+Lazy! sync"`) print plugin names in ANSI magenta
+-- and task names in ANSI cyan. Recolor to Harbor Night: plugin names periwinkle
+-- (Alacritty bright blue), task names champagne #cdbda2 (truecolor; not in the ANSI palette).
 -- Guarded: lazy.terminal is internal, so a lazy update that renames it just skips this.
 local ok, term = pcall(require, "lazy.terminal")
-if ok and type(term) == "table" and term.green then
-	term.magenta = term.green
+if ok and type(term) == "table" and type(term.colors) == "table" and term.bright_blue and term.color then
+	term.colors.champagne = "\27[38;2;205;189;162m"
+	term.magenta = term.bright_blue
+	term.cyan = function(text)
+		return term.color(text, "champagne")
+	end
 end
 
 -- Setup lazy.nvim
