@@ -9,7 +9,7 @@ return {
 		-- suppressed_dirs = { '~/', '~/Projects', '~/Downloads', '/' },
 		-- log_level = 'debug',
 		-- auto_restore_last_session = true,
-		show_auto_restore_notif = true,
+		show_auto_restore_notif = false, -- true caused a "Press ENTER" prompt in narrow panes
 		session_lens = {
 			theme_conf = {
 				layout_config = {
