@@ -8,6 +8,8 @@
 //         sidecar pzoom [WINDOW_ID]  toggle: expand the focused pane to fill its own side
 //                                    (the group's area, or the regular area) / restore
 //         sidecar reap               after a pane closes: undo an expand whose pane is gone
+//         sidecar fit [WINDOW_ID]    after a window resize: rescale its splits to the ratios
+//                                    last arranged (window option @sidecar_lay)
 //
 // Called from tmux hooks (see tmux.conf) with the window that just became
 // current. Before moving the group out of the window it was last in, it
@@ -53,7 +55,12 @@ const SEP: &str = "@@sep@@";
 type Res<T> = Result<T, String>;
 
 fn tmux(args: &[&str]) -> Res<String> {
-    let out = Command::new("tmux")
+    let mut cmd = Command::new("tmux");
+    // SIDECAR_SOCK names a separate tmux server (-L), for testing without touching the real one.
+    if let Some(sock) = env::var("SIDECAR_SOCK").ok().filter(|s| !s.is_empty()) {
+        cmd.args(["-L", &sock]);
+    }
+    let out = cmd
         .args(args)
         .output()
         .map_err(|e| e.to_string())?;
@@ -870,6 +877,300 @@ fn acquire(lock: &str) -> bool {
     false
 }
 
+// --- proportional layouts -------------------------------------------------------
+
+// A tmux layout as a tree, so saved layouts can be rescaled instead of handed to
+// select-layout at a stale size (tmux then spreads the difference evenly, in cells,
+// so a 33% pane drifts as the window changes size).
+#[derive(Clone, Debug, PartialEq)]
+enum Kind {
+    Leaf(String), // pane number, as in the layout
+    Row(Vec<Cell>), // "{...}": side by side
+    Col(Vec<Cell>), // "[...]": stacked
+}
+
+#[derive(Clone, Debug, PartialEq)]
+struct Cell {
+    w: i32,
+    h: i32,
+    x: i32,
+    y: i32,
+    k: Kind,
+}
+
+fn parse_layout(s: &str) -> Option<Cell> {
+    fn num(b: &[u8], i: &mut usize) -> Option<i32> {
+        let st = *i;
+        while *i < b.len() && b[*i].is_ascii_digit() {
+            *i += 1;
+        }
+        std::str::from_utf8(&b[st..*i]).ok()?.parse().ok()
+    }
+    fn eat(b: &[u8], i: &mut usize, c: u8) -> Option<()> {
+        (b.get(*i)? == &c).then(|| *i += 1)
+    }
+    fn cell(b: &[u8], i: &mut usize) -> Option<Cell> {
+        let w = num(b, i)?;
+        eat(b, i, b'x')?;
+        let h = num(b, i)?;
+        eat(b, i, b',')?;
+        let x = num(b, i)?;
+        eat(b, i, b',')?;
+        let y = num(b, i)?;
+        let k = match b.get(*i) {
+            Some(b',') => {
+                *i += 1;
+                Kind::Leaf(num(b, i)?.to_string())
+            }
+            Some(&o) if o == b'{' || o == b'[' => {
+                let close = if o == b'{' { b'}' } else { b']' };
+                *i += 1;
+                let mut kids = Vec::new();
+                loop {
+                    kids.push(cell(b, i)?);
+                    match *b.get(*i)? {
+                        b',' => *i += 1,
+                        c if c == close => {
+                            *i += 1;
+                            break;
+                        }
+                        _ => return None,
+                    }
+                }
+                if o == b'{' { Kind::Row(kids) } else { Kind::Col(kids) }
+            }
+            _ => return None,
+        };
+        Some(Cell { w, h, x, y, k })
+    }
+    let b = s.as_bytes();
+    let mut i = s.find(',')? + 1;
+    let c = cell(b, &mut i)?;
+    (i == b.len()).then_some(c)
+}
+
+impl Cell {
+    fn dump(&self, out: &mut String) {
+        out.push_str(&format!("{}x{},{},{}", self.w, self.h, self.x, self.y));
+        match &self.k {
+            Kind::Leaf(id) => out.push_str(&format!(",{}", id)),
+            Kind::Row(kids) | Kind::Col(kids) => {
+                let (open, close) = if matches!(self.k, Kind::Row(_)) { ('{', '}') } else { ('[', ']') };
+                out.push(open);
+                for (n, c) in kids.iter().enumerate() {
+                    if n > 0 {
+                        out.push(',');
+                    }
+                    c.dump(out);
+                }
+                out.push(close);
+            }
+        }
+    }
+    // The layout string select-layout takes, checksum included (tmux's layout_checksum).
+    fn layout(&self) -> String {
+        let mut body = String::new();
+        self.dump(&mut body);
+        let mut sum: u16 = 0;
+        for c in body.bytes() {
+            sum = (sum >> 1) | ((sum & 1) << 15);
+            sum = sum.wrapping_add(c as u16);
+        }
+        format!("{:04x},{}", sum, body)
+    }
+    // Arrangement without sizes, to tell whether two layouts are the same split tree.
+    fn shape(&self) -> String {
+        match &self.k {
+            Kind::Leaf(id) => id.clone(),
+            Kind::Row(kids) | Kind::Col(kids) => {
+                let inner: Vec<String> = kids.iter().map(|c| c.shape()).collect();
+                let (o, c) = if matches!(self.k, Kind::Row(_)) { ("{", "}") } else { ("[", "]") };
+                format!("{}{}{}", o, inner.join(","), c)
+            }
+        }
+    }
+    fn ids(&self) -> Vec<String> {
+        match &self.k {
+            Kind::Leaf(id) => vec![format!("%{}", id)],
+            Kind::Row(kids) | Kind::Col(kids) => kids.iter().flat_map(|c| c.ids()).collect(),
+        }
+    }
+    // Along the split axis of a Row (true) or Col (false).
+    fn len(&self, row: bool) -> i32 {
+        if row { self.w } else { self.h }
+    }
+    // This cell scaled to w x h at (x, y), every split keeping its proportions.
+    fn scaled(&self, w: i32, h: i32, x: i32, y: i32) -> Cell {
+        let k = match &self.k {
+            Kind::Leaf(id) => Kind::Leaf(id.clone()),
+            Kind::Row(kids) | Kind::Col(kids) => {
+                let row = matches!(self.k, Kind::Row(_));
+                let old: Vec<i32> = kids.iter().map(|c| c.len(row)).collect();
+                let sizes = shares(&old, if row { w } else { h });
+                Cell::place_kids(kids, &sizes, row, w, h, x, y, |c, cw, ch, cx, cy| c.scaled(cw, ch, cx, cy))
+            }
+        };
+        Cell { w, h, x, y, k }
+    }
+    fn place_kids(kids: &[Cell], sizes: &[i32], row: bool, w: i32, h: i32, x: i32, y: i32,
+                  mut f: impl FnMut(&Cell, i32, i32, i32, i32) -> Cell) -> Kind {
+        let mut at = if row { x } else { y };
+        let mut out = Vec::new();
+        for (c, &sz) in kids.iter().zip(sizes) {
+            out.push(if row { f(c, sz, h, at, y) } else { f(c, w, sz, x, at) });
+            at += sz + 1; // one cell of border between panes
+        }
+        if row { Kind::Row(out) } else { Kind::Col(out) }
+    }
+}
+
+// Split `total` cells (borders included) among parts in proportion to `old`, each at
+// least 1. Boundaries are rounded from running totals, so no rounding error piles up.
+fn shares(old: &[i32], total: i32) -> Vec<i32> {
+    let n = old.len() as i32;
+    let avail = (total - (n - 1)).max(n);
+    let sum: i64 = old.iter().map(|&v| v.max(1) as i64).sum();
+    let mut out = Vec::new();
+    let (mut run, mut prev) = (0i64, 0i32);
+    for (i, &v) in old.iter().enumerate() {
+        run += v.max(1) as i64;
+        let left = n - 1 - i as i32; // parts still to come, 1 cell each at least
+        let edge = ((run as f64) * (avail as f64) / (sum as f64)).round() as i32;
+        let edge = edge.max(prev + 1).min(avail - left);
+        out.push(edge - prev);
+        prev = edge;
+    }
+    out
+}
+
+// `saved` rescaled to a w x h window, or None if it does not parse.
+fn fit_layout(saved: &str, w: i32, h: i32) -> Option<String> {
+    let c = parse_layout(saved)?;
+    if (c.w, c.h) == (w, h) {
+        return Some(saved.to_string());
+    }
+    Some(c.scaled(w, h, 0, 0).layout())
+}
+
+fn win_size(win: &str) -> Option<(i32, i32)> {
+    let out = tmux(&["display-message", "-p", "-t", win, "#{window_width} #{window_height}"]).ok()?;
+    let (w, h) = dims(&out);
+    (w > 0 && h > 0).then_some((w, h))
+}
+
+// The pre-expand layout `saved`, with the expanded side refitted into the space the
+// expanded pane `anchor` has now and the other side kept as it is now (`cur`). So
+// resizing the sides, or the window, while a pane is expanded sticks. None if either
+// layout is not split cleanly between the two sides at the top.
+fn remap_pz(saved: &str, cur: &str, anchor: &str, side: &[String]) -> Option<String> {
+    let s = parse_layout(saved)?;
+    let c = parse_layout(cur)?;
+    let (row, skids, ckids) = match (&s.k, &c.k) {
+        (Kind::Row(a), Kind::Row(b)) => (true, a, b),
+        (Kind::Col(a), Kind::Col(b)) => (false, a, b),
+        _ => return None,
+    };
+    // Top-level cells of `saved` on the expanded side; they must be all of one side
+    // and next to each other.
+    let mut exp = Vec::new();
+    for (i, k) in skids.iter().enumerate() {
+        let ids = k.ids();
+        let n = ids.iter().filter(|id| side.contains(id)).count();
+        if n == ids.len() {
+            exp.push(i);
+        } else if n > 0 {
+            return None;
+        }
+    }
+    let (first, last) = (*exp.first()?, *exp.last()?);
+    if last - first + 1 != exp.len() {
+        return None;
+    }
+    let a = ckids.iter().find(|k| k.ids() == [anchor.to_string()])?;
+    let exp_sizes = shares(&exp.iter().map(|&i| skids[i].len(row)).collect::<Vec<_>>(), a.len(row));
+    let mut sizes = Vec::new();
+    let mut from: Vec<Option<&Cell>> = Vec::new(); // current cell to keep, for the other side
+    for (i, k) in skids.iter().enumerate() {
+        if i >= first && i <= last {
+            sizes.push(exp_sizes[i - first]);
+            from.push(None);
+        } else {
+            let mut ids = k.ids();
+            ids.sort();
+            let now = ckids.iter().find(|ck| {
+                let mut ci = ck.ids();
+                ci.sort();
+                ci == ids
+            })?;
+            sizes.push(now.len(row));
+            from.push((now.shape() == k.shape()).then_some(now));
+        }
+    }
+    if sizes.iter().sum::<i32>() + sizes.len() as i32 - 1 != c.len(row) {
+        return None;
+    }
+    let mut n = 0;
+    let k = Cell::place_kids(skids, &sizes, row, c.w, c.h, 0, 0, |k, w, h, x, y| {
+        let keep = from[n];
+        n += 1;
+        keep.unwrap_or(k).scaled(w, h, x, y)
+    });
+    Some(Cell { w: c.w, h: c.h, x: 0, y: 0, k }.layout())
+}
+
+// Window resized: scale the layout last arranged (@sidecar_lay, kept by tmux.conf hooks)
+// to the new size, so every split keeps its ratio. A changed arrangement just becomes
+// the new reference. Zoom is kept.
+fn fit(win: &str) -> Res<()> {
+    let out = tmux(&["display-message", "-p", "-t", win,
+                     "#{window_width}\t#{window_height}\t#{window_layout}\t#{window_zoomed_flag}\t#{pane_id}\t#{@sidecar_lay}"])?;
+    let f: Vec<&str> = out.split('\t').collect();
+    if f.len() < 6 {
+        return Ok(());
+    }
+    let (w, h) = (f[0].parse().unwrap_or(0), f[1].parse().unwrap_or(0));
+    let (cur, zoomed, active, saved) = (f[2], f[3] == "1", f[4], f[5]);
+    let (Some(c), Some(s)) = (parse_layout(cur), parse_layout(saved)) else {
+        tmux(&["set-option", "-w", "-t", win, "@sidecar_lay", cur])?;
+        return Ok(());
+    };
+    if c.shape() != s.shape() {
+        tmux(&["set-option", "-w", "-t", win, "@sidecar_lay", cur])?;
+        return Ok(());
+    }
+    let want = s.scaled(w, h, 0, 0);
+    if want == c {
+        return Ok(());
+    }
+    let lay = want.layout();
+    let mut cmd = vec!["set-option", "-w", "-t", win, "@sidecar_fitting", "1", ";", "select-layout", "-t", win, &lay];
+    if zoomed {
+        cmd.extend([";", "resize-pane", "-Z", "-t", active]);
+    }
+    cmd.extend([";", "set-option", "-wu", "-t", win, "@sidecar_fitting"]);
+    tmux(&cmd).map(|_| ())
+}
+
+// After sidecar rearranged panes: tmux has no hook for join-pane, so record each
+// window's arrangement as the new reference for fit. A window that only differs in
+// size is left alone: fit keeps its reference ratios.
+fn refresh_lays() {
+    let Ok(out) = tmux(&["list-windows", "-a", "-F", "#{window_id}\t#{window_layout}\t#{@sidecar_lay}"]) else { return };
+    for l in out.lines() {
+        let f: Vec<&str> = l.split('\t').collect();
+        if f.len() < 3 || f[1] == f[2] {
+            continue;
+        }
+        let keep = match (parse_layout(f[1]), parse_layout(f[2])) {
+            (Some(c), Some(s)) => c.shape() == s.shape() && (c.w, c.h) != (s.w, s.h),
+            _ => false,
+        };
+        if !keep {
+            let _ = tmux(&["set-option", "-w", "-t", f[0], "@sidecar_lay", f[1]]);
+        }
+    }
+}
+
 // --- maximize the group in place -------------------------------------------
 
 // Order the window's panes as `want` lists them (select-layout assigns cells by
@@ -898,7 +1199,10 @@ fn apply_layout_as(win: &str, saved: &str, now: &mut Vec<String>, sub: Option<(&
             now.swap(i, j);
         }
     }
-    cmd.extend(["select-layout", "-t", win, saved].map(String::from));
+    // Saved at another window size (the window was resized since): scale it rather
+    // than let tmux spread the difference evenly.
+    let fitted = win_size(win).and_then(|(w, h)| fit_layout(saved, w, h)).unwrap_or_else(|| saved.to_string());
+    cmd.extend(["select-layout", "-t", win, &fitted].map(String::from));
     tmux_v(&cmd).is_ok()
 }
 
@@ -1165,6 +1469,15 @@ fn exit_pz(win: &str) -> Res<()> {
     }
     let exact = layout_ids(&layout).map(|l| same_set(&l, &all)).unwrap_or(false);
     let side_tag = parked.first().map(|p| p.tag).unwrap_or(false);
+    // Keep sizes changed while expanded (the sides' split, or the window).
+    let layout = match (gone, in_win.first()) {
+        (false, Some(p)) if exact => {
+            let mut side: Vec<String> = parked.iter().map(|p| p.id.clone()).collect();
+            side.push(anchor.clone());
+            remap_pz(&layout, &p.layout, &anchor, &side).unwrap_or(layout)
+        }
+        _ => layout,
+    };
     let near = in_win
         .iter()
         .find(|p| p.id == anchor)
@@ -1293,7 +1606,7 @@ fn reap() -> Res<()> {
 fn main() {
     // Usage: sidecar [WINDOW_ID] | sidecar full|pzoom|left [WINDOW_ID]
     let args: Vec<String> = env::args().skip(1).collect();
-    let mode = args.first().map(|a| a.as_str()).filter(|a| ["full", "pzoom", "reap", "left"].contains(a)).map(String::from);
+    let mode = args.first().map(|a| a.as_str()).filter(|a| ["full", "pzoom", "reap", "left", "fit"].contains(a)).map(String::from);
     let win = match args.get(if mode.is_some() { 1 } else { 0 }) {
         Some(w) => w.clone(),
         None => match tmux(&["display-message", "-p", "#{window_id}"]) {
@@ -1310,8 +1623,12 @@ fn main() {
         Some("pzoom") => toggle_pz(&win),
         Some("reap") => reap(),
         Some("left") => left(&win),
+        Some("fit") => fit(&win),
         _ => sync(&win),
     };
+    if mode.as_deref() != Some("fit") {
+        refresh_lays();
+    }
     if let Err(e) = res {
         eprintln!("sidecar: {}", e);
     }
