@@ -1,0 +1,30 @@
+#!/bin/zsh
+# Claude Code hook (Stop / Notification): show a Hammerspoon alert when this Claude pane
+# finishes or needs input while you can't see it (expanded/parked by sidecar, another pane
+# z-zoomed, another window/session). Falls back to a tmux message if Hammerspoon is down.
+#   claude-pane-notify done|input   (hook JSON on stdin)
+setopt extendedglob
+mode=$1 pane=$TMUX_PANE
+[[ -n $pane ]] || exit 0
+json=$(cat)
+
+# Visible = its session is on screen, its window is current, and no other pane is zoomed.
+vis='#{&&:#{session_attached},#{&&:#{window_active},#{?window_zoomed_flag,#{pane_active},1}}}'
+[[ $(tmux display -p -t $pane $vis 2>/dev/null) == 1 ]] && exit 0
+# Claude sets the pane title to "<spinner glyph> <task>"; fall back to the pane id.
+where=$(tmux display -p -t $pane '#{pane_title}' 2>/dev/null)
+where=${where##[^[:alnum:]]#}; where=${where:-$pane}
+
+if [[ $mode == input ]]; then
+  msg=$(jq -r '.message // empty' 2>/dev/null <<<"$json")
+  text="Claude needs input: $where${msg:+
+$msg}"
+else
+  text="Claude finished: $where"
+fi
+text=${text//]==]/]=]}  # keep the Lua long string closed
+hs -t 2 -c "hs.alert.show([==[${text}]==], 4)" >/dev/null 2>&1 ||
+  for c in ${(f)"$(tmux list-clients -F '#{client_name}')"}; do
+    tmux display-message -c $c -d 5000 "${text//\\n/ — }"
+  done
+exit 0

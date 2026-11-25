@@ -1,3 +1,6 @@
+-- Lets the `hs` CLI run Lua here (scripts/claude-pane-notify shows alerts through it).
+require("hs.ipc")
+
 --- Automatic Config Reload ---
 local function reloadConfig(files)
 	local doReload = false
