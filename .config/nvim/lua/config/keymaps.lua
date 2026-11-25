@@ -24,7 +24,7 @@ vim.keymap.set("n", "<space>q", ":bd<CR>", { desc = "Delete buffer" })
 vim.keymap.set("n", "<space>x", ":bd<CR>", { desc = "Delete buffer" })
 vim.keymap.set("n", "<space><space>xf", ":bd!<CR>", { desc = "Force delete buffer" })
 vim.keymap.set("n", "<space><space>qf", ":bd!<CR>", { desc = "Force delete buffer" })
-vim.keymap.set("n", "<space><space>cp", function()
+vim.keymap.set("n", "<space><space>f", function()
 	local path = vim.fn.fnamemodify(vim.fn.expand("%:p"), ":~")
 	if path == "" then
 		return vim.notify("No file path", vim.log.levels.WARN)
