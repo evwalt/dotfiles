@@ -111,6 +111,10 @@ return {
 					-- Lime darkened to 70% (was 62%, #6b8356): still recedes, passes 4.5:1 on the cursor line
 					hl["@markup.list.checked"] = { fg = "#789461" }
 
+					-- Lazy UI: periwinkle header instead of champagne (IncSearch), soft white active tab instead of Visual blue
+					hl.LazyH1 = { bg = c.blue, fg = c.black, bold = true }
+					hl.LazyButtonActive = { bg = c.fg, fg = c.black, bold = true }
+
 					-- Steel blue over teal for fields/properties and link brackets; teal stays for hints
 					hl["@property"] = { fg = c.blue1 }
 					hl["@variable.member"] = { fg = c.blue1 }
