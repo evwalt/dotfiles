@@ -15,7 +15,7 @@ A custom low-glare dark palette with a periwinkle accent and muted accent colors
 Where it's defined:
 
 - Terminal palette: [`.config/alacritty/alacritty.toml`](.config/alacritty/alacritty.toml)
-- Neovim: tokyonight-night remapped in [`.config/nvim/lua/config/plugins/theme.lua`](.config/nvim/lua/config/plugins/theme.lua)
+- Neovim: a recolor of [folke/tokyonight.nvim](https://github.com/folke/tokyonight.nvim) (tokyonight-night) in [`.config/nvim/lua/config/plugins/theme.lua`](.config/nvim/lua/config/plugins/theme.lua)
 - Claude Code: [`.claude/themes/harbor-night.json`](.claude/themes/harbor-night.json)
 
 ## Highlights
