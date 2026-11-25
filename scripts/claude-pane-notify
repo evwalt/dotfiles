@@ -1,30 +1,65 @@
 #!/bin/zsh
-# Claude Code hook (Stop / Notification): show a Hammerspoon alert when this Claude pane
-# finishes or needs input while you can't see it (expanded/parked by sidecar, another pane
-# z-zoomed, another window/session). Falls back to a tmux message if Hammerspoon is down.
-#   claude-pane-notify done|input   (hook JSON on stdin)
+# Claude Code hook (Stop / Notification / PostToolUse / UserPromptSubmit).
+#   claude-pane-notify done    Stop: one Hammerspoon alert when this pane finishes while you
+#                              can't see it (expanded/parked by sidecar, another pane z-zoomed,
+#                              another window/session).
+#   claude-pane-notify input   Notification (permission prompt, question): alert now and every
+#                              10s until answered, visible or not (capped at 30 min).
+#   claude-pane-notify clear   PostToolUse / UserPromptSubmit: stop the input repeats.
+# Falls back to a tmux message if Hammerspoon is down. Hook JSON arrives on stdin.
 setopt extendedglob
 mode=$1 pane=$TMUX_PANE
 [[ -n $pane ]] || exit 0
 json=$(cat)
 
-# Visible = its session is on screen, its window is current, and no other pane is zoomed.
-vis='#{&&:#{session_attached},#{&&:#{window_active},#{?window_zoomed_flag,#{pane_active},1}}}'
-[[ $(tmux display -p -t $pane $vis 2>/dev/null) == 1 ]] && exit 0
+state=${TMPDIR:-/tmp}/claude-pane-notify
+sid=$(jq -r '.session_id // empty' 2>/dev/null <<<"$json")
+pidfile=$state/${sid:-${pane#%}}.pid
+
+stop_repeat() {
+  [[ -f $pidfile ]] || return 0
+  kill $(<$pidfile) 2>/dev/null
+  rm -f $pidfile
+}
+
+alert() {  # alert <text>
+  local text=${1//]==]/]=]}  # keep the Lua long string closed
+  hs -t 2 -c "hs.alert.show([==[${text}]==], 4)" >/dev/null 2>&1 ||
+    for c in ${(f)"$(tmux list-clients -F '#{client_name}')"}; do
+      tmux display-message -c $c -d 5000 "${text//$'\n'/ — }"
+    done
+}
+
 # Claude sets the pane title to "<spinner glyph> <task>"; fall back to the pane id.
 where=$(tmux display -p -t $pane '#{pane_title}' 2>/dev/null)
 where=${where##[^[:alnum:]]#}; where=${where:-$pane}
 
-if [[ $mode == input ]]; then
-  msg=$(jq -r '.message // empty' 2>/dev/null <<<"$json")
-  text="Claude needs input: $where${msg:+
+case $mode in
+  clear)
+    stop_repeat
+    ;;
+  input)
+    stop_repeat
+    msg=$(jq -r '.message // empty' 2>/dev/null <<<"$json")
+    text="Claude needs input: $where${msg:+
 $msg}"
-else
-  text="Claude finished: $where"
-fi
-text=${text//]==]/]=]}  # keep the Lua long string closed
-hs -t 2 -c "hs.alert.show([==[${text}]==], 4)" >/dev/null 2>&1 ||
-  for c in ${(f)"$(tmux list-clients -F '#{client_name}')"}; do
-    tmux display-message -c $c -d 5000 "${text//\\n/ — }"
-  done
+    alert $text
+    mkdir -p $state
+    # Detached repeat loop; the clear hook kills it once the prompt is answered.
+    ( for i in {1..180}; do
+        sleep 10
+        tmux display -p -t $pane '' >/dev/null 2>&1 || break  # pane closed
+        alert $text
+      done
+      rm -f $pidfile ) >/dev/null 2>&1 </dev/null &!
+    print $! >$pidfile
+    ;;
+  *)
+    stop_repeat
+    # Visible = its session is on screen, its window is current, and no other pane is zoomed.
+    vis='#{&&:#{session_attached},#{&&:#{window_active},#{?window_zoomed_flag,#{pane_active},1}}}'
+    [[ $(tmux display -p -t $pane $vis 2>/dev/null) == 1 ]] && exit 0
+    alert "Claude finished: $where"
+    ;;
+esac
 exit 0
