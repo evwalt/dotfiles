@@ -1,0 +1,150 @@
+#!/bin/zsh
+# mu ("monthly update"): update tools installed outside Homebrew.
+# Homebrew is a frozen base layer on this Mac (macOS 13, Intel), so these come
+# straight from upstream releases.
+#
+#   mu           update everything that is out of date, then pyenv and pipx
+#   mu -n        only report what is out of date
+#   mu NAME...   limit to these tools (skips pyenv/pipx)
+#
+# Previous versions are kept as <path>.old for rollback.
+emulate -L zsh
+setopt pipe_fail no_unset extended_glob
+
+BIN=$HOME/.local/bin
+SHARE=$HOME/.local/share
+STATE=$HOME/.local/state/mu
+PIPX_PY=$HOME/.pyenv/versions/3.13.18/bin/python3.13
+mkdir -p $BIN $STATE
+
+# name | GitHub repo | asset regex | kind | install path
+# kind bin: the asset is the binary, or the archive holds a binary named <name>.
+# kind dir: the whole unpacked archive becomes the install path (a wrapper in
+#           ~/.local/bin points into it).
+tools=(
+  "gh|cli/cli|_macOS_amd64\.zip$|bin|$BIN/gh"
+  "jq|jqlang/jq|^jq-macos-amd64$|bin|$BIN/jq"
+  "lazygit|jesseduffield/lazygit|_darwin_x86_64\.tar\.gz$|bin|$BIN/lazygit"
+  "stripe|stripe/stripe-cli|_mac-os_x86_64\.tar\.gz$|bin|$BIN/stripe"
+  "tree-sitter|tree-sitter/tree-sitter|^tree-sitter-macos-x64\.gz$|bin|$BIN/tree-sitter"
+  "shellcheck|koalaman/shellcheck|\.darwin\.x86_64\.tar\.xz$|bin|$BIN/shellcheck"
+  "bob|MordechaiHadad/bob|^bob-macos-x86_64\.zip$|bin|$SHARE/bob_bin/bob"
+  "lua-language-server|LuaLS/lua-language-server|-darwin-x64\.tar\.gz$|dir|$SHARE/lua-language-server"
+  "ltex-ls-plus|ltex-plus/ltex-ls-plus|-mac-x64\.tar\.gz$|dir|$SHARE/ltex-ls-plus"
+  "jdk-jdtls|-|-|dir|$SHARE/jdk-jdtls"
+  "jdtls|-|-|dir|$SHARE/jdtls"
+  "yadm|-|-|bin|$BIN/yadm"
+)
+
+dry=0
+[[ ${1-} == -n ]] && { dry=1; shift }
+only=("$@")
+failed=()
+outdated=0
+
+# Sets: tag url digest (digest is "sha256:<hex>" or empty)
+resolve() {
+  local name=$1 repo=$2 pat=$3 line
+  tag= url= digest=
+  case $name in
+    jdtls)
+      tag=$(curl -fsSL https://download.eclipse.org/jdtls/milestones/ |
+        grep -oE 'milestones/[0-9]+\.[0-9]+\.[0-9]+' | grep -oE '[0-9.]+[0-9]' | sort -uV | tail -1) || return 1
+      local file; file=$(curl -fsSL https://download.eclipse.org/jdtls/milestones/$tag/latest.txt) || return 1
+      url=https://download.eclipse.org/jdtls/milestones/$tag/$file
+      digest="sha256:$(curl -fsSL $url.sha256 | awk '{print $1}')" || return 1 ;;
+    jdk-jdtls)
+      # Temurin JDK used only by the jdtls wrapper (jdtls needs a newer Java than the system one)
+      local out; out=$(curl -fsSL 'https://api.adoptium.net/v3/assets/latest/25/hotspot?architecture=x64&image_type=jdk&os=mac' |
+        jq -r '.[0] | .release_name, .binary.package.link, .binary.package.checksum') || return 1
+      tag=${${(f)out}[1]} url=${${(f)out}[2]} digest="sha256:${${(f)out}[3]}" ;;
+    yadm)
+      tag=$(gh api repos/yadm-dev/yadm/tags --jq '.[].name' | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1) || return 1
+      url=https://raw.githubusercontent.com/yadm-dev/yadm/$tag/yadm ;;
+    *)
+      local out; out=$(gh api repos/$repo/releases/latest \
+        --jq '.tag_name, (.assets[] | "\(.name)\t\(.browser_download_url)\t\(.digest // "")")') || return 1
+      tag=${${(f)out}[1]}
+      line=$(print -r -- ${(F)${${(f)out}[2,-1]}} | awk -F'\t' -v p="$pat" '$1 ~ p' | head -1)
+      [[ -n $line ]] || { print -u2 "  no asset matching $pat"; return 1 }
+      url=${${(s:	:)line}[2]}
+      digest=${${(s:	:)line}[3]-} ;;
+  esac
+  [[ -n $tag && -n $url ]]
+}
+
+# Download, verify, unpack, and swap into place.
+install_tool() {
+  local name=$1 kind=$2 dest=$3 tmp file x
+  tmp=$(mktemp -d) || return 1
+  {
+    file=$tmp/${url:t}
+    curl -fsSL -o $file $url || return 1
+    if [[ $digest == sha256:?* ]]; then
+      [[ $(shasum -a 256 $file | awk '{print $1}') == ${digest#sha256:} ]] || { print -u2 "  checksum mismatch"; return 1 }
+    fi
+    x=$tmp/x; mkdir $x
+    case $file in
+      *.tar.gz|*.tgz|*.tar.xz) tar -xf $file -C $x || return 1 ;;
+      *.zip) unzip -q $file -d $x || return 1 ;;
+      *.gz)  gunzip -c $file > $x/$name || return 1 ;;
+      *)     cp $file $x/$name ;;
+    esac
+
+    if [[ $kind == bin ]]; then
+      local src
+      # Some archives (bob's zip) drop the executable bit
+      src=$(find $x -type f -name $name | head -1)
+      [[ -n $src ]] || { print -u2 "  no executable named $name in archive"; return 1 }
+      mkdir -p ${dest:h}
+      install -m 755 $src $dest.new || return 1
+      [[ -e $dest ]] && mv -f $dest $dest.old
+      mv $dest.new $dest
+    else
+      local top=($x/*(N)) src=$x
+      (( ${#top} == 1 )) && [[ -d $top[1] ]] && src=$top[1]
+      rm -rf $dest.new && mv $src $dest.new || return 1
+      if [[ -e $dest ]]; then rm -rf $dest.old; mv $dest $dest.old; fi
+      mv $dest.new $dest
+    fi
+    # yadm man page alongside the script
+    [[ $name == yadm ]] && mkdir -p $SHARE/man/man1 &&
+      curl -fsSL -o $SHARE/man/man1/yadm.1 ${url%/yadm}/yadm.1
+    return 0
+  } always {
+    rm -rf $tmp
+  }
+}
+
+local entry name repo pat kind dest have tag url digest
+for entry in $tools; do
+  IFS='|' read -r name repo pat kind dest <<< $entry
+  (( ${#only} )) && (( ! ${only[(Ie)$name]} )) && continue
+  if ! resolve $name $repo $pat; then
+    print "$name: could not check latest version"; failed+=$name; continue
+  fi
+  have=$(cat $STATE/$name 2>/dev/null || print '?')
+  if [[ $have == $tag && -e $dest ]]; then
+    (( dry )) || print "$name: $tag (current)"
+    continue
+  fi
+  print "$name: $have -> $tag"; (( outdated++ ))
+  (( dry )) && continue
+  if install_tool $name $kind $dest; then
+    print -r -- $tag > $STATE/$name
+  else
+    print "$name: update failed, previous version left in place"; failed+=$name
+  fi
+done
+
+if (( ! dry && ! ${#only} )); then
+  print "\n== pyenv"; pyenv update 2>&1 | grep -vE '^(Already up to date|Updating )' || true
+  # pipx runs on pyenv's Python; see the ~/.local/bin/pipx wrapper
+  print "\n== pipx";  $PIPX_PY -m pip install -q -U pipx && pipx upgrade-all
+fi
+
+(( dry && ! outdated && ! ${#failed} )) && print "Everything is current."
+
+if (( ${#failed} )); then
+  print "\nFailed: ${(j:, :)failed}"; exit 1
+fi
