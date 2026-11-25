@@ -23,8 +23,8 @@
     "suggestion": "#7fa9d1",
     "remember": "#7fa9d1",
     "ide": "#7896c4",
-    "background": "#6aaa9e",
-    "planMode": "#6aaa9e",
+    "background": "#acd38a",
+    "planMode": "#acd38a",
 
     "autoAccept": "#b996c4",
     "autoAcceptShimmer": "#d4bddc",
@@ -38,11 +38,11 @@
     "warning": "#dbbd84",
     "warningShimmer": "#ead5ad",
 
-    "diffAdded": "#16261f",
+    "diffAdded": "#1a2617",
     "diffRemoved": "#2a1720",
-    "diffAddedDimmed": "#121b18",
+    "diffAddedDimmed": "#141b12",
     "diffRemovedDimmed": "#1c1418",
-    "diffAddedWord": "#24453a",
+    "diffAddedWord": "#33472a",
     "diffRemovedWord": "#5a2a3a",
 
     "userMessageBackground": "#2f2a22",

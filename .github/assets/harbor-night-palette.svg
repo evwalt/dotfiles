@@ -58,10 +58,10 @@
 <text x="420" y="519.0" fill="#c0c6d6" font-size="14">hsl(187 33% 68%)</text>
 <text x="640" y="519.0" fill="#8a8fb0" font-size="13">keywords, H4</text>
 <rect x="16" y="536" width="868" height="44" rx="6" fill="#11121e"/>
-<circle cx="44" cy="558.0" r="10" fill="#6aaa9e" stroke="#33344f"/>
-<text x="66" y="563.0" fill="#c0c6d6" font-size="15">Teal</text>
-<text x="300" y="563.0" fill="#6aaa9e" font-size="15">#6aaa9e</text>
-<text x="420" y="563.0" fill="#c0c6d6" font-size="14">hsl(169 27% 54%)</text>
+<circle cx="44" cy="558.0" r="10" fill="#6fbcc6" stroke="#33344f"/>
+<text x="66" y="563.0" fill="#c0c6d6" font-size="15">Terminal cyan</text>
+<text x="300" y="563.0" fill="#6fbcc6" font-size="15">#6fbcc6</text>
+<text x="420" y="563.0" fill="#c0c6d6" font-size="14">hsl(187 43% 61%)</text>
 <text x="640" y="563.0" fill="#8a8fb0" font-size="13">ANSI cyan</text>
 <circle cx="44" cy="602.0" r="10" fill="#acd38a" stroke="#33344f"/>
 <text x="66" y="607.0" fill="#c0c6d6" font-size="15">Lime</text>

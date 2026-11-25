@@ -29,8 +29,8 @@
 	syntax-theme = Coldark-Dark
 	minus-style = syntax "#2a1720"
 	minus-emph-style = syntax "#6b3247"
-	plus-style = syntax "#16261f"
-	plus-emph-style = syntax "#2c5540"
+	plus-style = syntax "#1a2617"
+	plus-emph-style = syntax "#3d5a2c"
 	# Brighter than delta's defaults so numbers and gutters stay readable
 	line-numbers-zero-style = "#8a8fb0"
 	line-numbers-minus-style = "#e08592"

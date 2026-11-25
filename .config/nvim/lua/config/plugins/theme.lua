@@ -31,15 +31,15 @@ return {
 					c.blue = "#b1b9f9"
 					c.blue0 = "#34406a"
 					c.blue1 = "#7fa9d1"
-					c.blue2 = "#6aaa9e"
+					c.blue2 = "#7fa9d1"
 					c.blue5 = "#a9c6e3"
 					c.blue6 = "#c6dcef"
 					c.blue7 = "#2a3352"
 					c.cyan = "#92c2c8"
 					c.green = "#acd38a"
-					c.green1 = "#6aaa9e"
-					c.green2 = "#4f8f84"
-					c.teal = "#6aaa9e"
+					c.green1 = "#acd38a"
+					c.green2 = "#7a9a5e"
+					c.teal = "#7fa9d1" -- steel blue; lime is the only green, teal kept only for hints
 					c.magenta = "#b9aef0"
 					c.magenta2 = "#c98aa6"
 					c.purple = "#a59fe6"
@@ -50,7 +50,7 @@ return {
 					c.git = { add = "#8fb070", change = "#6a8cbf", delete = "#b56473", ignore = c.dark3 }
 
 					-- Derived colors
-					c.diff = { add = "#16261f", delete = "#2a1720", change = "#151a2e", text = "#24304f" }
+					c.diff = { add = "#1a2617", delete = "#2a1720", change = "#151a2e", text = "#24304f" }
 					c.black = "#07070c"
 					c.border = "#33344f"
 					c.border_highlight = "#4a4c70"
@@ -66,7 +66,7 @@ return {
 					c.todo = "#7fa9d1"
 					c.warning = c.yellow
 					c.info = "#7fa9d1"
-					c.hint = c.teal
+					c.hint = "#6aaa9e" -- teal, a deliberate exception
 					c.rainbow = { c.blue, c.yellow, c.green, c.teal, c.magenta, c.purple, c.orange, c.red }
 					-- :terminal palette, same as alacritty.toml
 					c.terminal = {
@@ -82,8 +82,8 @@ return {
 						blue_bright = "#b1b9f9", -- periwinkle, matches Alacritty
 						magenta = "#b996c4",
 						magenta_bright = "#d4bddc",
-						cyan = "#6aaa9e",
-						cyan_bright = "#93c4ba",
+						cyan = "#6fbcc6",
+						cyan_bright = "#a3d8de",
 						white = "#c0c6d6",
 						white_bright = "#dce1ec",
 					}
@@ -107,6 +107,9 @@ return {
 					hl["@markup.link.label.markdown_inline"] = { fg = c.blue }
 					hl["@markup.link.url.markdown_inline"] = { fg = c.dark5, underline = true }
 					hl.RenderMarkdownDash = { fg = "#3d3f5e" }
+					-- Dim lime so finished todos recede (render-markdown's checked icon links here)
+					-- Lime darkened to 70% (was 62%, #6b8356): still recedes, passes 4.5:1 on the cursor line
+					hl["@markup.list.checked"] = { fg = "#789461" }
 
 					-- Steel blue over teal for fields/properties and link brackets; teal stays for hints
 					hl["@property"] = { fg = c.blue1 }

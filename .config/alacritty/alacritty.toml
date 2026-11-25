@@ -38,7 +38,7 @@ green   = "#acd38a"
 yellow  = "#dbbd84"
 blue    = "#7fa9d1"
 magenta = "#b996c4"
-cyan    = "#6aaa9e"
+cyan    = "#6fbcc6"
 white   = "#c0c6d6"
 
 # Bright colors
@@ -50,7 +50,7 @@ yellow  = "#ead5ad"
 # Periwinkle, Claude Code's accent: its dark-ansi base draws inline code in bright blue
 blue    = "#b1b9f9"
 magenta = "#d4bddc"
-cyan    = "#93c4ba"
+cyan    = "#a3d8de"
 white   = "#dce1ec"
 
 # Dim colors: Alacritty's default 0.66 dimming, except white. Claude Code
@@ -59,11 +59,11 @@ white   = "#dce1ec"
 [colors.dim]
 black   = "#1d1e2e"
 red     = "#945860"
-green   = "#5a856c"
+green   = "#6b8356"
 yellow  = "#917d57"
 blue    = "#54708a"
 magenta = "#7a6381"
-cyan    = "#467068"
+cyan    = "#48767c"
 white   = "#c0c6d6"
 
 [keyboard]
