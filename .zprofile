@@ -8,6 +8,7 @@ export DOTNET_ROOT="$HOME/.dotnet"
 export PATH="$HOME/.dotnet:$HOME/.dotnet/tools:$PATH"
 
 # bob-managed Neovim
+export BOB_CONFIG="$HOME/.config/bob/config.toml"
 export PATH="$HOME/.local/share/bob/nvim-bin:$PATH"
 
 # go
@@ -16,9 +17,6 @@ export PATH="$HOME/go/bin:$PATH"
 
 # Keep rustup-managed toolchains first
 export PATH="$HOME/.cargo/bin:$PATH"
-
-# pipx
-export PATH="$PATH:$HOME/.local/bin"
 
 # pyenv
 export PYENV_ROOT="$HOME/.pyenv"
@@ -37,6 +35,15 @@ export PATH="$PATH:/usr/local/sbin"
 
 # rvm
 export PATH="$PATH:$HOME/.rvm/bin"
+
+# Manual installs (release downloads, pipx) win over frozen Homebrew; updated by `mu`
+export PATH="$HOME/.local/bin:$PATH"
+
+# Homebrew is a frozen base layer on macOS 13: never auto-update or upgrade implicitly
+export HOMEBREW_NO_AUTO_UPDATE=1
+export HOMEBREW_NO_INSTALL_UPGRADE=1
+export HOMEBREW_NO_INSTALL_CLEANUP=1
+export HOMEBREW_NO_AUTOREMOVE=1
 
 # scripts
 export PATH="$HOME/scripts:$PATH"
