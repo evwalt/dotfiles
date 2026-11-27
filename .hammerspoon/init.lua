@@ -1258,7 +1258,8 @@ end
 --                                               any case, without (key notes) or punctuation
 -- As you type, the labels that fit list under the prompt with their status, like the pickers
 -- ("Toggle Clock Date [shown]"), fuzzy-matched like search (see cmdList): clock, tog gr, date clock.
--- C-n/C-p (j/k in normal mode) select, Enter runs the selection. A front-app item (Quit App, Copy)
+-- C-n/C-p (j/k in normal mode) select, Enter runs the selection. Tab on an empty line lists every
+-- command (Enter on ct or ctq fills it in for its args). A front-app item (Quit App, Copy)
 -- reached by a partial match confirms first.
 -- ct ports ~/scripts/countdown.zsh. Each ct adds a timer; several can run at once. They show left
 -- of the clock in end-time order, soonest nearest the clock (that one is n = 0). At zero a timer's
@@ -1626,10 +1627,26 @@ end
 -- line is fuzzy-matched on its own, anywhere in the label and in any order, like search
 -- (fuzzyMatch, smartcase), and the scores add up: clock lists every clock item, date clock finds
 -- Toggle Clock Date. A line that is the whole label (its words, as labelWords reads them) ranks
--- first. Empty when the line starts with a named command (ct, ctq).
-local function cmdList(line)
+-- first. Empty when the line starts with a named command (ct, ctq). With showAll (Tab) an empty
+-- line lists everything: the named commands first, then every label.
+local NAMED_ROWS = { -- Enter on one fills its name in, to add the args
+	{ label = "ct <time> [-m label] [-e end message]", fill = "ct " },
+	{ label = "ct -t <HHMM|HHMMSS> [-m label] [-e msg]", fill = "ct -t " },
+	{ label = "ctq [all | <n> | <label>]", fill = "ctq " },
+}
+local function cmdList(line, showAll)
 	if commands[line:match("^%s*(%S+)")] then
 		return {}
+	end
+	if showAll and not line:find("%S") then
+		local list = {}
+		for _, row in ipairs(NAMED_ROWS) do
+			table.insert(list, { command = row, positions = {} })
+		end
+		for _, c in ipairs(labelCommands) do
+			table.insert(list, { command = c, positions = {} })
+		end
+		return list
 	end
 	local terms = {}
 	for term in line:gmatch("%S+") do
@@ -1675,12 +1692,12 @@ local function cmdList(line)
 end
 -- A tokenized line's action: a named command with its args, else the selected label command. A
 -- front-app item reached by a partial match confirms first, as from search (a bare q must not quit).
-local function findAction(tokens, line, selected)
+local function findAction(tokens, line, selected, showAll)
 	local name = table.remove(tokens, 1)
 	if commands[name] then
 		return commands[name](tokens)
 	end
-	local pick = cmdList(line)[selected]
+	local pick = cmdList(line, showAll)[selected]
 	if not pick then
 		return nil, "Not a command: " .. line
 	end
@@ -1691,6 +1708,7 @@ local function findAction(tokens, line, selected)
 	return c.run
 end
 local CMD_MATCHES_MAX = 10 -- label matches listed under the prompt at once; more scroll
+local CMD_ALL_MAX = 30 -- rows of the Tab list at once: everything, like search
 
 local cmd = { text = {}, cursor = 0, killed = "", error = nil, selected = 1, top = 1 }
 local CMD_HISTORY_MAX = 100
@@ -1746,11 +1764,12 @@ local function cmdRender()
 		table.insert(lines, "")
 		table.insert(lines, cmd.error)
 	else
-		local list = cmdList(line)
+		local list = cmdList(line, cmd.showAll)
 		cmd.selected = math.min(cmd.selected, math.max(1, #list))
 		cmd.top = math.min(cmd.top, cmd.selected)
-		cmd.top = math.max(cmd.top, cmd.selected - CMD_MATCHES_MAX + 1)
-		local last = math.min(#list, cmd.top + CMD_MATCHES_MAX - 1)
+		local max = (cmd.showAll and not line:find("%S")) and CMD_ALL_MAX or CMD_MATCHES_MAX
+		cmd.top = math.max(cmd.top, cmd.selected - max + 1)
+		local last = math.min(#list, cmd.top + max - 1)
 		if #list > 0 then
 			table.insert(lines, "")
 		end
@@ -1761,7 +1780,7 @@ local function cmdRender()
 				table.insert(highlights, { #lines, 2 + pos })
 			end
 		end
-		if #list > CMD_MATCHES_MAX then
+		if #list > max then
 			table.insert(lines, string.format("  %d-%d of %d", cmd.top, last, #list))
 		end
 	end
@@ -1802,7 +1821,7 @@ cmdTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(event)
 	local listKey = ctrlOnly or normal
 	older = older or (normal and key == "k")
 	newer = newer or (normal and key == "j")
-	local list = listKey and not cmdHistoryPos and cmdList(table.concat(cmd.text)) or {}
+	local list = listKey and not cmdHistoryPos and cmdList(table.concat(cmd.text), cmd.showAll) or {}
 	local escape = vimEscape(cmd, key, flags)
 	if escape == "close" then
 		cmdClose()
@@ -1815,15 +1834,30 @@ cmdTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(event)
 		if cmdHistoryStep(older and -1 or 1) then
 			cmdRender()
 		end
+	elseif key == "tab" and not (flags.cmd or flags.ctrl or flags.alt) then -- list every command
+		cmd.showAll, cmd.selected, cmd.top, cmd.error = true, 1, 1, nil
+		cmdRender()
 	elseif key == "return" or key == "padenter" then
 		local line = table.concat(cmd.text)
 		local tokens, err = tokenize(line)
 		local action
-		if tokens and #tokens == 0 then
+		local pick = cmdList(line, cmd.showAll)[cmd.selected]
+		if pick and pick.command.fill then -- a named command from the Tab list: fill it in for its args
+			cmdSetLine(pick.command.fill)
+			cmd.mode, cmd.selected, cmd.top = "insert", 1, 1
+			cmdRender()
+			return true
+		elseif tokens and #tokens == 0 and pick then -- picked from the Tab list: remember the label
+			local c = pick.command
+			line = table.concat(c.words, " ")
+			action = c.front
+					and confirmPrompt(c.label:gsub("%s*%b()", "") .. " (:)", "Run in the front app?", c.run)
+				or c.run
+		elseif tokens and #tokens == 0 then
 			cmdClose()
 			return true
 		elseif tokens then
-			action, err = findAction(tokens, line, cmd.selected)
+			action, err = findAction(tokens, line, cmd.selected, cmd.showAll)
 		end
 		if action then
 			cmdClose()
@@ -1847,7 +1881,7 @@ cmdTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(event)
 end)
 commandMode = function()
 	cmd.text, cmd.cursor, cmd.error, cmd.selected, cmd.top = {}, 0, nil, 1, 1
-	cmd.mode, cmd.pending = "insert", nil
+	cmd.mode, cmd.pending, cmd.showAll = "insert", nil, false
 	cmdHistoryPos, cmdDraft = nil, nil
 	hs.alert.closeAll()
 	cmdTap:start()
