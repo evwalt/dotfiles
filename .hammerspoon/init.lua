@@ -787,33 +787,14 @@ local SEARCH_TEXT_STYLE = {
 	paragraphStyle = PROMPT_STYLE.textStyle.paragraphStyle,
 }
 local SEARCH_MATCH_COLOR = { hex = "#97a3ff", alpha = 1 } -- more saturated than the border periwinkle so matches stand out from the off-white text
--- Key legend under search and command mode's Tab list, dimmed so it reads as help, not as rows.
-local LIST_LEGEND = {
-	"Enter: run   C-n/C-p, j/k: move   C-d/C-u: half page",
-	"Esc: normal mode   Esc Esc: close   gg/G: first/last",
-}
-local LEGEND_STYLE = { color = { hex = "#c0c6d6", alpha = 0.7 } }
+-- Dimmed text: the scroll position line ("1-48 of 53"), secondary to the rows.
+local DIM_STYLE = { color = { hex = "#c0c6d6", alpha = 0.7 } }
 -- The selected row's background: the border periwinkle, faint, so the row stands out without
 -- hiding the match colors.
 local SELECTED_STYLE = { backgroundColor = { hex = "#b1b9f9", alpha = 0.18 } }
 -- Styles a whole line of a joined alert text (lineStart: each line's byte offset).
 local function styleLine(text, lines, lineStart, i, style)
 	return text:setStyle(style, lineStart[i] + 1, lineStart[i] + #lines[i])
-end
--- Adds the legend to an alert's lines; returns the index of its first line, for legendStyle.
-local function addLegend(lines)
-	table.insert(lines, "")
-	for _, l in ipairs(LIST_LEGEND) do
-		table.insert(lines, l)
-	end
-	return #lines - #LIST_LEGEND + 1
-end
--- Dims the legend lines of a joined alert text (lineStart: each line's byte offset).
-local function legendStyle(text, lines, lineStart, from)
-	for i = from, from + #LIST_LEGEND - 1 do
-		text = styleLine(text, lines, lineStart, i, LEGEND_STYLE)
-	end
-	return text
 end
 local SEARCH_CURSOR_STYLE = { -- inverted cell, like Alacritty's default block cursor
 	color = { hex = "#0c0c16", alpha = 1 },
@@ -924,8 +905,8 @@ local function alertLinesFit()
 end
 local function searchRender()
 	-- Rows that fit on screen, less the title and query (3 lines), a blank and header per group
-	-- (8 lines), the legend (3 lines) and 2 lines of padding.
-	local fit = math.max(1, alertLinesFit() - 16)
+	-- (8 lines) and 2 lines of padding.
+	local fit = math.max(1, alertLinesFit() - 13)
 	local n = #search.matches
 	if n > fit then
 		fit = fit - 1 -- room for the position line
@@ -938,7 +919,7 @@ local function searchRender()
 	local lines = { "Search", "", prompt }
 	local highlights = {} -- { line, char column, style }
 	local cursor = { 3, cursorColumn, cursorStyle }
-	local group, selectedLine
+	local group, selectedLine, positionLine
 	for i = search.top, last do
 		local match = search.matches[i]
 		local entry = match.entry
@@ -973,9 +954,9 @@ local function searchRender()
 		table.insert(lines, "")
 		table.insert(lines, "  —")
 	elseif n > fit then
-		table.insert(lines, string.format("  %d-%d of %d", search.top, last, n))
+		table.insert(lines, string.format("%d-%d of %d", search.top, last, n))
+		positionLine = #lines
 	end
-	local legendFrom = addLegend(lines)
 	local width = searchWidth
 	for _, line in ipairs(lines) do
 		width = math.max(width, utf8.len(line))
@@ -986,7 +967,10 @@ local function searchRender()
 		lineStart[i] = offset
 		offset = offset + #lines[i] + 1 -- bytes: styledtext positions count bytes, not chars
 	end
-	local text = legendStyle(hs.styledtext.new(table.concat(lines, "\n"), SEARCH_TEXT_STYLE), lines, lineStart, legendFrom)
+	local text = hs.styledtext.new(table.concat(lines, "\n"), SEARCH_TEXT_STYLE)
+	if positionLine then
+		text = styleLine(text, lines, lineStart, positionLine, DIM_STYLE)
+	end
 	if selectedLine then
 		text = styleLine(text, lines, lineStart, selectedLine, SELECTED_STYLE)
 	end
@@ -1874,7 +1858,7 @@ local function cmdRender()
 	local prompt, cursorColumn, cursorStyle = promptLine(cmd)
 	local lines = { ":" .. prompt }
 	local highlights = { { 1, cursorColumn + 1, cursorStyle } } -- { line, char column, style }; +1 for ":"
-	local legendFrom, selectedLine
+	local positionLine, selectedLine
 	if cmd.error then
 		table.insert(lines, "")
 		table.insert(lines, cmd.error)
@@ -1883,8 +1867,8 @@ local function cmdRender()
 		cmd.selected = math.min(cmd.selected, math.max(1, #list))
 		cmd.top = math.min(cmd.top, cmd.selected)
 		-- The Tab list fills the screen like search: less the prompt, a blank and header per group
-		-- (8 lines), the position line, the legend (3 lines) and 2 lines of padding.
-		local max = kind == "all" and math.max(1, alertLinesFit() - 15) or CMD_MATCHES_MAX
+		-- (8 lines), the position line and 2 lines of padding.
+		local max = kind == "all" and math.max(1, alertLinesFit() - 12) or CMD_MATCHES_MAX
 		cmd.page = max -- for C-d/C-u (listNav)
 		cmd.top = math.max(cmd.top, cmd.selected - max + 1)
 		local last = math.min(#list, cmd.top + max - 1)
@@ -1908,10 +1892,8 @@ local function cmdRender()
 			end
 		end
 		if #list > max then
-			table.insert(lines, string.format("  %d-%d of %d", cmd.top, last, #list))
-		end
-		if kind == "all" and #list > 0 then
-			legendFrom = addLegend(lines)
+			table.insert(lines, string.format("%d-%d of %d", cmd.top, last, #list))
+			positionLine = #lines
 		end
 	end
 	local width = math.max(CMD_MIN_WIDTH, searchWidth) -- as wide as search, so both look the same
@@ -1925,8 +1907,8 @@ local function cmdRender()
 		offset = offset + #lines[i] + 1 -- bytes: styledtext positions count bytes, not chars
 	end
 	local text = hs.styledtext.new(table.concat(lines, "\n"), SEARCH_TEXT_STYLE)
-	if legendFrom then
-		text = legendStyle(text, lines, lineStart, legendFrom)
+	if positionLine then
+		text = styleLine(text, lines, lineStart, positionLine, DIM_STYLE)
 	end
 	if selectedLine then
 		text = styleLine(text, lines, lineStart, selectedLine, SELECTED_STYLE)
