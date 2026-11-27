@@ -124,7 +124,22 @@ return {
 						padding = pad,
 					},
 					{ "encoding", padding = pad },
-					{ "filetype", padding = pad },
+					-- Narrow windows show just the filetype icon, wide ones icon + name
+					{
+						"filetype",
+						icon_only = true,
+						cond = function()
+							return vim.fn.winwidth(0) < 80
+						end,
+						padding = pad,
+					},
+					{
+						"filetype",
+						cond = function()
+							return vim.fn.winwidth(0) >= 80
+						end,
+						padding = pad,
+					},
 				},
 				-- lualine_x = {
 				-- 	{
