@@ -454,6 +454,7 @@ local picker1Items = {
 	{ "c", "Copy (s-c)", keyStroker({ "cmd" }, "c"), front = true },
 	{ "r", "Cmd-Shift-L (s-S-l)", keyStroker({ "cmd", "shift" }, "l"), front = true },
 	{ "l", "Notes" },
+	{ "space", "Google Chrome" },
 	{
 		"d",
 		"Screenshot Window to ~/Downloads",
