@@ -1099,7 +1099,7 @@ local function lineEdit(state, event, key, flags)
 end
 -- Vim modes for search and the : prompt. Both open in insert mode (readline keys, lineEdit) with a
 -- thin bar cursor; Esc switches to normal mode with a block cursor on a char, and Esc there closes
--- (C-c closes from either mode). Normal mode:
+-- (so does q; C-c closes from either mode). Normal mode:
 --   h l 0 ^ $ w b e       motions (left/right arrows and lineEdit's ctrl/meta keys work too)
 --   i a I A s S C         insert here, after, at start, at end; change char, line, to end
 --   x X D p P             delete char, char before, to end; put the last kill after, before
@@ -1295,11 +1295,14 @@ local function listNav(state, count, page, event, key, flags)
 	state.selected = math.max(1, math.min(count, to))
 	return true
 end
--- Esc and C-c for both prompts: "close", "mode" (went to normal) or nil if neither key. Esc always
--- goes to normal mode first, so the list can be browsed with j/k; Esc again closes.
+-- Esc, q and C-c for both prompts: "close", "mode" (went to normal) or nil if none of them. Esc
+-- always goes to normal mode first, so the list can be browsed with j/k; Esc again or q closes, like
+-- less. In insert mode q is just a letter (q ct, Quit App).
 local function vimEscape(state, key, flags)
 	local ctrlOnly = flags.ctrl and not (flags.cmd or flags.alt)
-	if (ctrlOnly and key == "c") or (key == "escape" and state.mode == "normal") then
+	local plain = not (flags.cmd or flags.ctrl or flags.alt or flags.shift)
+	local normalClose = state.mode == "normal" and (key == "escape" or (plain and key == "q"))
+	if (ctrlOnly and key == "c") or normalClose then
 		return "close"
 	elseif key == "escape" then
 		state.mode, state.pending = "normal", nil
