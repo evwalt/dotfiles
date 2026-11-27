@@ -12,7 +12,7 @@ require("config.md-math")
 
 --- Keymaps ---
 require("config.keymaps")
-require("config.keyhelp")
+require("config.keyfinder")
 
 --- Plugin Management ---
 require("config.lazy")

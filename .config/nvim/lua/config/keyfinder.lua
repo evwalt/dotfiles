@@ -1,14 +1,15 @@
---- Key Help ---
--- Minimal which-key replacement: <space><space>? lists every normal-mode <space> mapping
--- (global and buffer-local), sorted alphabetically, in a float. <CR> runs the one under
--- the cursor, f fuzzy-filters live as you type, F clears the filter, / searches as usual, q or <Esc> closes.
+--- Key Finder ---
+-- Fuzzy finder over every normal-mode mapping (global, buffer-local, plugin, and Nvim
+-- defaults; <Plug> targets hidden), sorted alphabetically, in a float. Opens in a live fuzzy
+-- prompt (<C-n>/<C-p> move, <CR> runs, <Esc> drops to the list). In the list: j/k move,
+-- <CR> runs, f or i reopens the prompt, F clears the filter, / searches, q or <Esc> closes.
 
 local function show()
 	local seen, rows = {}, {}
 	local function add(maps)
 		for _, m in ipairs(maps) do
 			local lhs = m.lhs:gsub(" ", "<space>")
-			if lhs:sub(1, 7) == "<space>" and not seen[lhs] then
+			if not lhs:find("^<Plug>") and not seen[lhs] then
 				seen[lhs] = true
 				table.insert(rows, { lhs = lhs, desc = m.desc or m.rhs or "" })
 			end
@@ -60,8 +61,8 @@ local function show()
 		row = math.floor((vim.o.lines - h) / 2) - 1,
 		col = math.floor((vim.o.columns - w) / 2),
 		border = "rounded",
-		title = " <space> keys ",
-		footer = " <CR> run  f fuzzy  F clear  / search  q close ",
+		title = " keys ",
+		footer = " <CR> run  f/i fuzzy  F clear  / search  q close ",
 		style = "minimal",
 	})
 	vim.wo[win].number = true
@@ -76,16 +77,15 @@ local function show()
 	end
 	-- Run the mapping under the cursor: close first so buffer-local maps of the
 	-- original buffer apply, then feed the lhs as typed keys (remap on).
-	map("<CR>", function()
-		local r = shown[vim.api.nvim_win_get_cursor(0)[1]]
+	local function run()
+		local r = shown[vim.api.nvim_win_get_cursor(win)[1]]
 		if not r then
 			return
 		end
 		vim.api.nvim_win_close(win, true)
 		vim.api.nvim_feedkeys(vim.keycode(r.lhs), "m", false)
-	end)
-	-- Fuzzy filter that re-ranks the list on every keystroke. <CR> keeps the
-	-- result (cursor on the best match, so <CR> again runs it); <Esc> restores all.
+	end
+	map("<CR>", run)
 	-- While the prompt is open, push the list below any other float (noice's
 	-- command palette draws the prompt over the top rows otherwise).
 	local home = vim.api.nvim_win_get_config(win)
@@ -104,7 +104,26 @@ local function show()
 			vim.api.nvim_win_set_config(win, { relative = "editor", row = bottom, col = home.col, height = h })
 		end
 	end
-	map("f", function()
+	-- Live fuzzy prompt, like Telescope: <C-n>/<C-p> move the selection, <CR> runs
+	-- it, <Esc> keeps the results and drops to the list (j/k, <CR>; <Esc> closes).
+	local function fuzzy()
+		local accepted = false
+		local function move(d)
+			local row = vim.api.nvim_win_get_cursor(win)[1] + d
+			row = math.max(1, math.min(row, vim.api.nvim_buf_line_count(buf)))
+			vim.api.nvim_win_set_cursor(win, { row, 0 })
+			vim.cmd.redraw()
+		end
+		vim.keymap.set("c", "<C-n>", function()
+			move(1)
+		end)
+		vim.keymap.set("c", "<C-p>", function()
+			move(-1)
+		end)
+		vim.keymap.set("c", "<CR>", function()
+			accepted = true
+			return "<CR>"
+		end, { expr = true })
 		local au = vim.api.nvim_create_autocmd({ "CmdlineEnter", "CmdlineChanged" }, {
 			callback = function(ev)
 				if vim.fn.getcmdtype() ~= "@" then
@@ -123,15 +142,26 @@ local function show()
 				end)
 			end,
 		})
-		local ok, q = pcall(vim.fn.input, "fuzzy: ")
+		-- Ignore input()'s return ("" on <Esc>): the list already shows the last
+		-- render, and the cursor sits wherever <C-n>/<C-p> left it.
+		pcall(vim.fn.input, "fuzzy: ")
+		local row = vim.api.nvim_win_get_cursor(win)[1]
 		vim.api.nvim_del_autocmd(au)
+		pcall(vim.keymap.del, "c", "<C-n>")
+		pcall(vim.keymap.del, "c", "<C-p>")
+		pcall(vim.keymap.del, "c", "<CR>")
 		vim.api.nvim_win_set_config(win, { relative = "editor", row = home.row, col = home.col, height = home.height })
-		render(ok and q or nil)
-		vim.api.nvim_win_set_cursor(win, { 1, 0 })
-	end)
+		vim.api.nvim_win_set_cursor(win, { row, 0 })
+		if accepted then
+			run()
+		end
+	end
+	map("f", fuzzy)
+	map("i", fuzzy)
 	map("F", function()
 		render()
 	end)
+	vim.schedule(fuzzy) -- open straight into the prompt, after the float draws
 end
 
-vim.keymap.set("n", "<space><space>?", show, { desc = "List <space> keymaps" })
+vim.keymap.set("n", "<space><space>?", show, { desc = "Find keymaps" })
