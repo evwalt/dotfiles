@@ -1,15 +1,1 @@
-(() => {
-  let css =
-      'html {-webkit-filter: invert(100%);' +
-      '-moz-filter: invert(100%);' +
-      '-o-filter: invert(100%);' +
-      '-ms-filter: invert(100%); }',
-    head = document.getElementsByTagName('head')[0],
-    style = document.createElement('style');
-
-  style.type = 'text/css';
-
-  style.appendChild(document.createTextNode(css));
-
-  head.appendChild(style);
-})();
+javascript:(()=>{const css='html { filter: invert(100%); }' + 'img, video, canvas, [style*=background-image] { filter: invert(100%); }';const style=document.createElement('style');style.appendChild(document.createTextNode(css));document.head.appendChild(style);})();

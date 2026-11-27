@@ -32,6 +32,8 @@ Where it's defined:
 
 **Scripts** ([`scripts/`](scripts)): small tools such as `ct` (terminal countdown timer), `msgs` (read iMessages with contact names, read-only), and `ytt` (save a YouTube transcript).
 
+**Browser** ([`browser/`](browser)): Surfingkeys config, extension lists, and bookmarklets. Each bookmarklet `.js` file is the one-line `javascript:` URL to paste into a bookmark (`pbcopy < browser/invert-colors.js`). `invert-colors.js` inverts the page but leaves images alone; `invert-colors-including-images.js` inverts everything.
+
 ## Dependency tracking
 
 Installed tools are recorded in plain-text lockfiles in [`packages/`](packages) (`pipx-packages.txt`, `global-npm-packages.txt`, `cargo-packages.txt`, `rust-toolchains.txt`, `bob-versions.txt`, `go-version.txt`), plus `lazy-lock.json` for Neovim plugins, so diffs show exactly what changed and when. Homebrew no longer supports macOS 13, so newer tools come from pipx, npm, cargo, or direct binary downloads.
