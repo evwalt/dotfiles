@@ -1252,18 +1252,18 @@ end
 -- C-p/Up and C-n/Down step through past commands, like vim's : history (kept via hs.settings).
 --   ct <duration> [-m label] [-e end message]   ct 30m -m DSA, ct 1h 30m, ct 90s, ct 5 (minutes)
 --   ct -t <HHMM|HHMMSS> [-m label] [-e msg]     until a clock time, tomorrow if already past
---   ctq [all | <n> | <label>]                   cancel or dismiss timers (see below)
+--   q ct [all | <n> | <label>]                  cancel or dismiss timers (see below)
 --   <label>                                     any picker item, or Toggle Clock Date, Toggle Clock
 --                                               Seconds, Toggle Firefox Border: typed as its label in
 --                                               any case, without (key notes) or punctuation
 -- As you type, the labels that fit list under the prompt with their status, like the pickers
 -- ("Toggle Clock Date [shown]"), fuzzy-matched like search (see cmdList): clock, tog gr, date clock.
 -- C-n/C-p (j/k in normal mode) select, Enter runs the selection. Tab on an empty line lists every
--- command (Enter on ct or ctq fills it in for its args). A front-app item (Quit App, Copy)
+-- command (Enter on ct or q ct fills it in for its args). A front-app item (Quit App, Copy)
 -- reached by a partial match confirms first.
 -- ct ports ~/scripts/countdown.zsh. Each ct adds a timer; several can run at once. They show left
 -- of the clock in end-time order, soonest nearest the clock (that one is n = 0). At zero a timer's
--- end message replaces it and Hero repeats until it is dismissed. Bare ctq dismisses every ended
+-- end message replaces it and Hero repeats until it is dismissed. Bare q ct dismisses every ended
 -- timer; with none ended, it cancels the only timer, and with several it asks for all, n or a label.
 -- Quote multi-word values: ct 30m -m "Deep work". Timers persist via hs.settings across reloads.
 local CT_GAP = 0 -- px between ct slots and the clock: flush, separate panels
@@ -1522,7 +1522,11 @@ local commands = {
 			hs.alert.show((state.label or "Timer") .. " until " .. os.date(fmt, state.endTime), 2)
 		end
 	end,
-	ctq = function(args)
+	q = function(args) -- q <thing>: ct is the only thing it quits so far
+		if args[1] ~= "ct" then
+			return nil, "Usage: q ct [all | <n> | <label>]"
+		end
+		table.remove(args, 1)
 		local target = table.concat(args, " ")
 		local now, ended = os.time(), 0
 		for _, t in ipairs(cts) do
@@ -1542,7 +1546,7 @@ local commands = {
 				return true
 			end
 		elseif target == "" then
-			return nil, #cts .. " timers: ctq all, ctq <n> (0 = nearest the clock) or ctq <label>"
+			return nil, #cts .. " timers: q ct all, q ct <n> (0 = nearest the clock) or q ct <label>"
 		elseif target:match("^%d+$") then
 			local n = tonumber(target)
 			if n > #cts - 1 then
@@ -1627,12 +1631,12 @@ end
 -- line is fuzzy-matched on its own, anywhere in the label and in any order, like search
 -- (fuzzyMatch, smartcase), and the scores add up: clock lists every clock item, date clock finds
 -- Toggle Clock Date. A line that is the whole label (its words, as labelWords reads them) ranks
--- first. Empty when the line starts with a named command (ct, ctq). With showAll (Tab) an empty
+-- first. Empty when the line starts with a named command (ct, q). With showAll (Tab) an empty
 -- line lists everything: the named commands first, then every label.
 local NAMED_ROWS = { -- Enter on one fills its name in, to add the args
 	{ label = "ct <time> [-m label] [-e end message]", fill = "ct " },
 	{ label = "ct -t <HHMM|HHMMSS> [-m label] [-e msg]", fill = "ct -t " },
-	{ label = "ctq [all | <n> | <label>]", fill = "ctq " },
+	{ label = "q ct [all | <n> | <label>]", fill = "q ct " },
 }
 local function cmdList(line, showAll)
 	if commands[line:match("^%s*(%S+)")] then
@@ -1691,7 +1695,7 @@ local function cmdList(line, showAll)
 	return list
 end
 -- A tokenized line's action: a named command with its args, else the selected label command. A
--- front-app item reached by a partial match confirms first, as from search (a bare q must not quit).
+-- front-app item reached by a partial match confirms first, as from search (qu must not quit).
 local function findAction(tokens, line, selected, showAll)
 	local name = table.remove(tokens, 1)
 	if commands[name] then
