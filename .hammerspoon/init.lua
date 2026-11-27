@@ -28,6 +28,10 @@ hs.alert.defaultStyle.textSize = 17
 -- hs.alert has no offset option for atScreenEdge = 1, so nudge each alert's drawings down after
 -- it is shown. Covers prompts and search pickers, which are all alerts.
 local ALERT_TOP_OFFSET = 20
+-- Timed alerts (notices like "Claude finished", from scripts/claude-pane-notify) also go on a higher
+-- window level than the untimed ones (pickers, search, the : prompt), so a notice stays on top while a
+-- prompt is open and redraws itself, and closeAll (pickers and prompts closing) leaves notices to time out.
+local ALERT_NOTICE_LEVEL = hs.drawing.windowLevels.screenSaver + 1 -- alerts default to screenSaver
 local alertShow = hs.alert.show
 hs.alert.show = function(...)
 	local uuid = alertShow(...)
@@ -36,11 +40,27 @@ hs.alert.show = function(...)
 			for _, d in ipairs(entry.drawings) do
 				local f = d:frame()
 				d:setTopLeft({ x = f.x, y = f.y + ALERT_TOP_OFFSET })
+				if entry.timer then
+					d:setLevel(ALERT_NOTICE_LEVEL)
+				end
+			end
+			if entry.timer then -- text back above its panel within the new level
+				for i = 2, #entry.drawings do
+					entry.drawings[i]:orderAbove(entry.drawings[1])
+				end
 			end
 			entry.frame.y = entry.frame.y + ALERT_TOP_OFFSET
 		end
 	end
 	return uuid
+end
+hs.alert.closeAll = function(duration)
+	for i = #hs.alert._visibleAlerts, 1, -1 do
+		local entry = hs.alert._visibleAlerts[i]
+		if not entry.timer then
+			hs.alert.closeSpecific(entry.UUID, duration)
+		end
+	end
 end
 print(os.getenv("HOME") .. "/.hammerspoon/")
 
