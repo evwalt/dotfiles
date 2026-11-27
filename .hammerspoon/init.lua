@@ -287,7 +287,8 @@ end
 
 --- Floating Clock ---
 -- 24-hour HHMM (HHMMSS with seconds) in the top-right corner, above all windows and spaces,
--- click-through, with optional YYYY-MM-DD date prefix. Toggles live in the Hyper+G picker.
+-- click-through, with optional YYYY-MM-DD date prefix. On/off is in the Hyper+G picker; date and
+-- seconds are the date and secs commands in command mode.
 -- State persists via hs.settings (default: on).
 local clockOn = hs.settings.get("clockOn")
 if clockOn == nil then
@@ -455,14 +456,6 @@ local picker1Items = {
 	{ "n", "Spotify" },
 	{ "b", "Cut (s-x)", keyStroker({ "cmd" }, "x"), front = true },
 	{
-		"m",
-		"Toggle Clock Date",
-		toggleClockDate,
-		status = function()
-			return clockDate and "shown" or "hidden"
-		end,
-	},
-	{
 		"w",
 		"Toggle Clock",
 		function()
@@ -473,14 +466,6 @@ local picker1Items = {
 		end,
 	},
 	{ "v", "Paste (s-v)", keyStroker({ "cmd" }, "v"), front = true },
-	{
-		"z",
-		"Toggle Clock Seconds",
-		toggleClockSecs,
-		status = function()
-			return clockSecs and "shown" or "hidden"
-		end,
-	},
 	{
 		"delete",
 		"Toggle Countdown",
@@ -503,14 +488,6 @@ local picker2Items = {
 		end,
 		status = function()
 			return (hs.screen.getForceToGray()) and "on" or "off"
-		end,
-	},
-	{
-		"c",
-		"Toggle Firefox Border",
-		toggleBorder,
-		status = function()
-			return borderEnabled and "shown" or "hidden"
 		end,
 	},
 	{ "r", "Skim" },
@@ -1057,10 +1034,17 @@ end
 -- C-p/Up and C-n/Down step through past commands, like vim's : history (kept via hs.settings).
 --   ct <duration> [-m label] [-e end message]   ct 30m -m DSA, ct 1h 30m, ct 90s, ct 5 (minutes)
 --   ct -t <HHMM|HHMMSS> [-m label] [-e msg]     until a clock time, tomorrow if already past
---   q [all | <n> | <label>]                     cancel or dismiss timers (see below)
+--   ctq [all | <n> | <label>]                   cancel or dismiss timers (see below)
+--   <label>                                     any picker item, or Toggle Clock Date, Toggle Clock
+--                                               Seconds, Toggle Firefox Border: typed as its label in
+--                                               any case, without (key notes) or punctuation
+-- Labels abbreviate: each typed word a prefix of the label's word (tog gr -> Toggle Grayscale), run
+-- when only one label fits, except front-app items (Quit App, Copy), which need the full label. As
+-- you type, the labels that fit list under the prompt with their status, like the pickers
+-- ("Toggle Clock Date [shown]").
 -- ct ports ~/scripts/countdown.zsh. Each ct adds a timer; several can run at once. They show left
 -- of the clock in end-time order, soonest nearest the clock (that one is n = 0). At zero a timer's
--- end message replaces it and Hero repeats until it is dismissed. Bare q dismisses every ended
+-- end message replaces it and Hero repeats until it is dismissed. Bare ctq dismisses every ended
 -- timer; with none ended, it cancels the only timer, and with several it asks for all, n or a label.
 -- Quote multi-word values: ct 30m -m "Deep work". Timers persist via hs.settings across reloads.
 local CT_GAP = 0 -- px between ct slots and the clock: flush, separate panels
@@ -1319,7 +1303,7 @@ local commands = {
 			hs.alert.show((state.label or "Timer") .. " until " .. os.date(fmt, state.endTime), 2)
 		end
 	end,
-	q = function(args)
+	ctq = function(args)
 		local target = table.concat(args, " ")
 		local now, ended = os.time(), 0
 		for _, t in ipairs(cts) do
@@ -1339,7 +1323,7 @@ local commands = {
 				return true
 			end
 		elseif target == "" then
-			return nil, #cts .. " timers: q all, q <n> (0 = nearest the clock) or q <label>"
+			return nil, #cts .. " timers: ctq all, ctq <n> (0 = nearest the clock) or ctq <label>"
 		elseif target:match("^%d+$") then
 			local n = tonumber(target)
 			if n > #cts - 1 then
@@ -1365,6 +1349,103 @@ local commands = {
 		end
 	end,
 }
+-- Items run by label, like picker items ({ key, label, action, status }) without a key.
+local commandItems = {
+	{
+		nil,
+		"Toggle Clock Date",
+		toggleClockDate,
+		status = function()
+			return clockDate and "shown" or "hidden"
+		end,
+	},
+	{
+		nil,
+		"Toggle Clock Seconds",
+		toggleClockSecs,
+		status = function()
+			return clockSecs and "shown" or "hidden"
+		end,
+	},
+	{
+		nil,
+		"Toggle Firefox Border",
+		toggleBorder,
+		status = function()
+			return borderEnabled and "shown" or "hidden"
+		end,
+	},
+}
+-- Label commands: these plus every picker item. Front-app items run directly, as from the picker:
+-- the prompt never takes focus, so the front app is the one that was in front before it opened.
+-- A label's words, lowercased, without parenthesized key notes or punctuation:
+-- "Screenshot Window to ~/Downloads" -> screenshot window to downloads, "Quit App (s-q)" -> quit app.
+local function labelWords(text)
+	local words = {}
+	for w in text:lower():gsub("%b()", ""):gmatch("%S+") do
+		w = w:gsub("[^%w]", "")
+		if w ~= "" then
+			table.insert(words, w)
+		end
+	end
+	return words
+end
+local labelCommands = {} -- { label, words, status, run }
+for _, items in ipairs({ commandItems, picker1Items, picker2Items }) do
+	for _, item in ipairs(items) do
+		local words = labelWords(item[2])
+		assert(not commands[words[1]] or #words > 1, "label shadows a command: " .. item[2])
+		table.insert(labelCommands, {
+			label = item[2],
+			words = words,
+			status = item.status,
+			front = item.front,
+			run = itemAction(item[2], item[3]),
+		})
+	end
+end
+-- The label commands the typed words fit: all of them exactly, or else each a prefix of the
+-- label's word in the same place.
+local function labelMatches(typed)
+	local words = labelWords(typed)
+	local exact, prefix = {}, {}
+	if #words == 0 then
+		return exact, prefix
+	end
+	for _, c in ipairs(labelCommands) do
+		local same, fits = #words == #c.words, #words <= #c.words
+		for i, w in ipairs(words) do
+			same = same and c.words[i] == w
+			fits = fits and c.words[i] and c.words[i]:sub(1, #w) == w
+		end
+		if same then
+			table.insert(exact, c)
+		elseif fits then
+			table.insert(prefix, c)
+		end
+	end
+	return exact, prefix
+end
+-- A tokenized line's action: a named command (ct, ctq) with its args, else a label command.
+local function findAction(tokens)
+	local name = table.remove(tokens, 1)
+	if commands[name] then
+		return commands[name](tokens)
+	end
+	table.insert(tokens, 1, name)
+	local exact, prefix = labelMatches(table.concat(tokens, " "))
+	if #exact == 1 then
+		return exact[1].run
+	elseif #exact == 0 and #prefix == 1 and prefix[1].front then -- q must not quit the front app
+		return nil, "Acts on the front app, so type it in full: " .. prefix[1].label:gsub("%s*%b()", "")
+	elseif #exact == 0 and #prefix == 1 then
+		return prefix[1].run
+	elseif #exact + #prefix == 0 then
+		return nil, "Not a command: " .. table.concat(tokens, " ")
+	end
+	return nil, "More than one fits: keep typing"
+end
+local CMD_MATCHES_MAX = 10 -- label matches listed under the prompt
 
 local cmd = { text = {}, cursor = 0, killed = "", error = nil }
 local CMD_HISTORY_MAX = 100
@@ -1412,6 +1493,22 @@ local function cmdRender()
 	if cmd.error then
 		table.insert(lines, "")
 		table.insert(lines, cmd.error)
+	else
+		local line = table.concat(cmd.text)
+		if not commands[line:match("^%s*(%S+)")] then
+			local exact, prefix = labelMatches(line)
+			table.move(prefix, 1, #prefix, #exact + 1, exact)
+			if #exact > 0 then
+				table.insert(lines, "")
+			end
+			for i, c in ipairs(exact) do
+				if i > CMD_MATCHES_MAX then
+					table.insert(lines, "+" .. (#exact - CMD_MATCHES_MAX) .. " more")
+					break
+				end
+				table.insert(lines, shownLabel(c.label, c.status))
+			end
+		end
 	end
 	local width = CMD_MIN_WIDTH
 	for _, line in ipairs(lines) do
@@ -1453,12 +1550,7 @@ cmdTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(event)
 			cmdClose()
 			return true
 		elseif tokens then
-			local name = table.remove(tokens, 1)
-			if commands[name] then
-				action, err = commands[name](tokens)
-			else
-				err = "Not a command: " .. name
-			end
+			action, err = findAction(tokens)
 		end
 		if action then
 			cmdClose()
