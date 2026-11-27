@@ -43,6 +43,28 @@ api.Hints.setCharacters('aoeuidhtns');
 // --- Hint Align ---
 settings.hintAlign = 'left';
 
+// --- ASP.NET postback links (Chrome) ---
+// Chrome won't run a `javascript:` href when an extension clicks it (Firefox
+// does), and settings can't inject inline page scripts, so hint clicks on
+// `javascript:__doPostBack('target','arg')` links (e.g. CalCareers) do nothing.
+// Do what __doPostBack does: fill the hidden fields and submit the form.
+// Real mouse clicks are untouched.
+document.addEventListener(
+  'click',
+  (e) => {
+    if (e.isTrusted) return;
+    const a = e.target.closest?.('a[href^="javascript:__doPostBack("]');
+    const form = a && (a.closest('form') || document.forms[0]);
+    const m = a?.getAttribute('href').match(/__doPostBack\(\s*'([^']*)'\s*,\s*'([^']*)'\s*\)/);
+    if (!m || !form?.__EVENTTARGET || !form.__EVENTARGUMENT) return;
+    e.preventDefault();
+    form.__EVENTTARGET.value = m[1];
+    form.__EVENTARGUMENT.value = m[2];
+    form.submit();
+  },
+  true,
+);
+
 // --- Hints Theme ---
 api.Hints.style('border:1px solid #3e4452; color:#e5e9f0; background:#24272e;');
 api.Hints.style(
