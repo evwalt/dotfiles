@@ -787,6 +787,27 @@ local SEARCH_TEXT_STYLE = {
 	paragraphStyle = PROMPT_STYLE.textStyle.paragraphStyle,
 }
 local SEARCH_MATCH_COLOR = { hex = "#97a3ff", alpha = 1 } -- more saturated than the border periwinkle so matches stand out from the off-white text
+-- Key legend under search and command mode's Tab list, dimmed so it reads as help, not as rows.
+local LIST_LEGEND = {
+	"Enter: run   C-n/C-p, j/k: move   C-d/C-u: half page",
+	"Esc: normal mode   Esc Esc: close   gg/G: first/last",
+}
+local LEGEND_STYLE = { color = { hex = "#c0c6d6", alpha = 0.45 } }
+-- Adds the legend to an alert's lines; returns the index of its first line, for legendStyle.
+local function addLegend(lines)
+	table.insert(lines, "")
+	for _, l in ipairs(LIST_LEGEND) do
+		table.insert(lines, l)
+	end
+	return #lines - #LIST_LEGEND + 1
+end
+-- Dims the legend lines of a joined alert text (lineStart: each line's byte offset).
+local function legendStyle(text, lines, lineStart, from)
+	for i = from, from + #LIST_LEGEND - 1 do
+		text = text:setStyle(LEGEND_STYLE, lineStart[i] + 1, lineStart[i] + #lines[i])
+	end
+	return text
+end
 local SEARCH_CURSOR_STYLE = { -- inverted cell, like Alacritty's default block cursor
 	color = { hex = "#0c0c16", alpha = 1 },
 	backgroundColor = hs.alert.defaultStyle.textColor,
@@ -896,12 +917,13 @@ local function alertLinesFit()
 end
 local function searchRender()
 	-- Rows that fit on screen, less the title and query (3 lines), a blank and header per group
-	-- (8 lines) and 2 lines of padding.
-	local fit = math.max(1, alertLinesFit() - 13)
+	-- (8 lines), the legend (3 lines) and 2 lines of padding.
+	local fit = math.max(1, alertLinesFit() - 16)
 	local n = #search.matches
 	if n > fit then
 		fit = fit - 1 -- room for the position line
 	end
+	search.page = fit -- for C-d/C-u (listNav)
 	search.top = math.min(search.top, search.selected)
 	search.top = math.max(search.top, search.selected - fit + 1)
 	local last = math.min(n, search.top + fit - 1)
@@ -943,13 +965,18 @@ local function searchRender()
 	elseif n > fit then
 		table.insert(lines, string.format("  %d-%d of %d", search.top, last, n))
 	end
+	local legendFrom = addLegend(lines)
+	local width = searchWidth
+	for _, line in ipairs(lines) do
+		width = math.max(width, utf8.len(line))
+	end
 	local lineStart, offset = {}, 0 -- char offset of each line in the joined text
 	for i, line in ipairs(lines) do
-		lines[i] = line .. string.rep(" ", searchWidth - utf8.len(line))
+		lines[i] = line .. string.rep(" ", width - utf8.len(line))
 		lineStart[i] = offset
 		offset = offset + #lines[i] + 1 -- bytes: styledtext positions count bytes, not chars
 	end
-	local text = hs.styledtext.new(table.concat(lines, "\n"), SEARCH_TEXT_STYLE)
+	local text = legendStyle(hs.styledtext.new(table.concat(lines, "\n"), SEARCH_TEXT_STYLE), lines, lineStart, legendFrom)
 	table.insert(highlights, cursor)
 	for _, h in ipairs(highlights) do
 		text = styleChar(text, lines[h[1]], lineStart[h[1]], h[2], h[3] or { color = SEARCH_MATCH_COLOR })
@@ -1075,12 +1102,13 @@ local function lineEdit(state, event, key, flags)
 end
 -- Vim modes for search and the : prompt. Both open in insert mode (readline keys, lineEdit) with a
 -- thin bar cursor; Esc switches to normal mode with a block cursor on a char, and Esc there closes
--- (Esc on an empty line closes at once; C-c closes from either mode). Normal mode:
+-- (C-c closes from either mode). Normal mode:
 --   h l 0 ^ $ w b e       motions (left/right arrows and lineEdit's ctrl/meta keys work too)
 --   i a I A s S C         insert here, after, at start, at end; change char, line, to end
 --   x X D p P             delete char, char before, to end; put the last kill after, before
 --   d c + w b e 0 ^ $     delete or change over a motion (cw acts as ce, as in vim); dd, cc
---   j k                   next and previous row, like C-n and C-p
+--   j k                   next and previous row, like C-n and C-p (wrapping)
+--   C-d C-u C-f C-b gg G  half page down/up, page down/up, first and last row (see listNav)
 local function charClass(c) -- 0 blank, 1 word, 2 punctuation: what vim's w, b and e stop on
 	return c:find("^%s") and 0 or c:find("^[%w_]") and 1 or 2
 end
@@ -1235,10 +1263,46 @@ local function vimNormal(state, event, key, flags)
 	end
 	return nil
 end
--- Esc and C-c for both prompts: "close", "mode" (went to normal) or nil if neither key.
+-- Normal-mode list keys for search and the : prompt's list (j/k are handled with C-n/C-p): moves
+-- state.selected over count rows, page being the rows shown. Returns true if it took the key. An
+-- operator in progress (d, c) keeps its key, so dG-style input is left to vimNormal.
+local function listNav(state, count, page, event, key, flags)
+	if state.mode ~= "normal" or flags.cmd or flags.alt or state.pending == "d" or state.pending == "c" then
+		return false
+	end
+	local ch = flags.ctrl and "" or event:getCharacters()
+	local afterG = state.pending == "g"
+	state.pending = nil
+	if count == 0 then
+		return false
+	end
+	local half, to = math.max(1, page // 2), nil
+	if flags.ctrl and key == "d" then
+		to = state.selected + half
+	elseif flags.ctrl and key == "u" then
+		to = state.selected - half
+	elseif flags.ctrl and key == "f" then
+		to = state.selected + page
+	elseif flags.ctrl and key == "b" then
+		to = state.selected - page
+	elseif ch == "G" then
+		to = count
+	elseif ch == "g" and afterG then
+		to = 1
+	elseif ch == "g" then
+		state.pending = "g"
+		return true
+	else
+		return false
+	end
+	state.selected = math.max(1, math.min(count, to))
+	return true
+end
+-- Esc and C-c for both prompts: "close", "mode" (went to normal) or nil if neither key. Esc always
+-- goes to normal mode first, so the list can be browsed with j/k; Esc again closes.
 local function vimEscape(state, key, flags)
 	local ctrlOnly = flags.ctrl and not (flags.cmd or flags.alt)
-	if (ctrlOnly and key == "c") or (key == "escape" and (state.mode == "normal" or #state.text == 0)) then
+	if (ctrlOnly and key == "c") or (key == "escape" and state.mode == "normal") then
 		return "close"
 	elseif key == "escape" then
 		state.mode, state.pending = "normal", nil
@@ -1299,6 +1363,8 @@ searchTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(event)
 		if #search.matches > 0 then -- wraps past either end
 			search.selected = (search.selected - 1 + move) % #search.matches + 1
 		end
+		searchRender()
+	elseif listNav(search, #search.matches, search.page or 1, event, key, flags) then
 		searchRender()
 	else
 		local edit = vimEdit(search, event, key, flags)
@@ -1744,7 +1810,6 @@ local function cmdResolve(line, selected, showAll)
 	return (pick.exact and row.direct or row.run), row.words
 end
 local CMD_MATCHES_MAX = 10 -- matches listed under the prompt at once; more scroll
-local CMD_ALL_FOOTER = "Enter run   C-n/C-p move   Esc normal mode, Esc again close"
 
 local cmd = { text = {}, cursor = 0, killed = "", error = nil, selected = 1, top = 1 }
 local CMD_HISTORY_MAX = 100
@@ -1796,6 +1861,7 @@ local function cmdRender()
 	local prompt, cursorColumn, cursorStyle = promptLine(cmd)
 	local lines = { ":" .. prompt }
 	local highlights = { { 1, cursorColumn + 1, cursorStyle } } -- { line, char column, style }; +1 for ":"
+	local legendFrom
 	if cmd.error then
 		table.insert(lines, "")
 		table.insert(lines, cmd.error)
@@ -1804,8 +1870,9 @@ local function cmdRender()
 		cmd.selected = math.min(cmd.selected, math.max(1, #list))
 		cmd.top = math.min(cmd.top, cmd.selected)
 		-- The Tab list fills the screen like search: less the prompt, a blank and header per group
-		-- (8 lines), the position line, the footer (2 lines) and 2 lines of padding.
-		local max = kind == "all" and math.max(1, alertLinesFit() - 14) or CMD_MATCHES_MAX
+		-- (8 lines), the position line, the legend (3 lines) and 2 lines of padding.
+		local max = kind == "all" and math.max(1, alertLinesFit() - 15) or CMD_MATCHES_MAX
+		cmd.page = max -- for C-d/C-u (listNav)
 		cmd.top = math.max(cmd.top, cmd.selected - max + 1)
 		local last = math.min(#list, cmd.top + max - 1)
 		local group
@@ -1828,8 +1895,7 @@ local function cmdRender()
 			table.insert(lines, string.format("  %d-%d of %d", cmd.top, last, #list))
 		end
 		if kind == "all" and #list > 0 then
-			table.insert(lines, "")
-			table.insert(lines, CMD_ALL_FOOTER)
+			legendFrom = addLegend(lines)
 		end
 	end
 	local width = math.max(CMD_MIN_WIDTH, searchWidth) -- as wide as search, so both look the same
@@ -1843,6 +1909,9 @@ local function cmdRender()
 		offset = offset + #lines[i] + 1 -- bytes: styledtext positions count bytes, not chars
 	end
 	local text = hs.styledtext.new(table.concat(lines, "\n"), SEARCH_TEXT_STYLE)
+	if legendFrom then
+		text = legendStyle(text, lines, lineStart, legendFrom)
+	end
 	for _, h in ipairs(highlights) do
 		text = styleChar(text, lines[h[1]], lineStart[h[1]], h[2], h[3] or { color = SEARCH_MATCH_COLOR })
 	end
@@ -1888,6 +1957,8 @@ cmdTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(event)
 		if cmdHistoryStep(older and -1 or 1) then
 			cmdRender()
 		end
+	elseif listNav(cmd, #list, cmd.page or 1, event, key, flags) then
+		cmdRender()
 	elseif key == "tab" and not (flags.cmd or flags.ctrl or flags.alt) then -- list every command
 		cmd.showAll, cmd.selected, cmd.top, cmd.error = true, 1, 1, nil
 		cmdRender()
