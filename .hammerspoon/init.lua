@@ -1101,19 +1101,32 @@ local function lineEdit(state, event, key, flags)
 end
 -- Vim modes for search and the : prompt. Both open in insert mode (readline keys, lineEdit) with a
 -- thin bar cursor; Esc switches to normal mode with a block cursor on a char, and Esc there closes
--- (so does q; C-c closes from either mode). Normal mode:
---   h l 0 ^ $ w b e       motions (left/right arrows and lineEdit's ctrl/meta keys work too)
+-- (so does q; C-c closes from either mode; Esc with a key pending, like d or r, only cancels it).
+-- Normal mode:
+--   h l 0 ^ $ w b e W B E motions (left/right arrows and lineEdit's ctrl/meta keys work too)
+--   f F t T ; ,           find a char forward/back, to or just before it; repeat, reverse
 --   i a I A s S C         insert here, after, at start, at end; change char, line, to end
 --   x X D p P             delete char, char before, to end; put the last kill after, before
---   d c + w b e 0 ^ $     delete or change over a motion (cw acts as ce, as in vim); dd, cc
+--   r ~                   replace the char; toggle its case and step right
+--   u C-r                 undo, redo (a whole insert, from i to Esc, is one step)
+--   d c + motion          delete or change over a motion (cw acts as ce, as in vim); dd, cc
+--   d c + iw aw iW aW     delete or change a word, with its blanks for a
 --   j k                   next and previous row, like C-n and C-p (wrapping)
 --   C-d C-u C-f C-b gg G  half page down/up, page down/up, first and last row (see listNav)
+-- No counts, registers, dot repeat or visual mode.
 local function charClass(c) -- 0 blank, 1 word, 2 punctuation: what vim's w, b and e stop on
 	return c:find("^%s") and 0 or c:find("^[%w_]") and 1 or 2
+end
+local function bigClass(c) -- 0 blank, 1 anything else: what W, B and E stop on
+	return c:find("^%s") and 0 or 1
 end
 -- Motion targets for normal mode. c is the char index the block is on, 0-based.
 local function vimMotion(t, c, m)
 	local n = #t
+	local cls = charClass
+	if m == "W" or m == "B" or m == "E" then
+		cls, m = bigClass, m:lower()
+	end
 	if m == "h" or m == "left" then
 		return math.max(0, c - 1)
 	elseif m == "l" or m == "right" then
@@ -1130,37 +1143,93 @@ local function vimMotion(t, c, m)
 		return math.max(0, n - 1)
 	elseif m == "w" then -- start of the next word
 		local i = c + 1
-		local cls = i <= n and charClass(t[i])
-		while i <= n and cls ~= 0 and charClass(t[i]) == cls do
+		local k = i <= n and cls(t[i])
+		while i <= n and k ~= 0 and cls(t[i]) == k do
 			i = i + 1
 		end
-		while i <= n and charClass(t[i]) == 0 do
+		while i <= n and cls(t[i]) == 0 do
 			i = i + 1
 		end
 		return i - 1
 	elseif m == "e" then -- end of this or the next word
 		local i = c + 2
-		while i <= n and charClass(t[i]) == 0 do
+		while i <= n and cls(t[i]) == 0 do
 			i = i + 1
 		end
-		while i < n and charClass(t[i + 1]) == charClass(t[i]) do
+		while i < n and cls(t[i + 1]) == cls(t[i]) do
 			i = i + 1
 		end
 		return math.min(i, n) - 1
 	elseif m == "b" then -- start of this or the previous word
 		local i = c
-		while i > 0 and charClass(t[i]) == 0 do
+		while i > 0 and cls(t[i]) == 0 do
 			i = i - 1
 		end
-		while i > 1 and charClass(t[i - 1]) == charClass(t[i]) do
+		while i > 1 and cls(t[i - 1]) == cls(t[i]) do
 			i = i - 1
 		end
 		return math.max(0, i - 1)
 	end
 end
-local VIM_INCLUSIVE = { e = true, ["$"] = true } -- operator ranges that take the target char
+local FIND_REVERSE = { f = "F", F = "f", t = "T", T = "t" } -- also the set of find keys
+-- f F t T: the 0-based target of finding char x from c, or nil. again (; and ,) skips a t/T target
+-- right next to the block, so repeating moves on as in vim.
+local function vimFind(t, c, kind, x, again)
+	local skip = (again and (kind == "t" or kind == "T")) and 1 or 0
+	if kind == "f" or kind == "t" then
+		for i = c + 2 + skip, #t do
+			if t[i] == x then
+				return kind == "f" and i - 1 or i - 2
+			end
+		end
+	else
+		for i = c - skip, 1, -1 do
+			if t[i] == x then
+				return kind == "F" and i - 1 or i
+			end
+		end
+	end
+end
+-- iw aw iW aW: the 0-based range [from, to) of the word (or run of blanks) under the block. around
+-- adds the blanks after it, or before it when there are none after.
+local function vimWordObject(t, c, around, big)
+	local n = #t
+	if n == 0 then
+		return 0, 0
+	end
+	local cls = big and bigClass or charClass
+	local k = cls(t[c + 1])
+	local from, to = c + 1, c + 1 -- 1-based, inclusive
+	while from > 1 and cls(t[from - 1]) == k do
+		from = from - 1
+	end
+	while to < n and cls(t[to + 1]) == k do
+		to = to + 1
+	end
+	if around and k ~= 0 then
+		local after = to
+		while after < n and cls(t[after + 1]) == 0 do
+			after = after + 1
+		end
+		if after > to then
+			to = after
+		else
+			while from > 1 and cls(t[from - 1]) == 0 do
+				from = from - 1
+			end
+		end
+	end
+	return from - 1, to
+end
+local VIM_INCLUSIVE = { e = true, E = true, ["$"] = true, f = true, t = true } -- ranges that take the target char
 local function vimClamp(state)
 	state.cursor = math.max(0, math.min(state.cursor, #state.text - 1))
+end
+-- A pending key that takes the next char whatever it is: r, f F t T, or an operator's find or text
+-- object (df, ct, di, ca). While one is pending, j k q G and the like are that char, not commands.
+local function vimAwaitsChar(state)
+	local p = state.pending
+	return p ~= nil and p ~= "g" and p ~= "d" and p ~= "c"
 end
 -- One normal-mode key: returns "text", "cursor" or "mode" (all need a redraw), or nil if not a
 -- vim key. Plain keys it does not know are swallowed by the caller, never typed.
@@ -1171,6 +1240,7 @@ local function vimNormal(state, event, key, flags)
 	end
 	local t, c = state.text, state.cursor
 	local ch = event:getCharacters() -- shifted chars ($, ^, A) as typed
+	local printable = ch ~= "" and not ch:find("%c")
 	local function remove(from, to, keep)
 		if keep and to > from then
 			state.killed = table.concat(t, "", from + 1, to)
@@ -1193,36 +1263,88 @@ local function vimNormal(state, event, key, flags)
 		vimClamp(state)
 		return "text"
 	end
-	local op = state.pending
-	state.pending = nil
-	if op then
-		local result
-		if ch == op then -- dd, cc: the whole line
-			result = remove(0, #t, true)
-		else
-			local m = (op == "c" and ch == "w") and "e" or ch -- cw changes to the word's end, like vim
-			local target = vimMotion(t, c, m)
-			if not target then
-				return "cursor" -- unknown motion cancels the operator
-			end
-			local from, to = math.min(c, target), math.max(c, target)
-			if VIM_INCLUSIVE[m] then
-				to = to + 1
-			end
-			result = remove(from, math.min(to, #t), true)
-		end
+	local function operate(op, from, to) -- d or c over chars from+1..to
+		remove(from, math.min(to, #t), true)
 		if op == "c" then
 			insertMode(state.cursor)
+		else
+			vimClamp(state)
 		end
-		vimClamp(state)
-		return result
+		return "text"
 	end
-	local target = vimMotion(t, c, ch ~= "" and ch or key) or vimMotion(t, c, key)
+	local function motion(m) -- target and the motion it stands for (; and , resolve to a find)
+		if m == ";" or m == "," then
+			local last = state.lastFind
+			if not last then
+				return nil
+			end
+			local kind = m == "," and FIND_REVERSE[last[1]] or last[1]
+			return vimFind(t, c, kind, last[2], true), kind
+		end
+		return vimMotion(t, c, m), m
+	end
+	local op = state.pending
+	state.pending = nil
+	if op == "g" then -- gg is listNav's; anything else after g starts fresh
+		op = nil
+	end
+	if op == "r" then
+		if printable and c < #t then
+			t[c + 1] = ch
+			return "text"
+		end
+		return "cursor"
+	elseif op and FIND_REVERSE[op] then -- f F t T
+		if printable then
+			state.lastFind = { op, ch }
+			state.cursor = vimFind(t, c, op, ch) or c
+		end
+		return "cursor"
+	elseif op and #op == 2 then -- df, ct, di, ca and so on
+		local o, sub = op:sub(1, 1), op:sub(2)
+		if not printable then
+			return "cursor"
+		elseif FIND_REVERSE[sub] then
+			state.lastFind = { sub, ch }
+			local target = vimFind(t, c, sub, ch)
+			if not target then
+				return "cursor"
+			end
+			if VIM_INCLUSIVE[sub] then
+				return operate(o, c, target + 1)
+			end
+			return operate(o, target, c)
+		elseif ch == "w" or ch == "W" then
+			return operate(o, vimWordObject(t, c, sub == "a", ch == "W"))
+		end
+		return "cursor" -- unknown object cancels the operator
+	elseif op then -- d or c
+		if ch == op then -- dd, cc: the whole line
+			return operate(op, 0, #t)
+		elseif FIND_REVERSE[ch] or ch == "i" or ch == "a" then
+			state.pending = op .. ch
+			return "cursor"
+		end
+		local m = ch
+		if op == "c" and (ch == "w" or ch == "W") then -- cw changes to the word's end, like vim
+			m = ch == "w" and "e" or "E"
+		end
+		local target, kind = motion(m)
+		if not target then
+			return "cursor" -- unknown motion cancels the operator
+		end
+		local from, to = math.min(c, target), math.max(c, target)
+		if VIM_INCLUSIVE[kind] then
+			to = to + 1
+		end
+		return operate(op, from, to)
+	end
+	local target = motion(ch ~= "" and ch or key) or vimMotion(t, c, key)
 	if target then
 		state.cursor = target
 		vimClamp(state)
 		return "cursor"
-	elseif ch == "d" or ch == "c" then
+	elseif ch == "d" or ch == "c" or ch == "r" or FIND_REVERSE[ch] then
 		state.pending = ch
 		return "cursor"
 	elseif ch == "i" then
@@ -1259,14 +1381,23 @@ local function vimNormal(state, event, key, flags)
 		return put(math.min(#t, c + 1))
 	elseif ch == "P" then
 		return put(c)
+	elseif ch == "~" then
+		if c >= #t then
+			return "cursor"
+		end
+		local x = t[c + 1]
+		t[c + 1] = x:upper() == x and x:lower() or x:upper()
+		state.cursor = c + 1
+		vimClamp(state)
+		return "text"
 	end
 	return nil
 end
 -- Normal-mode list keys for search and the : prompt's list (j/k are handled with C-n/C-p): moves
--- state.selected over count rows, page being the rows shown. Returns true if it took the key. An
--- operator in progress (d, c) keeps its key, so dG-style input is left to vimNormal.
+-- state.selected over count rows, page being the rows shown. Returns true if it took the key. A
+-- pending key other than g (d, c, r, f) keeps its key, so dG-style input is left to vimNormal.
 local function listNav(state, count, page, event, key, flags)
-	if state.mode ~= "normal" or flags.cmd or flags.alt or state.pending == "d" or state.pending == "c" then
+	if state.mode ~= "normal" or flags.cmd or flags.alt or (state.pending and state.pending ~= "g") then
 		return false
 	end
 	local ch = flags.ctrl and "" or event:getCharacters()
@@ -1299,11 +1430,16 @@ local function listNav(state, count, page, event, key, flags)
 end
 -- Esc, q and C-c for both prompts: "close", "mode" (went to normal) or nil if none of them. Esc
 -- always goes to normal mode first, so the list can be browsed with j/k; Esc again or q closes, like
--- less. In insert mode q is just a letter (q ct, Quit App).
+-- less. In insert mode q is just a letter (q ct, Quit App), and so is it after r or f.
 local function vimEscape(state, key, flags)
 	local ctrlOnly = flags.ctrl and not (flags.cmd or flags.alt)
 	local plain = not (flags.cmd or flags.ctrl or flags.alt or flags.shift)
-	local normalClose = state.mode == "normal" and (key == "escape" or (plain and key == "q"))
+	if state.mode == "normal" and key == "escape" and state.pending then -- cancel d, r, f and so on
+		state.pending = nil
+		return "mode"
+	end
+	local qClose = plain and key == "q" and not vimAwaitsChar(state)
+	local normalClose = state.mode == "normal" and (key == "escape" or qClose)
 	if (ctrlOnly and key == "c") or normalClose then
 		return "close"
 	elseif key == "escape" then
@@ -1313,16 +1449,56 @@ local function vimEscape(state, key, flags)
 		return "mode"
 	end
 end
+-- Undo steps are the line and cursor as they were. The openers reset state.undo and state.redo.
+local function vimSnapshot(state)
+	return { text = table.concat(state.text), cursor = state.cursor }
+end
+local function vimRestore(state, snap)
+	state.text = {}
+	for _, code in utf8.codes(snap.text) do
+		table.insert(state.text, utf8.char(code))
+	end
+	state.cursor = snap.cursor
+	vimClamp(state)
+end
 -- A key in either mode that edits the line: lineEdit in insert, vimNormal (then lineEdit's
--- non-plain keys) in normal. Returns "text", "cursor", "mode" or nil.
+-- non-plain keys) in normal. Returns "text", "cursor", "mode" or nil. Each normal-mode change, and
+-- each switch to insert mode, saves an undo step first.
 local function vimEdit(state, event, key, flags)
+	state.undo, state.redo = state.undo or { vimSnapshot(state) }, state.redo or {}
 	if state.mode ~= "normal" then
 		return lineEdit(state, event, key, flags)
 	end
+	local plain = not (flags.cmd or flags.ctrl or flags.alt)
+	local ctrlOnly = flags.ctrl and not (flags.cmd or flags.alt)
+	local undo = plain and event:getCharacters() == "u"
+	if not state.pending and (undo or (ctrlOnly and key == "r")) then
+		local from, to = state.undo, state.redo
+		if not undo then
+			from, to = to, from
+		end
+		local now = table.concat(state.text)
+		while #from > 0 and from[#from].text == now do -- steps that changed nothing
+			table.remove(from)
+		end
+		if #from == 0 then
+			return "cursor"
+		end
+		table.insert(to, vimSnapshot(state))
+		vimRestore(state, table.remove(from))
+		return "text"
+	end
+	local before = vimSnapshot(state)
 	local edit = vimNormal(state, event, key, flags)
 	if edit == nil and (flags.cmd or flags.ctrl or flags.alt or not event:getCharacters():find("^[%g ]")) then
 		edit = lineEdit(state, event, key, flags)
 		vimClamp(state)
+	end
+	if edit == "text" or state.mode == "insert" then
+		table.insert(state.undo, before)
+		if edit == "text" then
+			state.redo = {}
+		end
 	end
 	return edit or "cursor" -- unknown plain keys are swallowed
 end
@@ -1346,7 +1522,7 @@ end
 searchTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(event)
 	local key, flags = hs.keycodes.map[event:getKeyCode()], event:getFlags()
 	local ctrlOnly = flags.ctrl and not (flags.cmd or flags.alt)
-	local normal = search.mode == "normal" and not (flags.cmd or flags.ctrl or flags.alt)
+	local normal = search.mode == "normal" and not (flags.cmd or flags.ctrl or flags.alt) and not vimAwaitsChar(search)
 	local down = key == "down" or (ctrlOnly and key == "n") or (normal and key == "j")
 	local up = key == "up" or (ctrlOnly and key == "p") or (normal and key == "k")
 	local move = down and 1 or up and -1
@@ -1382,6 +1558,7 @@ searchTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(event)
 end)
 searchAll = function()
 	search.query, search.text, search.cursor, search.mode, search.pending = "", {}, 0, "insert", nil
+	search.undo, search.redo = nil, nil
 	refreshSearchLabels()
 	searchFilter()
 	searchTap:start()
@@ -1940,7 +2117,7 @@ cmdTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(event)
 	local newer = key == "down" or (ctrlOnly and key == "n")
 	-- C-n/C-p move through the label list, as in search; Up/Down, and C-n/C-p with no list or
 	-- while browsing history, step through history.
-	local normal = cmd.mode == "normal" and not (flags.cmd or flags.ctrl or flags.alt)
+	local normal = cmd.mode == "normal" and not (flags.cmd or flags.ctrl or flags.alt) and not vimAwaitsChar(cmd)
 	local listKey = ctrlOnly or normal
 	older = older or (normal and key == "k")
 	newer = newer or (normal and key == "j")
@@ -2003,6 +2180,7 @@ end)
 commandMode = function(fill)
 	cmd.text, cmd.cursor, cmd.error, cmd.selected, cmd.top = {}, 0, nil, 1, 1
 	cmd.mode, cmd.pending, cmd.showAll = "insert", nil, false
+	cmd.undo, cmd.redo = nil, nil
 	if type(fill) == "string" then
 		cmdSetLine(fill)
 	end
