@@ -78,6 +78,18 @@ local FREE_LABEL = "(free)" -- unused slot, in the hints and in search
 local function shownLabel(label, status)
 	return status and string.format("%s [%s]", label, status()) or label
 end
+-- A label's words, lowercased, without parenthesized key notes or punctuation:
+-- "Screenshot Window to ~/Downloads" -> screenshot window to downloads, "Quit App (s-q)" -> quit app.
+local function labelWords(text)
+	local words = {}
+	for w in text:lower():gsub("%b()", ""):gmatch("%S+") do
+		w = w:gsub("[^%w]", "")
+		if w ~= "" then
+			table.insert(words, w)
+		end
+	end
+	return words
+end
 local function hintText(labels)
 	local lines = {}
 	for row, keys in ipairs(MIRROR_ROWS) do
@@ -585,6 +597,40 @@ end
 -- Rows keep their table order; the best match is selected and matched chars are pink. A query
 -- found as plain text in a group name ("picker 1", "hyper") also lists that whole group, ranked
 -- below label and key matches.
+-- Command Mode group, first in search and in command mode's Tab list. Named commands take args:
+-- Enter on one opens (or stays in) command mode with fill typed in. The toggles are picker-style
+-- items ({ key, label, action, status }) without a key, run by typing their label.
+local namedCommands = {
+	{ name = "ct", label = "ct <time> [-m label] [-e end message]", fill = "ct " },
+	{ name = "ct -t", label = "ct -t <HHMM|HHMMSS> [-m label] [-e msg]", fill = "ct -t " },
+	{ name = "q ct", label = "q ct [all | <n> | <label>]", fill = "q ct " },
+}
+local commandItems = {
+	{
+		nil,
+		"Toggle Clock Date",
+		toggleClockDate,
+		status = function()
+			return clockDate and "shown" or "hidden"
+		end,
+	},
+	{
+		nil,
+		"Toggle Clock Seconds",
+		toggleClockSecs,
+		status = function()
+			return clockSecs and "shown" or "hidden"
+		end,
+	},
+	{
+		nil,
+		"Toggle Firefox Border",
+		toggleBorder,
+		status = function()
+			return borderEnabled and "shown" or "hidden"
+		end,
+	},
+}
 local searchEntries = {} -- { group, label, keys, run }
 -- Rows are sorted like the hints (see sortSearchEntries): grid keys in Dvorak order, then extras,
 -- with free slots in place.
@@ -599,10 +645,13 @@ for _, extra in ipairs(EXTRA_KEYS) do
 	table.insert(KEY_SLOT, extra[1])
 	KEY_SLOT[extra[1]] = #KEY_SLOT
 end
--- opts: front (confirm first), shortKeys (keys in the confirm title), key (hint slot), status.
+-- opts: front (confirm first), shortKeys (keys in the confirm title), key (hint slot), status,
+-- name and fill (a named command). Command mode lists these same entries (see cmdList); it runs
+-- `direct`, the action without the front-app confirm, when the label is typed in full.
 local function addSearchEntry(group, label, keys, action, opts)
 	opts = opts or {}
-	local run = itemAction(label, action)
+	local direct = itemAction(label, action)
+	local run = direct
 	if opts.front then
 		run = confirmPrompt(label .. " (" .. (opts.shortKeys or keys) .. ")", "Run in the front app?", run)
 	end
@@ -612,9 +661,22 @@ local function addSearchEntry(group, label, keys, action, opts)
 		shown = label, -- label plus status, refreshed each time search opens
 		keys = keys,
 		run = run,
+		direct = direct,
+		front = opts.front,
+		words = table.concat(labelWords(label), " "), -- how command mode reads a typed label
+		name = opts.name,
+		fill = opts.fill,
 		key = opts.key,
 		status = opts.status,
 	})
+end
+for _, command in ipairs(namedCommands) do
+	addSearchEntry("Command Mode", command.label, ":" .. command.name, function()
+		commandMode(command.fill)
+	end, { name = command.name, fill = command.fill })
+end
+for _, item in ipairs(commandItems) do
+	addSearchEntry("Command Mode", item[2], ":", item[3], { status = item.status })
 end
 -- Unused slots are listed as FREE_LABEL, so searching "free" shows every open key. Enter on one
 -- just names it.
@@ -640,17 +702,23 @@ local function addFreeEntries(group, prefix, used, withExtras)
 		end
 	end
 end
-for _, picker in ipairs({ { "H-g", picker1Items, "Picker 1 (H-g)" }, { "H-f", picker2Items, "Picker 2 (H-f)" } }) do
+-- A picker item's keys as hints and search show them: "H-f h/u", "H-g DEL". Also returns the short
+-- form without the mirror, for confirm titles like "Shut Down (H-f h)".
+local PICKERS = { { "H-g", picker1Items, "Picker 1 (H-g)" }, { "H-f", picker2Items, "Picker 2 (H-f)" } }
+local function pickerKeys(prefix, key)
+	local keyName = key
+	for _, extra in ipairs(EXTRA_KEYS) do
+		if extra[1] == key then
+			keyName = extra[2]
+		end
+	end
+	local shortKeys = prefix .. " " .. keyName
+	return MIRROR[key] and string.format("%s/%s", shortKeys, MIRROR[key]) or shortKeys, shortKeys
+end
+for _, picker in ipairs(PICKERS) do
 	for _, item in ipairs(picker[2]) do
 		local key = item[1]
-		local keyName = key
-		for _, extra in ipairs(EXTRA_KEYS) do
-			if extra[1] == key then
-				keyName = extra[2]
-			end
-		end
-		local shortKeys = picker[1] .. " " .. keyName -- confirm title, like "Shut Down (H-f h)"
-		local keys = MIRROR[key] and string.format("%s/%s", shortKeys, MIRROR[key]) or shortKeys
+		local keys, shortKeys = pickerKeys(picker[1], key)
 		addSearchEntry(picker[3], item[2], keys, item[3], {
 			front = item.front,
 			shortKeys = shortKeys,
@@ -695,6 +763,9 @@ do -- stable sort: group order as added, then hint slot (unslotted keys last, in
 		end
 		return a.index < b.index
 	end)
+	for i, entry in ipairs(searchEntries) do -- list order, for command mode's ranking ties
+		entry.order = i
+	end
 end
 local keysWidth, searchWidth
 -- Every line is padded to the widest row, so the alert keeps its width and position while typing.
@@ -815,14 +886,18 @@ local function searchFilter()
 	search.selected = bestScore and search.selected or 1
 	search.top = 1
 end
-local function searchRender()
+-- Text lines that fit in an alert on the main screen.
+local function alertLinesFit()
 	local lineHeight = hs.drawing.getTextDrawingSize("x", {
 		font = hs.alert.defaultStyle.textFont,
 		size = hs.alert.defaultStyle.textSize,
 	}).h
+	return math.floor((hs.screen.mainScreen():frame().h - ALERT_TOP_OFFSET) / lineHeight)
+end
+local function searchRender()
 	-- Rows that fit on screen, less the title and query (3 lines), a blank and header per group
-	-- (6 lines) and 2 lines of padding.
-	local fit = math.max(1, math.floor((hs.screen.mainScreen():frame().h - ALERT_TOP_OFFSET) / lineHeight) - 11)
+	-- (8 lines) and 2 lines of padding.
+	local fit = math.max(1, alertLinesFit() - 13)
 	local n = #search.matches
 	if n > fit then
 		fit = fit - 1 -- room for the position line
@@ -1572,100 +1647,45 @@ local commands = {
 		end
 	end,
 }
--- Items run by label, like picker items ({ key, label, action, status }) without a key.
-local commandItems = {
-	{
-		nil,
-		"Toggle Clock Date",
-		toggleClockDate,
-		status = function()
-			return clockDate and "shown" or "hidden"
-		end,
-	},
-	{
-		nil,
-		"Toggle Clock Seconds",
-		toggleClockSecs,
-		status = function()
-			return clockSecs and "shown" or "hidden"
-		end,
-	},
-	{
-		nil,
-		"Toggle Firefox Border",
-		toggleBorder,
-		status = function()
-			return borderEnabled and "shown" or "hidden"
-		end,
-	},
-}
--- Label commands: these plus every picker item. Front-app items run directly, as from the picker:
--- the prompt never takes focus, so the front app is the one that was in front before it opened.
--- A label's words, lowercased, without parenthesized key notes or punctuation:
--- "Screenshot Window to ~/Downloads" -> screenshot window to downloads, "Quit App (s-q)" -> quit app.
-local function labelWords(text)
-	local words = {}
-	for w in text:lower():gsub("%b()", ""):gmatch("%S+") do
-		w = w:gsub("[^%w]", "")
-		if w ~= "" then
-			table.insert(words, w)
-		end
-	end
-	return words
+for _, entry in ipairs(searchEntries) do
+	local first = entry.words:match("^%S+")
+	assert(entry.name or not commands[first] or entry.words:find(" "), "label shadows a command: " .. entry.label)
 end
-local labelCommands = {} -- { label, words, status, run }
-for _, items in ipairs({ commandItems, picker1Items, picker2Items }) do
-	for _, item in ipairs(items) do
-		local words = labelWords(item[2])
-		assert(not commands[words[1]] or #words > 1, "label shadows a command: " .. item[2])
-		table.insert(labelCommands, {
-			label = item[2],
-			words = words,
-			status = item.status,
-			front = item.front,
-			run = itemAction(item[2], item[3]),
-		})
-	end
-end
--- The label commands a line lists under the prompt, best first. Each space-separated word of the
--- line is fuzzy-matched on its own, anywhere in the label and in any order, like search
--- (fuzzyMatch, smartcase), and the scores add up: clock lists every clock item, date clock finds
--- Toggle Clock Date. A line that is the whole label (its words, as labelWords reads them) ranks
--- first. Empty when the line starts with a named command (ct, q). With showAll (Tab) an empty
--- line lists everything: the named commands first, then every label.
-local NAMED_ROWS = { -- Enter on one fills its name in, to add the args
-	{ label = "ct <time> [-m label] [-e end message]", fill = "ct " },
-	{ label = "ct -t <HHMM|HHMMSS> [-m label] [-e msg]", fill = "ct -t " },
-	{ label = "q ct [all | <n> | <label>]", fill = "q ct " },
-}
+-- The entries a line lists under the prompt: search's entries (see addSearchEntry), as
+-- { row, positions, exact }, and how to read them:
+--   "all"    Tab on an empty line: every entry under its group header, exactly as search lists them
+--   "match"  the line fuzzy-matched like search (fuzzyMatch, smartcase): each space-separated word
+--            on its own, anywhere and in any order, scores added (clock, tog gr, date clock).
+--            A named command matches on its name (ct, q ct), not its usage. Best first: the
+--            exact name or label, then by score, then the earlier match, the shorter name or
+--            label, and list order.
+--   "usage"  the line is a named command with args (ct 30m): its usage rows, as a hint. Enter
+--            runs the line itself, so there is nothing to select.
 local function cmdList(line, showAll)
-	if commands[line:match("^%s*(%S+)")] then
-		return {}
-	end
-	if showAll and not line:find("%S") then
-		local list = {}
-		for _, row in ipairs(NAMED_ROWS) do
-			table.insert(list, { command = row, positions = {} })
+	local list = {}
+	local first = line:match("^%s*(%S+)")
+	if commands[first] and line:find("^%s*%S+%s") then
+		for _, row in ipairs(searchEntries) do
+			if row.name and row.name:match("^%S+") == first then
+				table.insert(list, { row = row, positions = {} })
+			end
 		end
-		for _, c in ipairs(labelCommands) do
-			table.insert(list, { command = c, positions = {} })
+		return list, "usage"
+	elseif not first then
+		if showAll then
+			for _, row in ipairs(searchEntries) do
+				table.insert(list, { row = row, positions = {} })
+			end
 		end
-		return list
-	end
-	local terms = {}
-	for term in line:gmatch("%S+") do
-		table.insert(terms, term)
-	end
-	if #terms == 0 then
-		return {}
+		return list, "all"
 	end
 	local caseSensitive = line:find("%u") ~= nil
+	local typed = line:match("^%s*(.-)%s*$")
 	local typedWords = table.concat(labelWords(line), " ")
-	local list = {}
-	for index, c in ipairs(labelCommands) do
+	for _, row in ipairs(searchEntries) do
 		local total, positions = 0, {}
-		for _, term in ipairs(terms) do
-			local score, at = fuzzyMatch(c.label, term, caseSensitive)
+		for term in line:gmatch("%S+") do
+			local score, at = fuzzyMatch(row.name or row.label, term, caseSensitive)
 			if not score then
 				total = nil
 				break
@@ -1674,45 +1694,57 @@ local function cmdList(line, showAll)
 			table.move(at, 1, #at, #positions + 1, positions)
 		end
 		if total then
-			local exact = typedWords == table.concat(c.words, " ")
+			local exact = row.name == typed or (not row.name and row.words == typedWords)
 			table.insert(list, {
-				command = c,
+				row = row,
+				positions = positions,
 				exact = exact,
 				score = exact and math.huge or total,
-				positions = positions,
-				index = index,
+				start = math.min(table.unpack(positions)),
+				length = #(row.name or row.label),
 			})
 		end
 	end
 	table.sort(list, function(a, b)
 		if a.score ~= b.score then
 			return a.score > b.score
-		elseif #a.command.label ~= #b.command.label then -- clock: Toggle Clock before Toggle Clock Date
-			return #a.command.label < #b.command.label
+		elseif a.start ~= b.start then -- ct: ct before q ct
+			return a.start < b.start
+		elseif a.length ~= b.length then -- clock: Toggle Clock before Toggle Clock Date
+			return a.length < b.length
 		end
-		return a.index < b.index
+		return a.row.order < b.row.order
 	end)
-	return list
+	return list, "match"
 end
--- A tokenized line's action: a named command with its args, else the selected label command. A
--- front-app item reached by a partial match confirms first, as from search (qu must not quit).
-local function findAction(tokens, line, selected, showAll)
-	local name = table.remove(tokens, 1)
-	if commands[name] then
-		return commands[name](tokens)
+-- What Enter does with a line: returns action, the line to remember in history, and either an
+-- error or, for a named command picked from the list, the text to fill in. A named command with
+-- args runs as typed; otherwise the selected entry runs. A front-app item runs at once when its
+-- label is typed in full, and otherwise confirms first, as from search (qu must not quit).
+local function cmdResolve(line, selected, showAll)
+	local tokens, err = tokenize(line)
+	if not tokens then
+		return nil, nil, err
 	end
-	local pick = cmdList(line, showAll)[selected]
+	local list, kind = cmdList(line, showAll)
+	if kind == "usage" then
+		local name = table.remove(tokens, 1)
+		local action
+		action, err = commands[name](tokens)
+		return action, line, err
+	end
+	local pick = list[selected]
 	if not pick then
-		return nil, "Not a command: " .. line
+		return nil, nil, #tokens > 0 and "Not a command: " .. line or nil
 	end
-	local c = pick.command
-	if c.front and not pick.exact then
-		return confirmPrompt(c.label:gsub("%s*%b()", "") .. " (:" .. line .. ")", "Run in the front app?", c.run)
+	local row = pick.row
+	if row.fill then
+		return nil, nil, nil, row.fill
 	end
-	return c.run
+	return (pick.exact and row.direct or row.run), row.words
 end
-local CMD_MATCHES_MAX = 10 -- label matches listed under the prompt at once; more scroll
-local CMD_ALL_MAX = 30 -- rows of the Tab list at once: everything, like search
+local CMD_MATCHES_MAX = 10 -- matches listed under the prompt at once; more scroll
+local CMD_ALL_FOOTER = "Enter run   C-n/C-p move   Esc normal mode, Esc again close"
 
 local cmd = { text = {}, cursor = 0, killed = "", error = nil, selected = 1, top = 1 }
 local CMD_HISTORY_MAX = 100
@@ -1768,27 +1800,39 @@ local function cmdRender()
 		table.insert(lines, "")
 		table.insert(lines, cmd.error)
 	else
-		local list = cmdList(line, cmd.showAll)
+		local list, kind = cmdList(line, cmd.showAll)
 		cmd.selected = math.min(cmd.selected, math.max(1, #list))
 		cmd.top = math.min(cmd.top, cmd.selected)
-		local max = (cmd.showAll and not line:find("%S")) and CMD_ALL_MAX or CMD_MATCHES_MAX
+		-- The Tab list fills the screen like search: less the prompt, a blank and header per group
+		-- (8 lines), the position line, the footer (2 lines) and 2 lines of padding.
+		local max = kind == "all" and math.max(1, alertLinesFit() - 14) or CMD_MATCHES_MAX
 		cmd.top = math.max(cmd.top, cmd.selected - max + 1)
 		local last = math.min(#list, cmd.top + max - 1)
-		if #list > 0 then
-			table.insert(lines, "")
-		end
+		local group
 		for i = cmd.top, last do
-			local c = list[i].command
-			table.insert(lines, (i == cmd.selected and "> " or "  ") .. shownLabel(c.label, c.status))
+			local row = list[i].row
+			if i == cmd.top or (kind == "all" and row.group ~= group) then
+				table.insert(lines, "")
+				if kind == "all" then -- a header above each group, like search
+					group = row.group
+					table.insert(lines, group)
+				end
+			end
+			local mark = (kind ~= "usage" and i == cmd.selected) and ">" or " "
+			table.insert(lines, string.format("%s %-" .. keysWidth .. "s  %s", mark, row.keys, row.shown))
 			for _, pos in ipairs(list[i].positions) do
-				table.insert(highlights, { #lines, 2 + pos })
+				table.insert(highlights, { #lines, 2 + keysWidth + 2 + pos })
 			end
 		end
 		if #list > max then
 			table.insert(lines, string.format("  %d-%d of %d", cmd.top, last, #list))
 		end
+		if kind == "all" and #list > 0 then
+			table.insert(lines, "")
+			table.insert(lines, CMD_ALL_FOOTER)
+		end
 	end
-	local width = CMD_MIN_WIDTH
+	local width = math.max(CMD_MIN_WIDTH, searchWidth) -- as wide as search, so both look the same
 	for _, l in ipairs(lines) do
 		width = math.max(width, utf8.len(l))
 	end
@@ -1825,7 +1869,13 @@ cmdTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(event)
 	local listKey = ctrlOnly or normal
 	older = older or (normal and key == "k")
 	newer = newer or (normal and key == "j")
-	local list = listKey and not cmdHistoryPos and cmdList(table.concat(cmd.text), cmd.showAll) or {}
+	local list, kind = {}, nil
+	if listKey and not cmdHistoryPos then
+		list, kind = cmdList(table.concat(cmd.text), cmd.showAll)
+		if kind == "usage" then
+			list = {} -- a hint, nothing to select
+		end
+	end
 	local escape = vimEscape(cmd, key, flags)
 	if escape == "close" then
 		cmdClose()
@@ -1843,33 +1893,22 @@ cmdTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(event)
 		cmdRender()
 	elseif key == "return" or key == "padenter" then
 		local line = table.concat(cmd.text)
-		local tokens, err = tokenize(line)
-		local action
-		local pick = cmdList(line, cmd.showAll)[cmd.selected]
-		if pick and pick.command.fill then -- a named command from the Tab list: fill it in for its args
-			cmdSetLine(pick.command.fill)
+		local action, remember, err, fill = cmdResolve(line, cmd.selected, cmd.showAll)
+		if fill then -- a named command picked from the list: fill it in for its args
+			cmdSetLine(fill)
 			cmd.mode, cmd.selected, cmd.top = "insert", 1, 1
 			cmdRender()
-			return true
-		elseif tokens and #tokens == 0 and pick then -- picked from the Tab list: remember the label
-			local c = pick.command
-			line = table.concat(c.words, " ")
-			action = c.front
-					and confirmPrompt(c.label:gsub("%s*%b()", "") .. " (:)", "Run in the front app?", c.run)
-				or c.run
-		elseif tokens and #tokens == 0 then
+		elseif action then
 			cmdClose()
-			return true
-		elseif tokens then
-			action, err = findAction(tokens, line, cmd.selected, cmd.showAll)
-		end
-		if action then
-			cmdClose()
-			cmdRemember(line)
+			if remember ~= "" then -- free slots have no words
+				cmdRemember(remember)
+			end
 			hs.timer.doAfter(0, action) -- outside the tap callback
-		else
+		elseif err then
 			cmd.error = err
 			cmdRender()
+		else -- Enter on an empty line
+			cmdClose()
 		end
 	else
 		local edit = vimEdit(cmd, event, key, flags)
@@ -1883,10 +1922,15 @@ cmdTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(event)
 	end
 	return true -- every key press stays out of the front app while the prompt is open
 end)
-commandMode = function()
+-- fill: text to start with, like "ct " from a named command in search.
+commandMode = function(fill)
 	cmd.text, cmd.cursor, cmd.error, cmd.selected, cmd.top = {}, 0, nil, 1, 1
 	cmd.mode, cmd.pending, cmd.showAll = "insert", nil, false
+	if type(fill) == "string" then
+		cmdSetLine(fill)
+	end
 	cmdHistoryPos, cmdDraft = nil, nil
+	refreshSearchLabels() -- current statuses and column widths
 	hs.alert.closeAll()
 	cmdTap:start()
 	cmdRender()
