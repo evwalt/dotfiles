@@ -452,6 +452,7 @@ local picker1Items = {
 		front = true,
 	},
 	{ "c", "Copy (s-c)", keyStroker({ "cmd" }, "c"), front = true },
+	{ "r", "Cmd-Shift-L (s-S-l)", keyStroker({ "cmd", "shift" }, "l"), front = true },
 	{ "l", "Notes" },
 	{
 		"d",
