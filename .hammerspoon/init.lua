@@ -579,12 +579,12 @@ end
 --- Search every picker item and Hyper key (s/a in a picker) ---
 -- Drawn as an alert like the pickers, growing with the matches and scrolling only past the screen
 -- bottom. While open, a key tap reads every key press and keeps it from the front app: type to
--- filter, C-n/Down and C-p/Up to move, Enter to run, Esc to cancel. The query edits like a
--- readline prompt (see searchEdit), with a block cursor like Alacritty's. A front-app
--- item asks to confirm first. Matching is fuzzy over the label and the keys (see fuzzyMatch), with
--- smartcase. Rows keep their table order; the best match is selected and matched chars are pink.
--- A query found as plain text in a group name ("picker 1", "hyper") also lists that whole group,
--- ranked below label and key matches.
+-- filter, C-n/Down and C-p/Up to move, Enter to run, Esc then Esc to cancel. The query edits in
+-- vim modes, insert mode like a readline prompt (see vimEdit and lineEdit). A front-app item asks
+-- to confirm first. Matching is fuzzy over the label and the keys (see fuzzyMatch), with smartcase.
+-- Rows keep their table order; the best match is selected and matched chars are pink. A query
+-- found as plain text in a group name ("picker 1", "hyper") also lists that whole group, ranked
+-- below label and key matches.
 local searchEntries = {} -- { group, label, keys, run }
 -- Rows are sorted like the hints (see sortSearchEntries): grid keys in Dvorak order, then extras,
 -- with free slots in place.
@@ -821,9 +821,10 @@ local function searchRender()
 	search.top = math.min(search.top, search.selected)
 	search.top = math.max(search.top, search.selected - fit + 1)
 	local last = math.min(n, search.top + fit - 1)
-	local lines = { "Search", "", search.query .. " " } -- trailing space holds the cursor at the end
+	local prompt, cursorColumn, cursorStyle = promptLine(search)
+	local lines = { "Search", "", prompt }
 	local highlights = {} -- { line, char column, style }
-	local cursor = { 3, search.cursor + 1, SEARCH_CURSOR_STYLE }
+	local cursor = { 3, cursorColumn, cursorStyle }
 	local group
 	for i = search.top, last do
 		local match = search.matches[i]
@@ -989,14 +990,222 @@ local function lineEdit(state, event, key, flags)
 	end
 	return "cursor"
 end
+-- Vim modes for search and the : prompt. Both open in insert mode (readline keys, lineEdit) with a
+-- thin bar cursor; Esc switches to normal mode with a block cursor on a char, and Esc there closes
+-- (Esc on an empty line closes at once; C-c closes from either mode). Normal mode:
+--   h l 0 ^ $ w b e       motions (left/right arrows and lineEdit's ctrl/meta keys work too)
+--   i a I A s S C         insert here, after, at start, at end; change char, line, to end
+--   x X D p P             delete char, char before, to end; put the last kill after, before
+--   d c + w b e 0 ^ $     delete or change over a motion (cw acts as ce, as in vim); dd, cc
+--   j k                   next and previous row, like C-n and C-p
+local function charClass(c) -- 0 blank, 1 word, 2 punctuation: what vim's w, b and e stop on
+	return c:find("^%s") and 0 or c:find("^[%w_]") and 1 or 2
+end
+-- Motion targets for normal mode. c is the char index the block is on, 0-based.
+local function vimMotion(t, c, m)
+	local n = #t
+	if m == "h" or m == "left" then
+		return math.max(0, c - 1)
+	elseif m == "l" or m == "right" then
+		return math.min(n, c + 1)
+	elseif m == "0" then
+		return 0
+	elseif m == "^" then
+		local i = 0
+		while i < n and charClass(t[i + 1]) == 0 do
+			i = i + 1
+		end
+		return i
+	elseif m == "$" then
+		return math.max(0, n - 1)
+	elseif m == "w" then -- start of the next word
+		local i = c + 1
+		local cls = i <= n and charClass(t[i])
+		while i <= n and cls ~= 0 and charClass(t[i]) == cls do
+			i = i + 1
+		end
+		while i <= n and charClass(t[i]) == 0 do
+			i = i + 1
+		end
+		return i - 1
+	elseif m == "e" then -- end of this or the next word
+		local i = c + 2
+		while i <= n and charClass(t[i]) == 0 do
+			i = i + 1
+		end
+		while i < n and charClass(t[i + 1]) == charClass(t[i]) do
+			i = i + 1
+		end
+		return math.min(i, n) - 1
+	elseif m == "b" then -- start of this or the previous word
+		local i = c
+		while i > 0 and charClass(t[i]) == 0 do
+			i = i - 1
+		end
+		while i > 1 and charClass(t[i - 1]) == charClass(t[i]) do
+			i = i - 1
+		end
+		return math.max(0, i - 1)
+	end
+end
+local VIM_INCLUSIVE = { e = true, ["$"] = true } -- operator ranges that take the target char
+local function vimClamp(state)
+	state.cursor = math.max(0, math.min(state.cursor, #state.text - 1))
+end
+-- One normal-mode key: returns "text", "cursor" or "mode" (all need a redraw), or nil if not a
+-- vim key. Plain keys it does not know are swallowed by the caller, never typed.
+local function vimNormal(state, event, key, flags)
+	if flags.cmd or flags.ctrl or flags.alt then
+		state.pending = nil
+		return nil
+	end
+	local t, c = state.text, state.cursor
+	local ch = event:getCharacters() -- shifted chars ($, ^, A) as typed
+	local function remove(from, to, keep)
+		if keep and to > from then
+			state.killed = table.concat(t, "", from + 1, to)
+		end
+		for _ = from + 1, to do
+			table.remove(t, from + 1)
+		end
+		state.cursor = from
+		return "text"
+	end
+	local function insertMode(at)
+		state.mode, state.cursor = "insert", at
+		return "mode"
+	end
+	local function put(at)
+		for i, code in ipairs({ utf8.codepoint(state.killed, 1, -1) }) do
+			table.insert(t, at + i, utf8.char(code))
+		end
+		state.cursor = at + utf8.len(state.killed) - 1
+		vimClamp(state)
+		return "text"
+	end
+	local op = state.pending
+	state.pending = nil
+	if op then
+		local result
+		if ch == op then -- dd, cc: the whole line
+			result = remove(0, #t, true)
+		else
+			local m = (op == "c" and ch == "w") and "e" or ch -- cw changes to the word's end, like vim
+			local target = vimMotion(t, c, m)
+			if not target then
+				return "cursor" -- unknown motion cancels the operator
+			end
+			local from, to = math.min(c, target), math.max(c, target)
+			if VIM_INCLUSIVE[m] then
+				to = to + 1
+			end
+			result = remove(from, math.min(to, #t), true)
+		end
+		if op == "c" then
+			insertMode(state.cursor)
+		end
+		vimClamp(state)
+		return result
+	end
+	local target = vimMotion(t, c, ch ~= "" and ch or key) or vimMotion(t, c, key)
+	if target then
+		state.cursor = target
+		vimClamp(state)
+		return "cursor"
+	elseif ch == "d" or ch == "c" then
+		state.pending = ch
+		return "cursor"
+	elseif ch == "i" then
+		return insertMode(c)
+	elseif ch == "a" then
+		return insertMode(math.min(#t, c + 1))
+	elseif ch == "I" then
+		return insertMode(vimMotion(t, c, "^"))
+	elseif ch == "A" then
+		return insertMode(#t)
+	elseif ch == "x" then
+		remove(c, math.min(#t, c + 1), true)
+		vimClamp(state)
+		return "text"
+	elseif ch == "X" then
+		return c > 0 and remove(c - 1, c, true) or "cursor"
+	elseif ch == "D" then
+		remove(c, #t, true)
+		vimClamp(state)
+		return "text"
+	elseif ch == "C" then
+		remove(c, #t, true)
+		insertMode(c)
+		return "text"
+	elseif ch == "s" then
+		remove(c, math.min(#t, c + 1), true)
+		insertMode(c)
+		return "text"
+	elseif ch == "S" then
+		remove(0, #t, true)
+		insertMode(0)
+		return "text"
+	elseif ch == "p" then
+		return put(math.min(#t, c + 1))
+	elseif ch == "P" then
+		return put(c)
+	end
+	return nil
+end
+-- Esc and C-c for both prompts: "close", "mode" (went to normal) or nil if neither key.
+local function vimEscape(state, key, flags)
+	local ctrlOnly = flags.ctrl and not (flags.cmd or flags.alt)
+	if (ctrlOnly and key == "c") or (key == "escape" and (state.mode == "normal" or #state.text == 0)) then
+		return "close"
+	elseif key == "escape" then
+		state.mode, state.pending = "normal", nil
+		state.cursor = state.cursor - 1
+		vimClamp(state)
+		return "mode"
+	end
+end
+-- A key in either mode that edits the line: lineEdit in insert, vimNormal (then lineEdit's
+-- non-plain keys) in normal. Returns "text", "cursor", "mode" or nil.
+local function vimEdit(state, event, key, flags)
+	if state.mode ~= "normal" then
+		return lineEdit(state, event, key, flags)
+	end
+	local edit = vimNormal(state, event, key, flags)
+	if edit == nil and (flags.cmd or flags.ctrl or flags.alt or not event:getCharacters():find("^[%g ]")) then
+		edit = lineEdit(state, event, key, flags)
+		vimClamp(state)
+	end
+	return edit or "cursor" -- unknown plain keys are swallowed
+end
+-- The prompt line with its cursor: a thin bar in insert mode, a block on the char in normal mode.
+-- The bar is a thin space on the cursor color, set in the proportional system font: the alert font
+-- is monospace, where any space takes a full cell. Returns the line (trailing space holds an end
+-- cursor), the cursor's 1-based char column and its style.
+local INSERT_CURSOR_STYLE = {
+	font = { name = ".AppleSystemUIFont", size = hs.alert.defaultStyle.textSize },
+	backgroundColor = hs.alert.defaultStyle.textColor,
+}
+local INSERT_BAR = "\u{2009}"
+local function promptLine(state)
+	if state.mode == "normal" then
+		return table.concat(state.text) .. " ", state.cursor + 1, SEARCH_CURSOR_STYLE
+	end
+	return table.concat(state.text, "", 1, state.cursor) .. INSERT_BAR .. table.concat(state.text, "", state.cursor + 1) .. " ",
+		state.cursor + 1,
+		INSERT_CURSOR_STYLE
+end
 searchTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(event)
 	local key, flags = hs.keycodes.map[event:getKeyCode()], event:getFlags()
 	local ctrlOnly = flags.ctrl and not (flags.cmd or flags.alt)
-	local down = key == "down" or (ctrlOnly and key == "n")
-	local up = key == "up" or (ctrlOnly and key == "p")
+	local normal = search.mode == "normal" and not (flags.cmd or flags.ctrl or flags.alt)
+	local down = key == "down" or (ctrlOnly and key == "n") or (normal and key == "j")
+	local up = key == "up" or (ctrlOnly and key == "p") or (normal and key == "k")
 	local move = down and 1 or up and -1
-	if key == "escape" then
+	local escape = vimEscape(search, key, flags)
+	if escape == "close" then
 		searchClose()
+	elseif escape then
+		searchRender()
 	elseif key == "return" or key == "padenter" then
 		local match = search.matches[search.selected]
 		searchClose()
@@ -1009,7 +1218,7 @@ searchTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(event)
 		end
 		searchRender()
 	else
-		local edit = lineEdit(search, event, key, flags)
+		local edit = vimEdit(search, event, key, flags)
 		if edit == "text" then
 			search.query = table.concat(search.text)
 			searchFilter()
@@ -1021,7 +1230,7 @@ searchTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(event)
 	return true -- every key press stays out of the front app while searching
 end)
 searchAll = function()
-	search.query, search.text, search.cursor = "", {}, 0
+	search.query, search.text, search.cursor, search.mode, search.pending = "", {}, 0, "insert", nil
 	refreshSearchLabels()
 	searchFilter()
 	searchTap:start()
@@ -1029,8 +1238,9 @@ searchAll = function()
 end
 
 --- Command mode (H-z/;) ---
--- A vim-style : prompt drawn like search. Enter runs the command, Esc cancels, and editing is
--- the same as in search (lineEdit). An error shows under the prompt and keeps the text.
+-- A vim-style : prompt drawn like search. Enter runs the command. Editing, vim modes and closing
+-- (Esc in normal mode) are the same as in search (vimEdit). An error shows under the prompt and
+-- keeps the text.
 -- C-p/Up and C-n/Down step through past commands, like vim's : history (kept via hs.settings).
 --   ct <duration> [-m label] [-e end message]   ct 30m -m DSA, ct 1h 30m, ct 90s, ct 5 (minutes)
 --   ct -t <HHMM|HHMMSS> [-m label] [-e msg]     until a clock time, tomorrow if already past
@@ -1525,14 +1735,18 @@ local function cmdHistoryStep(step)
 	cmdHistoryPos = pos <= #cmdHistory and pos or nil
 	cmdSetLine(cmdHistoryPos and cmdHistory[pos] or cmdDraft)
 	cmd.selected, cmd.top = 1, 1
+	if cmd.mode == "normal" then
+		vimClamp(cmd)
+	end
 	return true
 end
 local cmdTap, cmdAlert
 local CMD_MIN_WIDTH = 40 -- chars; keeps the prompt from jumping in width while typing
 local function cmdRender()
 	local line = table.concat(cmd.text)
-	local lines = { ":" .. line .. " " } -- trailing space holds the cursor at the end
-	local highlights = { { 1, cmd.cursor + 2, SEARCH_CURSOR_STYLE } } -- { line, char column, style }
+	local prompt, cursorColumn, cursorStyle = promptLine(cmd)
+	local lines = { ":" .. prompt }
+	local highlights = { { 1, cursorColumn + 1, cursorStyle } } -- { line, char column, style }; +1 for ":"
 	if cmd.error then
 		table.insert(lines, "")
 		table.insert(lines, cmd.error)
@@ -1590,9 +1804,16 @@ cmdTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(event)
 	local newer = key == "down" or (ctrlOnly and key == "n")
 	-- C-n/C-p move through the label list, as in search; Up/Down, and C-n/C-p with no list or
 	-- while browsing history, step through history.
-	local list = ctrlOnly and not cmdHistoryPos and cmdList(table.concat(cmd.text)) or {}
-	if key == "escape" then
+	local normal = cmd.mode == "normal" and not (flags.cmd or flags.ctrl or flags.alt)
+	local listKey = ctrlOnly or normal
+	older = older or (normal and key == "k")
+	newer = newer or (normal and key == "j")
+	local list = listKey and not cmdHistoryPos and cmdList(table.concat(cmd.text)) or {}
+	local escape = vimEscape(cmd, key, flags)
+	if escape == "close" then
 		cmdClose()
+	elseif escape then
+		cmdRender()
 	elseif (older or newer) and #list > 0 then -- wraps past either end
 		cmd.selected = (cmd.selected - 1 + (newer and 1 or -1)) % #list + 1
 		cmdRender()
@@ -1619,7 +1840,7 @@ cmdTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(event)
 			cmdRender()
 		end
 	else
-		local edit = lineEdit(cmd, event, key, flags)
+		local edit = vimEdit(cmd, event, key, flags)
 		if edit == "text" then
 			cmd.error, cmdHistoryPos = nil, nil -- an edited recall becomes the new draft
 			cmd.selected, cmd.top = 1, 1
@@ -1632,6 +1853,7 @@ cmdTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(event)
 end)
 commandMode = function()
 	cmd.text, cmd.cursor, cmd.error, cmd.selected, cmd.top = {}, 0, nil, 1, 1
+	cmd.mode, cmd.pending = "insert", nil
 	cmdHistoryPos, cmdDraft = nil, nil
 	hs.alert.closeAll()
 	cmdTap:start()
