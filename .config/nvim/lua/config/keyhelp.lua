@@ -1,7 +1,7 @@
 --- Key Help ---
 -- Minimal which-key replacement: <space><space>? lists every normal-mode <space> mapping
 -- (global and buffer-local), sorted alphabetically, in a float. <CR> runs the one under
--- the cursor, f filters, F clears the filter, / searches as usual, q or <Esc> closes.
+-- the cursor, f fuzzy-filters live as you type, F clears the filter, / searches as usual, q or <Esc> closes.
 
 local function show()
 	local seen, rows = {}, {}
@@ -27,13 +27,16 @@ local function show()
 	local shown = rows -- rows currently listed, after any filter
 
 	local buf = vim.api.nvim_create_buf(false, true)
+	-- Empty filter lists every row; otherwise fuzzy-match "lhs  desc", best first.
 	local function render(filter)
-		shown = {}
-		for _, r in ipairs(rows) do
-			local hay = (r.lhs .. " " .. r.desc):lower()
-			if not filter or hay:find(filter:lower(), 1, true) then
-				table.insert(shown, r)
-			end
+		if not filter or filter == "" then
+			shown = rows
+		else
+			shown = vim.fn.matchfuzzy(rows, filter, {
+				text_cb = function(r)
+					return r.lhs .. "  " .. r.desc
+				end,
+			})
 		end
 		local lines = {}
 		for _, r in ipairs(shown) do
@@ -58,7 +61,7 @@ local function show()
 		col = math.floor((vim.o.columns - w) / 2),
 		border = "rounded",
 		title = " <space> keys ",
-		footer = " <CR> run  f filter  F clear  / search  q close ",
+		footer = " <CR> run  f fuzzy  F clear  / search  q close ",
 		style = "minimal",
 	})
 	vim.wo[win].number = true
@@ -81,10 +84,49 @@ local function show()
 		vim.api.nvim_win_close(win, true)
 		vim.api.nvim_feedkeys(vim.keycode(r.lhs), "m", false)
 	end)
-	-- Filter rows by substring of key or description (case-insensitive).
+	-- Fuzzy filter that re-ranks the list on every keystroke. <CR> keeps the
+	-- result (cursor on the best match, so <CR> again runs it); <Esc> restores all.
+	-- While the prompt is open, push the list below any other float (noice's
+	-- command palette draws the prompt over the top rows otherwise).
+	local home = vim.api.nvim_win_get_config(win)
+	local function dodge()
+		local bottom = 0
+		for _, w in ipairs(vim.api.nvim_list_wins()) do
+			local c = vim.api.nvim_win_get_config(w)
+			if w ~= win and c.relative ~= "" and not c.hide then
+				local pos = vim.api.nvim_win_get_position(w)
+				-- noice wraps its prompt in an outer window whose height already spans the border
+				bottom = math.max(bottom, pos[1] + vim.api.nvim_win_get_height(w))
+			end
+		end
+		if bottom > home.row then
+			local h = math.max(home.height - (bottom - home.row), 3)
+			vim.api.nvim_win_set_config(win, { relative = "editor", row = bottom, col = home.col, height = h })
+		end
+	end
 	map("f", function()
-		local q = vim.fn.input("filter: ")
-		render(q ~= "" and q or nil)
+		local au = vim.api.nvim_create_autocmd({ "CmdlineEnter", "CmdlineChanged" }, {
+			callback = function(ev)
+				if vim.fn.getcmdtype() ~= "@" then
+					return
+				end
+				if ev.event == "CmdlineChanged" then
+					render(vim.fn.getcmdline())
+					vim.api.nvim_win_set_cursor(win, { 1, 0 })
+				end
+				-- noice opens its popup asynchronously, so measure on the next tick
+				vim.schedule(function()
+					if vim.api.nvim_win_is_valid(win) then
+						dodge()
+						vim.cmd.redraw()
+					end
+				end)
+			end,
+		})
+		local ok, q = pcall(vim.fn.input, "fuzzy: ")
+		vim.api.nvim_del_autocmd(au)
+		vim.api.nvim_win_set_config(win, { relative = "editor", row = home.row, col = home.col, height = home.height })
+		render(ok and q or nil)
 		vim.api.nvim_win_set_cursor(win, { 1, 0 })
 	end)
 	map("F", function()
