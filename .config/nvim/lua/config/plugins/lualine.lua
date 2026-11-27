@@ -26,6 +26,120 @@ return {
 			return theme
 		end
 
+		-- Narrow windows drop pieces in this order until the line fits: encoding,
+		-- filetype name (icon stays), directory path (shortened, then gone),
+		-- md:math, ltex:mode. Sections a and b are measured as they render (they
+		-- draw before c), and the filename component in c decides for x.
+		local left_w = 0
+		local show = { enc = true, ftname = true, path = 0, md = true, ltex = true }
+
+		local function vis(s)
+			return vim.fn.strdisplaywidth((s:gsub("%%#[^#]*#", ""):gsub("%%%*", "")))
+		end
+		-- fmt hook that adds a section a/b component's rendered width to left_w
+		local function measure(extra, reset)
+			return function(s)
+				if reset then
+					left_w = 0
+				end
+				if s ~= "" then
+					left_w = left_w + vis(s) + extra
+				end
+				return s
+			end
+		end
+
+		local function recording()
+			local reg = vim.fn.reg_recording()
+			return reg ~= "" and ("Recording @" .. reg) or ""
+		end
+		local function bufpos()
+			-- position in the bufferline (what the <space>'' style jump keys use), not the nvim buffer number
+			local cur = vim.api.nvim_get_current_buf()
+			_G.nvim_bufferline() -- bufferline only fills its list when drawn, so refresh it while hidden
+			for i, el in ipairs(require("bufferline").get_elements().elements) do
+				if el.id == cur then
+					return tostring(i)
+				end
+			end
+			return ""
+		end
+		-- ltex spelling mode (<space><space>ts) where ltex is attached
+		local function ltex()
+			if #vim.lsp.get_clients({ bufnr = 0, name = "ltex_plus" }) > 0 then
+				return "ltex:" .. require("config.ltex-filter").mode()
+			end
+			return ""
+		end
+		-- Tree-sitter math highlighting (<space><space>tm) in markdown buffers
+		local function md()
+			if vim.bo.filetype == "markdown" then
+				return "md:" .. (require("config.md-math").enabled() and "math" or "nomath")
+			end
+			return ""
+		end
+		-- line:column with the line padded to the file's longest line number,
+		-- so the right edge stays put without trailing spaces
+		local function location()
+			local width = #tostring(vim.fn.line("$"))
+			return string.format("%" .. width .. "d:%d", vim.fn.line("."), vim.fn.virtcol("."))
+		end
+		-- 0 = full path, 1 = shortened dirs, 2 = name only
+		local function filename(level)
+			local name = vim.fn.expand("%:p:~")
+			if name == "" then
+				name = "[No Name]"
+			elseif level == 1 then
+				name = vim.fn.pathshorten(name)
+			elseif level == 2 then
+				name = vim.fn.expand("%:t")
+			end
+			if vim.bo.modified then
+				name = name .. " [+]"
+			end
+			if not vim.bo.modifiable or vim.bo.readonly then
+				name = name .. " [-]"
+			end
+			return name
+		end
+
+		local function layout()
+			-- width of a padded component, 0 when it renders nothing
+			local function w(s)
+				return s == "" and 0 or 1 + vim.fn.strdisplaywidth(s)
+			end
+			local ft = vim.bo.filetype
+			local enc = vim.bo.fileencoding
+			local ftname = ft ~= "" and 1 + vim.fn.strdisplaywidth(ft) or 0
+			local fixed = left_w + w(recording()) + w(bufpos()) + w("Top") + w(location()) + (ft ~= "" and 2 or 0)
+			local opt = { ltex = w(ltex()), md = w(md()), enc = w(enc) }
+			local s = { enc = true, ftname = true, path = 0, md = true, ltex = true }
+			local function total()
+				return fixed
+					+ w(filename(s.path))
+					+ (s.enc and opt.enc or 0)
+					+ (s.ftname and ftname or 0)
+					+ (s.md and opt.md or 0)
+					+ (s.ltex and opt.ltex or 0)
+			end
+			local drops = {
+				function() s.enc = false end,
+				function() s.ftname = false end,
+				function() s.path = 1 end,
+				function() s.path = 2 end,
+				function() s.md = false end,
+				function() s.ltex = false end,
+			}
+			local avail = vim.fn.winwidth(0)
+			for _, drop in ipairs(drops) do
+				if total() <= avail then
+					break
+				end
+				drop()
+			end
+			show = s
+		end
+
 		local opts = {
 			options = {
 				icons_enabled = true,
@@ -61,28 +175,24 @@ return {
 				},
 			},
 			sections = {
-				lualine_a = { { "mode", padding = 0 } },
+				lualine_a = { { "mode", padding = 0, fmt = measure(0, true) } },
 				lualine_b = {
-					{ "branch", padding = pad },
-					{ "diff", padding = pad },
-					{ "diagnostics", padding = pad },
+					{ "branch", padding = pad, fmt = measure(3) }, -- 3 = padding + icon and its space
+					{ "diff", padding = pad, fmt = measure(1) },
+					{ "diagnostics", padding = pad, fmt = measure(1) },
 				},
-				-- lualine_c = { "filename" },
 				lualine_c = {
-					{ "filename", path = 3, padding = pad },
-				},
-				-- lualine_x = { "encoding", "fileformat", "filetype" },
-				lualine_x = {
 					{
 						function()
-							local reg = vim.fn.reg_recording()
-							-- If a macro is being recorded, show "Recording @<register>"
-							if reg ~= "" then
-								return "Recording @" .. reg
-							else
-								return ""
-							end
+							layout()
+							return (filename(show.path):gsub("%%", "%%%%"))
 						end,
+						padding = pad,
+					},
+				},
+				lualine_x = {
+					{
+						recording,
 						-- Harbor Night warning; other themes use their own warning color.
 						color = function()
 							if (vim.g.colors_name or ""):find("^tokyonight") then
@@ -93,50 +203,40 @@ return {
 						end,
 						padding = pad,
 					},
+					{ bufpos, padding = pad },
 					{
-						function()
-							-- position in the bufferline (what the <space>'' style jump keys use), not the nvim buffer number
-							local cur = vim.api.nvim_get_current_buf()
-							_G.nvim_bufferline() -- bufferline only fills its list when drawn, so refresh it while hidden
-							for i, el in ipairs(require("bufferline").get_elements().elements) do
-								if el.id == cur then
-									return tostring(i)
-								end
-							end
-							return ""
+						ltex,
+						cond = function()
+							return show.ltex
 						end,
 						padding = pad,
 					},
 					{
-						-- Two independent toggles: ltex spelling mode (<space><space>ts) where
-						-- ltex is attached, and Tree-sitter math highlighting (<space><space>tm)
-						-- in markdown buffers, e.g. "ltex:loose md:nomath"
-						function()
-							local parts = {}
-							if #vim.lsp.get_clients({ bufnr = 0, name = "ltex_plus" }) > 0 then
-								table.insert(parts, "ltex:" .. (require("config.ltex-filter").mode()))
-							end
-							if vim.bo.filetype == "markdown" then
-								table.insert(parts, "md:" .. (require("config.md-math").enabled() and "math" or "nomath"))
-							end
-							return table.concat(parts, " ")
+						md,
+						cond = function()
+							return show.md
 						end,
 						padding = pad,
 					},
-					{ "encoding", padding = pad },
-					-- Narrow windows show just the filetype icon, wide ones icon + name
+					{
+						"encoding",
+						cond = function()
+							return show.enc
+						end,
+						padding = pad,
+					},
 					{
 						"filetype",
 						icon_only = true,
 						cond = function()
-							return vim.fn.winwidth(0) < 80
+							return not show.ftname
 						end,
 						padding = pad,
 					},
 					{
 						"filetype",
 						cond = function()
-							return vim.fn.winwidth(0) >= 80
+							return show.ftname
 						end,
 						padding = pad,
 					},
@@ -149,17 +249,7 @@ return {
 				-- 	},
 				-- },
 				lualine_y = { { "progress", padding = pad } },
-				lualine_z = {
-					{
-						-- line:column with the line padded to the file's longest line number,
-						-- so the right edge stays put without trailing spaces
-						function()
-							local width = #tostring(vim.fn.line("$"))
-							return string.format("%" .. width .. "d:%d", vim.fn.line("."), vim.fn.virtcol("."))
-						end,
-						padding = pad,
-					},
-				},
+				lualine_z = { { location, padding = pad } },
 			},
 			inactive_sections = {
 				lualine_a = {},
