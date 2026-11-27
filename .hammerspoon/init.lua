@@ -721,6 +721,14 @@ local SEARCH_CURSOR_STYLE = { -- inverted cell, like Alacritty's default block c
 	backgroundColor = hs.alert.defaultStyle.textColor,
 }
 -- text: query chars; cursor: chars before it; killed: last killed text, for C-y.
+-- Styles one char of a joined alert text, given its line, the line's byte offset and the char's
+-- column. styledtext positions are bytes, so a multibyte char before it (the insert-mode bar, "—")
+-- would shift a char-counted position.
+local function styleChar(text, line, lineStart, column, style)
+	local from = utf8.offset(line, column)
+	local to = (utf8.offset(line, column + 1) or #line + 1) - 1
+	return text:setStyle(style, lineStart + from, lineStart + to)
+end
 local search = { query = "", text = {}, cursor = 0, killed = "", matches = {}, selected = 1, top = 1 }
 local promptLine -- the query line with its vim-mode cursor, defined with vimEdit below
 local searchTap, searchAlert
@@ -864,13 +872,12 @@ local function searchRender()
 	for i, line in ipairs(lines) do
 		lines[i] = line .. string.rep(" ", searchWidth - utf8.len(line))
 		lineStart[i] = offset
-		offset = offset + utf8.len(lines[i]) + 1
+		offset = offset + #lines[i] + 1 -- bytes: styledtext positions count bytes, not chars
 	end
 	local text = hs.styledtext.new(table.concat(lines, "\n"), SEARCH_TEXT_STYLE)
 	table.insert(highlights, cursor)
 	for _, h in ipairs(highlights) do
-		local at = lineStart[h[1]] + h[2]
-		text = text:setStyle(h[3] or { color = SEARCH_MATCH_COLOR }, at, at)
+		text = styleChar(text, lines[h[1]], lineStart[h[1]], h[2], h[3] or { color = SEARCH_MATCH_COLOR })
 	end
 	if searchAlert then
 		hs.alert.closeSpecific(searchAlert, 0)
@@ -1766,12 +1773,11 @@ local function cmdRender()
 	for i, l in ipairs(lines) do
 		lines[i] = l .. string.rep(" ", width - utf8.len(l))
 		lineStart[i] = offset
-		offset = offset + utf8.len(lines[i]) + 1
+		offset = offset + #lines[i] + 1 -- bytes: styledtext positions count bytes, not chars
 	end
 	local text = hs.styledtext.new(table.concat(lines, "\n"), SEARCH_TEXT_STYLE)
 	for _, h in ipairs(highlights) do
-		local at = lineStart[h[1]] + h[2]
-		text = text:setStyle(h[3] or { color = SEARCH_MATCH_COLOR }, at, at)
+		text = styleChar(text, lines[h[1]], lineStart[h[1]], h[2], h[3] or { color = SEARCH_MATCH_COLOR })
 	end
 	if cmdAlert then
 		hs.alert.closeSpecific(cmdAlert, 0)
