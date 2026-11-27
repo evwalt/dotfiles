@@ -1427,27 +1427,67 @@ local function labelMatches(typed)
 	return exact, prefix
 end
 -- A tokenized line's action: a named command (ct, ctq) with its args, else a label command.
-local function findAction(tokens)
+-- The label commands a line lists under the prompt: exact fits first, then abbreviations. Empty
+-- when the line starts with a named command (ct, ctq).
+local function cmdList(line)
+	if commands[line:match("^%s*(%S+)")] then
+		return {}
+	end
+	local exact, prefix = labelMatches(line)
+	local list = {}
+	for _, c in ipairs(exact) do
+		table.insert(list, { command = c, exact = true })
+	end
+	for _, c in ipairs(prefix) do
+		table.insert(list, { command = c })
+	end
+	return list
+end
+-- A tokenized line's action: a named command with its args, else the selected label command. A
+-- front-app item reached by abbreviation confirms first, as from search (a bare q must not quit).
+local function findAction(tokens, line, selected)
 	local name = table.remove(tokens, 1)
 	if commands[name] then
 		return commands[name](tokens)
 	end
-	table.insert(tokens, 1, name)
-	local exact, prefix = labelMatches(table.concat(tokens, " "))
-	if #exact == 1 then
-		return exact[1].run
-	elseif #exact == 0 and #prefix == 1 and prefix[1].front then -- q must not quit the front app
-		return nil, "Acts on the front app, so type it in full: " .. prefix[1].label:gsub("%s*%b()", "")
-	elseif #exact == 0 and #prefix == 1 then
-		return prefix[1].run
-	elseif #exact + #prefix == 0 then
-		return nil, "Not a command: " .. table.concat(tokens, " ")
+	local pick = cmdList(line)[selected]
+	if not pick then
+		return nil, "Not a command: " .. line
 	end
-	return nil, "More than one fits: keep typing"
+	local c = pick.command
+	if c.front and not pick.exact then
+		return confirmPrompt(c.label:gsub("%s*%b()", "") .. " (:" .. line .. ")", "Run in the front app?", c.run)
+	end
+	return c.run
 end
-local CMD_MATCHES_MAX = 10 -- label matches listed under the prompt
+-- Char positions in a label of the typed words' prefixes, for the match color. Mirrors labelWords:
+-- (key notes) are skipped and punctuation does not count toward a prefix.
+local function labelHighlights(label, typed)
+	local words, positions = labelWords(typed), {}
+	local masked = label:gsub("%b()", function(p)
+		return string.rep(" ", #p)
+	end)
+	local wi = 0
+	for start, token in masked:gmatch("()(%S+)") do
+		if token:find("%w") then
+			wi = wi + 1
+			local left = words[wi] and #words[wi] or 0
+			for ci = 1, #token do
+				if left == 0 then
+					break
+				end
+				if token:sub(ci, ci):find("%w") then
+					table.insert(positions, start + ci - 1)
+					left = left - 1
+				end
+			end
+		end
+	end
+	return positions
+end
+local CMD_MATCHES_MAX = 10 -- label matches listed under the prompt at once; more scroll
 
-local cmd = { text = {}, cursor = 0, killed = "", error = nil }
+local cmd = { text = {}, cursor = 0, killed = "", error = nil, selected = 1, top = 1 }
 local CMD_HISTORY_MAX = 100
 local cmdHistory = hs.settings.get("cmdHistory") or {} -- oldest first
 local cmdHistoryPos, cmdDraft -- index into cmdHistory while browsing (nil = the line being typed)
@@ -1484,41 +1524,53 @@ local function cmdHistoryStep(step)
 	end
 	cmdHistoryPos = pos <= #cmdHistory and pos or nil
 	cmdSetLine(cmdHistoryPos and cmdHistory[pos] or cmdDraft)
+	cmd.selected, cmd.top = 1, 1
 	return true
 end
 local cmdTap, cmdAlert
 local CMD_MIN_WIDTH = 40 -- chars; keeps the prompt from jumping in width while typing
 local function cmdRender()
-	local lines = { ":" .. table.concat(cmd.text) .. " " } -- trailing space holds the cursor at the end
+	local line = table.concat(cmd.text)
+	local lines = { ":" .. line .. " " } -- trailing space holds the cursor at the end
+	local highlights = { { 1, cmd.cursor + 2, SEARCH_CURSOR_STYLE } } -- { line, char column, style }
 	if cmd.error then
 		table.insert(lines, "")
 		table.insert(lines, cmd.error)
 	else
-		local line = table.concat(cmd.text)
-		if not commands[line:match("^%s*(%S+)")] then
-			local exact, prefix = labelMatches(line)
-			table.move(prefix, 1, #prefix, #exact + 1, exact)
-			if #exact > 0 then
-				table.insert(lines, "")
+		local list = cmdList(line)
+		cmd.selected = math.min(cmd.selected, math.max(1, #list))
+		cmd.top = math.min(cmd.top, cmd.selected)
+		cmd.top = math.max(cmd.top, cmd.selected - CMD_MATCHES_MAX + 1)
+		local last = math.min(#list, cmd.top + CMD_MATCHES_MAX - 1)
+		if #list > 0 then
+			table.insert(lines, "")
+		end
+		for i = cmd.top, last do
+			local c = list[i].command
+			table.insert(lines, (i == cmd.selected and "> " or "  ") .. shownLabel(c.label, c.status))
+			for _, pos in ipairs(labelHighlights(c.label, line)) do
+				table.insert(highlights, { #lines, 2 + pos })
 			end
-			for i, c in ipairs(exact) do
-				if i > CMD_MATCHES_MAX then
-					table.insert(lines, "+" .. (#exact - CMD_MATCHES_MAX) .. " more")
-					break
-				end
-				table.insert(lines, shownLabel(c.label, c.status))
-			end
+		end
+		if #list > CMD_MATCHES_MAX then
+			table.insert(lines, string.format("  %d-%d of %d", cmd.top, last, #list))
 		end
 	end
 	local width = CMD_MIN_WIDTH
-	for _, line in ipairs(lines) do
-		width = math.max(width, utf8.len(line))
+	for _, l in ipairs(lines) do
+		width = math.max(width, utf8.len(l))
 	end
-	for i, line in ipairs(lines) do
-		lines[i] = line .. string.rep(" ", width - utf8.len(line))
+	local lineStart, offset = {}, 0 -- char offset of each line in the joined text
+	for i, l in ipairs(lines) do
+		lines[i] = l .. string.rep(" ", width - utf8.len(l))
+		lineStart[i] = offset
+		offset = offset + utf8.len(lines[i]) + 1
 	end
 	local text = hs.styledtext.new(table.concat(lines, "\n"), SEARCH_TEXT_STYLE)
-	text = text:setStyle(SEARCH_CURSOR_STYLE, cmd.cursor + 2, cmd.cursor + 2) -- +1 for ":", +1 for 1-based
+	for _, h in ipairs(highlights) do
+		local at = lineStart[h[1]] + h[2]
+		text = text:setStyle(h[3] or { color = SEARCH_MATCH_COLOR }, at, at)
+	end
 	if cmdAlert then
 		hs.alert.closeSpecific(cmdAlert, 0)
 	end
@@ -1536,8 +1588,14 @@ cmdTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(event)
 	local ctrlOnly = flags.ctrl and not (flags.cmd or flags.alt)
 	local older = key == "up" or (ctrlOnly and key == "p")
 	local newer = key == "down" or (ctrlOnly and key == "n")
+	-- C-n/C-p move through the label list, as in search; Up/Down, and C-n/C-p with no list or
+	-- while browsing history, step through history.
+	local list = ctrlOnly and not cmdHistoryPos and cmdList(table.concat(cmd.text)) or {}
 	if key == "escape" then
 		cmdClose()
+	elseif (older or newer) and #list > 0 then -- wraps past either end
+		cmd.selected = (cmd.selected - 1 + (newer and 1 or -1)) % #list + 1
+		cmdRender()
 	elseif older or newer then
 		if cmdHistoryStep(older and -1 or 1) then
 			cmdRender()
@@ -1550,7 +1608,7 @@ cmdTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(event)
 			cmdClose()
 			return true
 		elseif tokens then
-			action, err = findAction(tokens)
+			action, err = findAction(tokens, line, cmd.selected)
 		end
 		if action then
 			cmdClose()
@@ -1564,6 +1622,7 @@ cmdTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(event)
 		local edit = lineEdit(cmd, event, key, flags)
 		if edit == "text" then
 			cmd.error, cmdHistoryPos = nil, nil -- an edited recall becomes the new draft
+			cmd.selected, cmd.top = 1, 1
 		end
 		if edit then
 			cmdRender()
@@ -1572,7 +1631,7 @@ cmdTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(event)
 	return true -- every key press stays out of the front app while the prompt is open
 end)
 commandMode = function()
-	cmd.text, cmd.cursor, cmd.error = {}, 0, nil
+	cmd.text, cmd.cursor, cmd.error, cmd.selected, cmd.top = {}, 0, nil, 1, 1
 	cmdHistoryPos, cmdDraft = nil, nil
 	hs.alert.closeAll()
 	cmdTap:start()
