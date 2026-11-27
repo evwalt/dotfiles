@@ -722,6 +722,7 @@ local SEARCH_CURSOR_STYLE = { -- inverted cell, like Alacritty's default block c
 }
 -- text: query chars; cursor: chars before it; killed: last killed text, for C-y.
 local search = { query = "", text = {}, cursor = 0, killed = "", matches = {}, selected = 1, top = 1 }
+local promptLine -- the query line with its vim-mode cursor, defined with vimEdit below
 local searchTap, searchAlert
 local function chars(text)
 	local list = {}
@@ -1186,7 +1187,7 @@ local INSERT_CURSOR_STYLE = {
 	backgroundColor = hs.alert.defaultStyle.textColor,
 }
 local INSERT_BAR = "\u{2009}"
-local function promptLine(state)
+promptLine = function(state)
 	if state.mode == "normal" then
 		return table.concat(state.text) .. " ", state.cursor + 1, SEARCH_CURSOR_STYLE
 	end
@@ -1248,10 +1249,10 @@ end
 --   <label>                                     any picker item, or Toggle Clock Date, Toggle Clock
 --                                               Seconds, Toggle Firefox Border: typed as its label in
 --                                               any case, without (key notes) or punctuation
--- Labels abbreviate: each typed word a prefix of the label's word (tog gr -> Toggle Grayscale), run
--- when only one label fits, except front-app items (Quit App, Copy), which need the full label. As
--- you type, the labels that fit list under the prompt with their status, like the pickers
--- ("Toggle Clock Date [shown]").
+-- As you type, the labels that fit list under the prompt with their status, like the pickers
+-- ("Toggle Clock Date [shown]"), fuzzy-matched like search (see cmdList): clock, tog gr, date clock.
+-- C-n/C-p (j/k in normal mode) select, Enter runs the selection. A front-app item (Quit App, Copy)
+-- reached by a partial match confirms first.
 -- ct ports ~/scripts/countdown.zsh. Each ct adds a timer; several can run at once. They show left
 -- of the clock in end-time order, soonest nearest the clock (that one is n = 0). At zero a timer's
 -- end message replaces it and Hero repeats until it is dismissed. Bare ctq dismisses every ended
@@ -1614,47 +1615,59 @@ for _, items in ipairs({ commandItems, picker1Items, picker2Items }) do
 		})
 	end
 end
--- The label commands the typed words fit: all of them exactly, or else each a prefix of the
--- label's word in the same place.
-local function labelMatches(typed)
-	local words = labelWords(typed)
-	local exact, prefix = {}, {}
-	if #words == 0 then
-		return exact, prefix
-	end
-	for _, c in ipairs(labelCommands) do
-		local same, fits = #words == #c.words, #words <= #c.words
-		for i, w in ipairs(words) do
-			same = same and c.words[i] == w
-			fits = fits and c.words[i] and c.words[i]:sub(1, #w) == w
-		end
-		if same then
-			table.insert(exact, c)
-		elseif fits then
-			table.insert(prefix, c)
-		end
-	end
-	return exact, prefix
-end
--- A tokenized line's action: a named command (ct, ctq) with its args, else a label command.
--- The label commands a line lists under the prompt: exact fits first, then abbreviations. Empty
--- when the line starts with a named command (ct, ctq).
+-- The label commands a line lists under the prompt, best first. Each space-separated word of the
+-- line is fuzzy-matched on its own, anywhere in the label and in any order, like search
+-- (fuzzyMatch, smartcase), and the scores add up: clock lists every clock item, date clock finds
+-- Toggle Clock Date. A line that is the whole label (its words, as labelWords reads them) ranks
+-- first. Empty when the line starts with a named command (ct, ctq).
 local function cmdList(line)
 	if commands[line:match("^%s*(%S+)")] then
 		return {}
 	end
-	local exact, prefix = labelMatches(line)
+	local terms = {}
+	for term in line:gmatch("%S+") do
+		table.insert(terms, term)
+	end
+	if #terms == 0 then
+		return {}
+	end
+	local caseSensitive = line:find("%u") ~= nil
+	local typedWords = table.concat(labelWords(line), " ")
 	local list = {}
-	for _, c in ipairs(exact) do
-		table.insert(list, { command = c, exact = true })
+	for index, c in ipairs(labelCommands) do
+		local total, positions = 0, {}
+		for _, term in ipairs(terms) do
+			local score, at = fuzzyMatch(c.label, term, caseSensitive)
+			if not score then
+				total = nil
+				break
+			end
+			total = total + score
+			table.move(at, 1, #at, #positions + 1, positions)
+		end
+		if total then
+			local exact = typedWords == table.concat(c.words, " ")
+			table.insert(list, {
+				command = c,
+				exact = exact,
+				score = exact and math.huge or total,
+				positions = positions,
+				index = index,
+			})
+		end
 	end
-	for _, c in ipairs(prefix) do
-		table.insert(list, { command = c })
-	end
+	table.sort(list, function(a, b)
+		if a.score ~= b.score then
+			return a.score > b.score
+		elseif #a.command.label ~= #b.command.label then -- clock: Toggle Clock before Toggle Clock Date
+			return #a.command.label < #b.command.label
+		end
+		return a.index < b.index
+	end)
 	return list
 end
 -- A tokenized line's action: a named command with its args, else the selected label command. A
--- front-app item reached by abbreviation confirms first, as from search (a bare q must not quit).
+-- front-app item reached by a partial match confirms first, as from search (a bare q must not quit).
 local function findAction(tokens, line, selected)
 	local name = table.remove(tokens, 1)
 	if commands[name] then
@@ -1669,31 +1682,6 @@ local function findAction(tokens, line, selected)
 		return confirmPrompt(c.label:gsub("%s*%b()", "") .. " (:" .. line .. ")", "Run in the front app?", c.run)
 	end
 	return c.run
-end
--- Char positions in a label of the typed words' prefixes, for the match color. Mirrors labelWords:
--- (key notes) are skipped and punctuation does not count toward a prefix.
-local function labelHighlights(label, typed)
-	local words, positions = labelWords(typed), {}
-	local masked = label:gsub("%b()", function(p)
-		return string.rep(" ", #p)
-	end)
-	local wi = 0
-	for start, token in masked:gmatch("()(%S+)") do
-		if token:find("%w") then
-			wi = wi + 1
-			local left = words[wi] and #words[wi] or 0
-			for ci = 1, #token do
-				if left == 0 then
-					break
-				end
-				if token:sub(ci, ci):find("%w") then
-					table.insert(positions, start + ci - 1)
-					left = left - 1
-				end
-			end
-		end
-	end
-	return positions
 end
 local CMD_MATCHES_MAX = 10 -- label matches listed under the prompt at once; more scroll
 
@@ -1762,7 +1750,7 @@ local function cmdRender()
 		for i = cmd.top, last do
 			local c = list[i].command
 			table.insert(lines, (i == cmd.selected and "> " or "  ") .. shownLabel(c.label, c.status))
-			for _, pos in ipairs(labelHighlights(c.label, line)) do
+			for _, pos in ipairs(list[i].positions) do
 				table.insert(highlights, { #lines, 2 + pos })
 			end
 		end
