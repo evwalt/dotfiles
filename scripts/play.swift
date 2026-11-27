@@ -7,7 +7,7 @@
 //   play <file>          play a local audio file (exits when it ends)
 //   play --list          show built-in stations
 //
-// Build:  swiftc -O ~/.local/src/play/play.swift -o ~/.local/bin/play
+// Build:  swiftc -O ~/scripts/play.swift -o ~/scripts/play
 // Ctrl-C stops playback. Volume is the system volume.
 //
 // To add a station, add a line to `stations` below. Find stream URLs on a
