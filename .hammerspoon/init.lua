@@ -792,7 +792,14 @@ local LIST_LEGEND = {
 	"Enter: run   C-n/C-p, j/k: move   C-d/C-u: half page",
 	"Esc: normal mode   Esc Esc: close   gg/G: first/last",
 }
-local LEGEND_STYLE = { color = { hex = "#c0c6d6", alpha = 0.45 } }
+local LEGEND_STYLE = { color = { hex = "#c0c6d6", alpha = 0.7 } }
+-- The selected row's background: the border periwinkle, faint, so the row stands out without
+-- hiding the match colors.
+local SELECTED_STYLE = { backgroundColor = { hex = "#b1b9f9", alpha = 0.18 } }
+-- Styles a whole line of a joined alert text (lineStart: each line's byte offset).
+local function styleLine(text, lines, lineStart, i, style)
+	return text:setStyle(style, lineStart[i] + 1, lineStart[i] + #lines[i])
+end
 -- Adds the legend to an alert's lines; returns the index of its first line, for legendStyle.
 local function addLegend(lines)
 	table.insert(lines, "")
@@ -804,7 +811,7 @@ end
 -- Dims the legend lines of a joined alert text (lineStart: each line's byte offset).
 local function legendStyle(text, lines, lineStart, from)
 	for i = from, from + #LIST_LEGEND - 1 do
-		text = text:setStyle(LEGEND_STYLE, lineStart[i] + 1, lineStart[i] + #lines[i])
+		text = styleLine(text, lines, lineStart, i, LEGEND_STYLE)
 	end
 	return text
 end
@@ -931,7 +938,7 @@ local function searchRender()
 	local lines = { "Search", "", prompt }
 	local highlights = {} -- { line, char column, style }
 	local cursor = { 3, cursorColumn, cursorStyle }
-	local group
+	local group, selectedLine
 	for i = search.top, last do
 		local match = search.matches[i]
 		local entry = match.entry
@@ -952,6 +959,9 @@ local function searchRender()
 		end
 		local mark = i == search.selected and ">" or " "
 		table.insert(lines, string.format("%s %-" .. keysWidth .. "s  %s", mark, entry.keys, entry.shown))
+		if i == search.selected then
+			selectedLine = #lines
+		end
 		for _, pos in ipairs(match.keysPositions or {}) do
 			table.insert(highlights, { #lines, 2 + pos })
 		end
@@ -977,6 +987,9 @@ local function searchRender()
 		offset = offset + #lines[i] + 1 -- bytes: styledtext positions count bytes, not chars
 	end
 	local text = legendStyle(hs.styledtext.new(table.concat(lines, "\n"), SEARCH_TEXT_STYLE), lines, lineStart, legendFrom)
+	if selectedLine then
+		text = styleLine(text, lines, lineStart, selectedLine, SELECTED_STYLE)
+	end
 	table.insert(highlights, cursor)
 	for _, h in ipairs(highlights) do
 		text = styleChar(text, lines[h[1]], lineStart[h[1]], h[2], h[3] or { color = SEARCH_MATCH_COLOR })
@@ -1861,7 +1874,7 @@ local function cmdRender()
 	local prompt, cursorColumn, cursorStyle = promptLine(cmd)
 	local lines = { ":" .. prompt }
 	local highlights = { { 1, cursorColumn + 1, cursorStyle } } -- { line, char column, style }; +1 for ":"
-	local legendFrom
+	local legendFrom, selectedLine
 	if cmd.error then
 		table.insert(lines, "")
 		table.insert(lines, cmd.error)
@@ -1887,6 +1900,9 @@ local function cmdRender()
 			end
 			local mark = (kind ~= "usage" and i == cmd.selected) and ">" or " "
 			table.insert(lines, string.format("%s %-" .. keysWidth .. "s  %s", mark, row.keys, row.shown))
+			if mark == ">" then
+				selectedLine = #lines
+			end
 			for _, pos in ipairs(list[i].positions) do
 				table.insert(highlights, { #lines, 2 + keysWidth + 2 + pos })
 			end
@@ -1911,6 +1927,9 @@ local function cmdRender()
 	local text = hs.styledtext.new(table.concat(lines, "\n"), SEARCH_TEXT_STYLE)
 	if legendFrom then
 		text = legendStyle(text, lines, lineStart, legendFrom)
+	end
+	if selectedLine then
+		text = styleLine(text, lines, lineStart, selectedLine, SELECTED_STYLE)
 	end
 	for _, h in ipairs(highlights) do
 		text = styleChar(text, lines[h[1]], lineStart[h[1]], h[2], h[3] or { color = SEARCH_MATCH_COLOR })
