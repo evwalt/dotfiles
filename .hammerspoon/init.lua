@@ -456,6 +456,20 @@ end
 local function handyDictate()
 	hs.task.new("/Applications/Handy.app/Contents/MacOS/handy", nil, { "--toggle-transcription" }):start()
 end
+-- Browser swap: normally H-m is Firefox and H-i / H-g SPC are Chrome. Toggle Browsers (H-f d) flips
+-- them and reloads, since the hints, search and hotkeys are all built from these labels at load.
+local browsersSwapped = hs.settings.get("browsersSwapped") or false
+local M_BROWSER = browsersSwapped and "Google Chrome" or "Firefox" -- H-m
+local I_BROWSER = browsersSwapped and "Firefox" or "Google Chrome" -- H-i, H-g SPC
+if hs.settings.get("browsersJustSwapped") then
+	hs.settings.clear("browsersJustSwapped")
+	hs.alert.show("H-m: " .. M_BROWSER .. "\nH-i, H-g SPC: " .. I_BROWSER, PROMPT_STYLE)
+end
+local function toggleBrowsers()
+	hs.settings.set("browsersSwapped", not browsersSwapped)
+	hs.settings.set("browsersJustSwapped", true)
+	hs.timer.doAfter(0, hs.reload) -- let the picker's key handler return first
+end
 local function keyStroker(mods, key)
 	return function()
 		hs.eventtap.keyStroke(mods, key)
@@ -474,7 +488,7 @@ local picker1Items = {
 	{ "c", "Copy (s-c)", keyStroker({ "cmd" }, "c"), front = true },
 	{ "r", "Cmd-Shift-L (s-S-l)", keyStroker({ "cmd", "shift" }, "l"), front = true },
 	{ "l", "Notes" },
-	{ "space", "Google Chrome" },
+	{ "space", I_BROWSER },
 	{
 		"d",
 		"Screenshot Window to ~/Downloads",
@@ -514,6 +528,14 @@ local picker1Items = {
 hs.hotkey.bind(hyper, "G", actionPicker("Picker 1 (H-g)", picker1Items))
 local picker2Items = {
 	{ "f", "Finder" },
+	{
+		"d",
+		"Toggle Browsers",
+		toggleBrowsers,
+		status = function()
+			return browsersSwapped and "swapped" or "normal"
+		end,
+	},
 	{
 		"g",
 		"Toggle Grayscale",
@@ -569,7 +591,7 @@ local hyperKeys = {
 	{ "w", "(Volume Mode)" },
 	{ "s", "Activity Monitor" },
 	{ "b", "Messages" },
-	{ "m", "Firefox" },
+	{ "m", M_BROWSER },
 	{ "v", "Alacritty" },
 	{
 		"z",
@@ -578,7 +600,7 @@ local hyperKeys = {
 			commandMode()
 		end,
 	},
-	{ "i", "Google Chrome" },
+	{ "i", I_BROWSER },
 	{ "j", "zoom.us" }, -- firmware sends H-j from the thumb + Backspace position
 }
 local hyperLabels = { f = "Picker 2", g = "Picker 1" }
